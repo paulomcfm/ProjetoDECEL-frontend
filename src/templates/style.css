@@ -1,0 +1,50 @@
+.custom-dropdown {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.navbar-nav {
+    width: 100%;
+    text-align: center;
+}
+
+.navbar-nav .nav-link {
+    display: inline-block;
+    float: none;
+}
+
+.bts-custom{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;    
+}
+
+.ml-auto {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-right: 10%;
+}
+
+.bts-custom > .btn {
+    width: 250px;
+    margin: 10px;
+    font-size: 1.2rem;
+    margin-top: 20%;
+
+}
+
+.brandLogo {
+    margin-right: auto;
+    margin-left: 40px;
+    display: flex;
+    align-items: center;
+}
+
+body, div {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
