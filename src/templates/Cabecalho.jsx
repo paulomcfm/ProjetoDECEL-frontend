@@ -4,55 +4,30 @@ import { Navbar, Nav, NavDropdown, Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import './style.css';
 
-export default function Cabecalho(props){
+export default function Cabecalho(props) {
     return (
-        <Navbar bg="dark" variant="dark" expand="lg">
+        <Navbar expand="lg" variant="light" bg="light">
             <Navbar.Brand as={Link} to="/" className="brandLogo mr-auto">
-                    <img
-                        src={logo} 
-                        alt="Logo DECEL"
-                        className="img-fluid"
-                        style={{ maxHeight: '60px' }}
-                    />
-                    Transporte DECEL
-                </Navbar.Brand>
-                <Navbar.Toggle aria-controls="navbarNav" />
-            <Container >
-                <Navbar.Collapse id="navbarNav">
-                    <Nav className="ml-auto">
-                        <NavDropdown title="Veículos" id="veiculosDropdown" className="custom-dropdown">
-                            <NavDropdown.Item href="#">Cadastrar</NavDropdown.Item>
-                            <NavDropdown.Item href="#">Alterar</NavDropdown.Item>
-                            <NavDropdown.Item href="#">Excluir</NavDropdown.Item>
-                        </NavDropdown>
-                        <NavDropdown title="Alunos" id="alunosDropdown">
-                            <NavDropdown.Item as={Link} to="/alunos">Cadastrar</NavDropdown.Item>
-                            <NavDropdown.Item href="#">Alterar</NavDropdown.Item>
-                            <NavDropdown.Item href="#">Excluir</NavDropdown.Item>
-                        </NavDropdown>
-                        <NavDropdown title="Responsáveis" id="responsaveisDropdown">
-                            <NavDropdown.Item as={Link} to="/responsaveis">Cadastrar</NavDropdown.Item>
-                            <NavDropdown.Item href="#">Alterar</NavDropdown.Item>
-                            <NavDropdown.Item href="#">Excluir</NavDropdown.Item>
-                        </NavDropdown>
-                        <NavDropdown title="Escolas" id="escolasDropdown">
-                            <NavDropdown.Item as={Link} to="/escolas">Cadastrar</NavDropdown.Item>
-                            <NavDropdown.Item href="#">Alterar</NavDropdown.Item>
-                            <NavDropdown.Item href="#">Excluir</NavDropdown.Item>
-                        </NavDropdown>
-                        <NavDropdown title="Pontos de Embarque" id="pontosDropdown">
-                            <NavDropdown.Item href="#">Cadastrar</NavDropdown.Item>
-                            <NavDropdown.Item href="#">Alterar</NavDropdown.Item>
-                            <NavDropdown.Item href="#">Excluir</NavDropdown.Item>
-                        </NavDropdown>
-                        <NavDropdown title="Motoristas" id="motoristasDropdown">
-                            <NavDropdown.Item href="#">Cadastrar</NavDropdown.Item>
-                            <NavDropdown.Item href="#">Alterar</NavDropdown.Item>
-                            <NavDropdown.Item href="#">Excluir</NavDropdown.Item>
-                        </NavDropdown>
-                    </Nav>
-                </Navbar.Collapse>
-            </Container>
+                <img
+                    src={logo}
+                    alt="Logo DECEL"
+                    className="img-fluid"
+                    style={{ maxHeight: '40px' }}
+                />
+
+            </Navbar.Brand>
+            <Navbar.Toggle aria-controls="basic-navbar-nav" />
+            <Navbar.Collapse id="basic-navbar-nav">
+                <Nav className="ml-auto">
+                    <Nav.Link as={Link} to="/">Início</Nav.Link>
+                    <Nav.Link href="#">Veículos</Nav.Link>
+                    <Nav.Link as={Link} to="/alunos">Alunos</Nav.Link>
+                    <Nav.Link as={Link} to="/responsaveis">Responsáveis</Nav.Link>
+                    <Nav.Link as={Link} to="/escolas">Escolas</Nav.Link>
+                    <Nav.Link href="#">Pontos de Embarque</Nav.Link>
+                </Nav>
+            </Navbar.Collapse>
+            
         </Navbar>
     );
 }
