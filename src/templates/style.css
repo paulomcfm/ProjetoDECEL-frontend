@@ -11,13 +11,22 @@
 .navbar-nav .nav-link {
     display: inline-block;
     float: none;
+    position: relative; 
 }
 
-.bts-custom{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-around;    
+.navbar-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; 
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: transparent;
+    transition: background-color 0.3s; 
+}
+
+.navbar-nav .nav-link:hover::after {
+    background-color: #007bff;
 }
 
 .ml-auto {
@@ -26,14 +35,6 @@
     align-items: center;
     justify-content: space-between;
     margin-right: 10%;
-}
-
-.bts-custom > .btn {
-    width: 250px;
-    margin: 10px;
-    font-size: 1.2rem;
-    margin-top: 20%;
-
 }
 
 .brandLogo {
@@ -47,4 +48,23 @@ body, div {
     margin: 0;
     padding: 0;
     border: none;
+}
+
+.custom-btn {
+    border-radius: 20px;
+    font-size: 1.2rem;
+    padding: 12px 24px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.custom-btn.btn-modern {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+}
+
+.custom-btn.btn-modern:hover {
+    background-color: #0056b3;
 }
