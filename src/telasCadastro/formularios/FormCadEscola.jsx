@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Form, Button, Col, Row } from 'react-bootstrap';
+import { Form, Button, Row } from 'react-bootstrap';
 import { adicionarEscola, atualizarEscola } from '../../redux/escolaReducer';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -94,16 +94,15 @@ export default function FormCadEscolas(props) {
                         <option value='a'>Ambos</option>
                     </Form.Select>
                 </Form.Group>
-                <Row>
-                    <Col md={6} offset={5} className="d-flex justify-content-end">
-                        <Button type="submit" variant={"primary"} onClick={() => {
-                        }}>{props.modoEdicao ? "Alterar" : "Cadastrar"}</Button>
-                    </Col>
-                    <Col>
-                        <Button type="submit" variant={"danger"} onClick={() => {
-                            props.exibirFormulario(false);
-                        }}>Voltar</Button>
-                    </Col>
+                <Row className="justify-content-end">
+                    <div className="d-flex justify-content-center">
+                        <Button type="submit" variant="primary">
+                            {props.modoEdicao ? "Alterar" : "Cadastrar"}
+                        </Button>
+                        <Button type="submit" variant="danger" className="ms-2" onClick={() => props.exibirFormulario(false)}>
+                            Voltar
+                        </Button>
+                    </div>
                 </Row>
             </Form>
         </>
