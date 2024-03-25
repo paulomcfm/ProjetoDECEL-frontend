@@ -22,6 +22,7 @@ export default function FormCadAlunos(props) {
     const [termoBusca, setTermoBusca] = useState('');
     const { estadoResp, mensagemResp, responsaveis } = useSelector((state) => state.responsavel);
     const [responsaveisSelecionados, setResponsaveisSelecionados] = useState([]);
+    const [responsavelHover, setResponsavelHover] = useState(-1);
 
     const dispatch = useDispatch();
 
@@ -38,6 +39,12 @@ export default function FormCadAlunos(props) {
         if (!responsaveisSelecionados.find(r => r.codigo === responsavel.codigo)) {
             setResponsaveisSelecionados([...responsaveisSelecionados, responsavel]);
         }
+    }
+
+    function removerResponsavel(index) {
+        const novosResponsaveis = [...responsaveisSelecionados];
+        novosResponsaveis.splice(index, 1);
+        setResponsaveisSelecionados(novosResponsaveis);
     }
 
     useEffect(() => {
@@ -124,7 +131,7 @@ export default function FormCadAlunos(props) {
                         name="responsavel"
                         value={termoBusca}
                         onChange={e => setTermoBusca(e.target.value)}
-                         />
+                    />
                     <Form.Group className="mb-3">
                         {termoBusca !== '' ? (
                             responsaveisFiltrados.map((responsavel, index) => (
@@ -144,15 +151,36 @@ export default function FormCadAlunos(props) {
                     </Form.Group>
                     <Form.Group>
                         {responsaveisSelecionados.map((responsavel, index) => (
-                            <Button
-                                key={index}
-                                variant="primary"
-                                className="me-2 mb-2 mt-3"
-                            >
-                                {`${responsavel.nome} - RG: ${responsavel.rg}`}
-                            </Button>
+                            <div key={index} className="d-flex align-items-center">
+                                <Button
+                                    variant="primary"
+                                    className="me-2 mb-2 mt-3"
+                                    onClick={() => adicionarResponsavel(responsavel)}
+                                >
+                                    {`${responsavel.nome} - RG: ${responsavel.rg}`}
+                                </Button>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Parentesco"
+                                    className="mb-2 mt-3"
+                                    value={responsavel.parentesco}
+                                    onChange={(e) => {
+                                        const novosResponsaveis = [...responsaveisSelecionados];
+                                        novosResponsaveis[index].parentesco = e.target.value;
+                                        setResponsaveisSelecionados(novosResponsaveis);
+                                    }}
+                                />
+                                <Button
+                                    variant="danger"
+                                    className="mb-2 mt-3"
+                                    onClick={() => removerResponsavel(index)}
+                                >
+                                    Remover
+                                </Button>
+                            </div>
                         ))}
                     </Form.Group>
+
                 </Form.Group>
                 <Form.Group className="mb-3">
                     <Form.Label>Observações:</Form.Label>
@@ -163,7 +191,7 @@ export default function FormCadAlunos(props) {
                         name="observacoes"
                         value={aluno.observacoes}
                         onChange={manipularMudancas}
-                     />
+                    />
                 </Form.Group>
                 <Row>
                     <Col md={6} offset={5} className="d-flex justify-content-end">
