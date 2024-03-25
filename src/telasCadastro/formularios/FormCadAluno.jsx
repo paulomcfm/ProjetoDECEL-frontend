@@ -3,6 +3,7 @@ import { Form, Button, Col, Row } from 'react-bootstrap';
 import { adicionarAluno, atualizarAluno } from '../../redux/alunoReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarResponsaveis } from '../../redux/responsavelReducer';
+import { adicionarParentesco } from '../../redux/parentescoReducer';
 import { useEffect } from 'react';
 
 
@@ -22,7 +23,7 @@ export default function FormCadAlunos(props) {
     const [termoBusca, setTermoBusca] = useState('');
     const { estadoResp, mensagemResp, responsaveis } = useSelector((state) => state.responsavel);
     const [responsaveisSelecionados, setResponsaveisSelecionados] = useState([]);
-    const [responsavelHover, setResponsavelHover] = useState(-1);
+
 
     const dispatch = useDispatch();
 
@@ -35,7 +36,7 @@ export default function FormCadAlunos(props) {
         setAluno({ ...aluno, [componente.name]: componente.value });
     }
 
-    function adicionarResponsavel(responsavel) {
+    function addResponsavel(responsavel) {
         if (!responsaveisSelecionados.find(r => r.codigo === responsavel.codigo)) {
             setResponsaveisSelecionados([...responsaveisSelecionados, responsavel]);
         }
@@ -56,15 +57,28 @@ export default function FormCadAlunos(props) {
     function manipularSubmissao(e) {
         const form = e.currentTarget;
         if (form.checkValidity()) {
-            const alunoComResponsaveis = { ...aluno, responsaveis: responsaveisSelecionados };
             if (!props.modoEdicao) {
-                dispatch(adicionarAluno(alunoComResponsaveis));
-                props.setMensagem('Aluno incluído com sucesso');
-                props.setTipoMensagem('success');
-                props.setMostrarMensagem(true);
+                dispatch(adicionarAluno(aluno)).then((retorno) => {
+                    if (retorno.payload.status) {
+                        props.setMensagem('Aluno incluído com sucesso!');
+                        props.setTipoMensagem('success');
+                        props.setMostrarMensagem(true);
+                        responsaveisSelecionados.forEach(responsavel => {
+                            dispatch(adicionarParentesco({
+                                codigoAluno: retorno.payload.aluno.codigoGerado,
+                                codigoResponsavel: responsavel.codigo,
+                                parentesco: responsavel.parentesco
+                            }));
+                        });
+                    }else{
+                        props.setMensagem('Aluno não incluído!');
+                        props.setTipoMensagem('danger');
+                        props.setMostrarMensagem(true);
+                    }
+                });
             }
             else {
-                dispatch(atualizarAluno(alunoComResponsaveis));
+                dispatch(atualizarAluno(aluno));
                 props.setMensagem('Aluno alterado com sucesso');
                 props.setTipoMensagem('success');
                 props.setMostrarMensagem(true);
@@ -141,7 +155,7 @@ export default function FormCadAlunos(props) {
                                     className="me-2 mb-2 mt-3"
                                     onClick={() => {
                                         setTermoBusca('');
-                                        adicionarResponsavel(responsavel);
+                                        addResponsavel(responsavel);
                                     }}
                                 >
                                     {`${responsavel.nome} - RG: ${responsavel.rg}`}
@@ -155,7 +169,7 @@ export default function FormCadAlunos(props) {
                                 <Button
                                     variant="primary"
                                     className="me-2 mb-2 mt-3"
-                                    onClick={() => adicionarResponsavel(responsavel)}
+                                    onClick={() => addResponsavel(responsavel)}
                                 >
                                     {`${responsavel.nome} - RG: ${responsavel.rg}`}
                                 </Button>
@@ -166,7 +180,10 @@ export default function FormCadAlunos(props) {
                                     value={responsavel.parentesco}
                                     onChange={(e) => {
                                         const novosResponsaveis = [...responsaveisSelecionados];
-                                        novosResponsaveis[index].parentesco = e.target.value;
+                                        novosResponsaveis[index] = {
+                                            ...responsavel,
+                                            parentesco: e.target.value
+                                        };
                                         setResponsaveisSelecionados(novosResponsaveis);
                                     }}
                                 />
