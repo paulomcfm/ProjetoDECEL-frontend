@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ESTADO from '../recursos/estado';
-const urlBase = 'http://localhost:4000/responsavel';
+const urlBase = 'https://projetodecel-backend.onrender.com/responsavel';
 
 export const buscarResponsaveis = createAsyncThunk('responsavel/buscar', async () => {
     try {

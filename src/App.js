@@ -3,6 +3,7 @@ import TelaCadastroEscola from './telasCadastro/telaCadastroEscola.jsx';
 import TelaCadastroResponsavel from './telasCadastro/telaCadastroResponsavel.jsx';
 import TelaCadastroAluno from './telasCadastro/telaCadastroAluno.jsx';
 import TelaCadastroPontoEmbarque from './telasCadastro/telaCadastroPontoEmbarque.jsx';
+import TelaMotorista from './telasCadastro/telaMotorista.jsx';
 import Tela404 from './telasCadastro/Tela404.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import TelaMenu from './telasCadastro/TelaMenu.jsx'
@@ -16,6 +17,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path='/pontos-embarque' element={<TelaCadastroPontoEmbarque />} />
+            <Route path='/motorista' element={<TelaMotorista />} />
             <Route path='/alunos' element={<TelaCadastroAluno />} />
             <Route path='/responsaveis' element={<TelaCadastroResponsavel />} />
             <Route path='/escolas' element={<TelaCadastroEscola />} />
