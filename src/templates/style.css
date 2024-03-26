@@ -24,16 +24,16 @@
     transition: background-color 0.3s;
 }
 
-.navbar-nav .nav-link.active::after { /* Adicionado para exibir a linha apenas na aba selecionada */
-    background-color: #007bff; /* Cor da linha na aba selecionada */
+.navbar-nav .nav-link.active::after {
+    background-color: #007bff;
 }
 
 .navbar-nav .nav-link:hover::after {
-    background-color: rgba(0, 123, 255, 0.1); /* Cor da linha ao passar o mouse */
+    background-color: rgba(0, 123, 255, 0.1); 
 }
 
 .custom-navbar {
-    background-color: #3b4b5a94; /* Cor de fundo personalizada */
+    background-color: #3b4b5a94;
 }
 
 .ml-auto {
