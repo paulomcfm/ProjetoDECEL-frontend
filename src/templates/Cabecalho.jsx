@@ -23,7 +23,7 @@ export default function Cabecalho(props) {
                     <NavLink to="/alunos" className="nav-link">Alunos</NavLink>
                     <NavLink to="/responsaveis" className="nav-link">Responsáveis</NavLink>
                     <NavLink to="/escolas" className="nav-link">Escolas</NavLink>
-                    <Nav.Link href="#">Pontos de Embarque</Nav.Link>
+                    <NavLink to="/pontos-embarque" className="nav-link">Pontos de Embarque</NavLink>
                     <Nav.Link href="#">Motoristas</Nav.Link>
                 </Nav>
             </Navbar.Collapse>
