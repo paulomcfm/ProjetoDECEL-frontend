@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ESTADO from '../recursos/estado';
-const urlBase = 'http://localhost:4000/parentesco';
+const urlBase = 'https://projetodecel-backend.onrender.com/parentesco';
 
 export const buscarParentescos = createAsyncThunk('parentesco/buscar', async () => {
     try {
