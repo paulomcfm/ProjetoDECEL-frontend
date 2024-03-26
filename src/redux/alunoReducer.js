@@ -44,8 +44,6 @@ export const adicionarAluno = createAsyncThunk('aluno/adicionar', async (aluno) 
     });
     if (resposta.ok) {
         const dados = await resposta.json();
-        console.log(dados);
-        console.log(aluno);
         return {
             status: dados.status,
             mensagem: dados.mensagem,
@@ -85,7 +83,13 @@ export const atualizarAluno = createAsyncThunk('aluno/atualizar', async (aluno) 
         return {
             status: dados.status,
             mensagem: dados.mensagem,
-            aluno
+            aluno: {
+                codigoGerado: dados.codigoGerado,
+                nome: aluno.nome,
+                rg: aluno.rg,
+                dataNasc: aluno.dataNasc,
+                observacoes: aluno.observacoes
+            }
         }
     }
     else {

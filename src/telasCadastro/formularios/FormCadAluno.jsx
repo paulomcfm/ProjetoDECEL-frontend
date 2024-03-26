@@ -3,7 +3,7 @@ import { Form, Button, Col, Row } from 'react-bootstrap';
 import { adicionarAluno, atualizarAluno } from '../../redux/alunoReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarResponsaveis } from '../../redux/responsavelReducer';
-import { adicionarParentesco } from '../../redux/parentescoReducer';
+import { adicionarParentesco, atualizarParentesco, removerParentesco } from '../../redux/parentescoReducer';
 import { useEffect } from 'react';
 
 
@@ -13,7 +13,8 @@ export default function FormCadAlunos(props) {
         nome: '',
         rg: '',
         observacoes: '',
-        dataNasc: ''
+        dataNasc: '',
+        responsaveis: []
     }
 
     const estadoInicialAluno = props.alunoParaEdicao;
@@ -23,18 +24,53 @@ export default function FormCadAlunos(props) {
     const [termoBusca, setTermoBusca] = useState('');
     const { estadoResp, mensagemResp, responsaveis } = useSelector((state) => state.responsavel);
     const [responsaveisSelecionados, setResponsaveisSelecionados] = useState([]);
-
+    const [responsaveisAntes, setResponsaveisAntes] = useState([]);
 
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (termoBusca.trim() !== '') {
+            dispatch(buscarResponsaveis());
+        }
+    }, [dispatch, termoBusca]);
+
+    useEffect(() => {
+        dispatch(buscarResponsaveis());
+    }, []);
+
+    useEffect(() => {
+        if (props.alunoParaEdicao.responsaveis.length > 0) {
+            const responsaveisSelecionados = props.alunoParaEdicao.responsaveis.map(responsavel => {
+                const responsavelCompleto = responsaveis.find(r => r.codigo === responsavel.codigoResponsavel);
+                if (responsavelCompleto) {
+                    return {
+                        ...responsavelCompleto,
+                        parentesco: responsavel.parentesco
+                    };
+                }
+                return null;
+            }).filter(responsavel => responsavel !== null);
+
+            setResponsaveisSelecionados(responsaveisSelecionados);
+            setResponsaveisAntes(responsaveisSelecionados);
+        }
+
+    }, [responsaveis]);
 
     const responsaveisFiltrados = responsaveis.filter(responsavel =>
         responsavel.nome.toLowerCase().includes(termoBusca.toLowerCase())
     );
 
+    function formatDate(s) {
+        var b = s.split(/\D/);
+        return `${b[0]}-${(b[1].length === 1 ? '0' : '') + b[1]}-${(b[2].length === 1 ? '0' : '') + b[2]}`;
+    }
+
     function manipularMudancas(e) {
         const componente = e.currentTarget;
         setAluno({ ...aluno, [componente.name]: componente.value });
     }
+
 
     function addResponsavel(responsavel) {
         if (!responsaveisSelecionados.find(r => r.codigo === responsavel.codigo)) {
@@ -48,11 +84,6 @@ export default function FormCadAlunos(props) {
         setResponsaveisSelecionados(novosResponsaveis);
     }
 
-    useEffect(() => {
-        if (termoBusca.trim() !== '') {
-            dispatch(buscarResponsaveis());
-        }
-    }, [dispatch, termoBusca]);
 
     function manipularSubmissao(e) {
         const form = e.currentTarget;
@@ -70,7 +101,7 @@ export default function FormCadAlunos(props) {
                                 parentesco: responsavel.parentesco
                             }));
                         });
-                    }else{
+                    } else {
                         props.setMensagem('Aluno não incluído!');
                         props.setTipoMensagem('danger');
                         props.setMostrarMensagem(true);
@@ -78,12 +109,48 @@ export default function FormCadAlunos(props) {
                 });
             }
             else {
-                dispatch(atualizarAluno(aluno));
-                props.setMensagem('Aluno alterado com sucesso');
-                props.setTipoMensagem('success');
-                props.setMostrarMensagem(true);
-                props.setModoEdicao(false);
-                props.setAlunoParaEdicao(alunoVazio);
+                dispatch(atualizarAluno(aluno)).then((retorno) => {
+                    if (retorno.payload.status) {
+                        props.setMensagem('Aluno alterado com sucesso');
+                        props.setTipoMensagem('success');
+                        props.setMostrarMensagem(true);
+                        props.setModoEdicao(false);
+                        props.setAlunoParaEdicao(alunoVazio);
+                        responsaveisSelecionados.forEach(responsavel => {
+                            if (!responsaveisAntes.find(r => r.codigo === responsavel.codigo)) {
+                                dispatch(adicionarParentesco({
+                                    codigoAluno: retorno.payload.aluno.codigoGerado,
+                                    codigoResponsavel: responsavel.codigo,
+                                    parentesco: responsavel.parentesco
+                                }));
+                            }
+                        });
+
+                        responsaveisSelecionados.forEach(responsavel => {
+                            if (responsaveisAntes.find(r => r.codigo === responsavel.codigo)) {
+                                dispatch(atualizarParentesco({
+                                    codigoAluno: retorno.payload.aluno.codigoGerado,
+                                    codigoResponsavel: responsavel.codigo,
+                                    parentesco: responsavel.parentesco
+                                }));
+                            }
+                        });
+
+                        responsaveisAntes.forEach(responsavel => {
+                            if (!responsaveisSelecionados.find(r => r.codigo === responsavel.codigo)) {
+                                dispatch(removerParentesco({
+                                    codigoAluno: retorno.payload.aluno.codigoGerado,
+                                    codigoResponsavel: responsavel.codigo,
+                                    parentesco: responsavel.parentesco
+                                }));
+                            }
+                        });
+                    } else {
+                        props.setMensagem('Aluno não alterado!');
+                        props.setTipoMensagem('danger');
+                        props.setMostrarMensagem(true);
+                    }
+                });
             }
             setAluno(alunoVazio);
             setFormValidado(false);
@@ -103,10 +170,10 @@ export default function FormCadAlunos(props) {
 
             <Form noValidate validated={formValidado} onSubmit={manipularSubmissao} id='formAluno'>
                 <Form.Group className="mb-3">
-                    <Form.Label>Nome:</Form.Label>
+                    <Form.Label>Nome completo(*):</Form.Label>
                     <Form.Control
                         type="text"
-                        placeholder="Nome"
+                        placeholder="Nome completo"
                         id="nome"
                         name="nome"
                         value={aluno.nome}
@@ -115,27 +182,37 @@ export default function FormCadAlunos(props) {
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>RG:</Form.Label>
+                    <Form.Label>RG(*):</Form.Label>
                     <Form.Control
                         type="text"
-                        placeholder="RG"
+                        placeholder="XX.XXX.XXX-X"
                         id="rg"
                         name="rg"
                         value={aluno.rg}
                         onChange={manipularMudancas}
-                        required />
+                        required
+                        pattern="\d{2}\.\d{3}\.\d{3}-[\dxX]"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                        O RG deve estar no formato XX.XXX.XXX-X.
+                    </Form.Control.Feedback>
                 </Form.Group>
 
-                <Form.Group className="mb-3">
-                    <Form.Label>Data de Nascimento:</Form.Label>
-                    <Form.Control
-                        type="date"
-                        id="dataNasc"
-                        name="dataNasc"
-                        value={aluno.dataNasc}
-                        onChange={manipularMudancas}
-                        required />
-                </Form.Group>
+                <Row>
+                    <Col md={2}>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Data de Nascimento(*):</Form.Label>
+                            <Form.Control
+                                type="date"
+                                id="dataNasc"
+                                name="dataNasc"
+                                value={aluno.dataNasc ? formatDate(aluno.dataNasc) : ''}
+                                onChange={manipularMudancas}
+                                required
+                            />
+                        </Form.Group>
+                    </Col>
+                </Row>
                 <Form.Group className="mb-3">
                     <Form.Label>Responsável:</Form.Label>
                     <Form.Control
@@ -175,7 +252,7 @@ export default function FormCadAlunos(props) {
                                 </Button>
                                 <Form.Control
                                     type="text"
-                                    placeholder="Parentesco"
+                                    placeholder="Parentesco do responsável"
                                     className="mb-2 mt-3"
                                     value={responsavel.parentesco}
                                     onChange={(e) => {
@@ -186,6 +263,7 @@ export default function FormCadAlunos(props) {
                                         };
                                         setResponsaveisSelecionados(novosResponsaveis);
                                     }}
+                                    required
                                 />
                                 <Button
                                     variant="danger"
@@ -203,13 +281,14 @@ export default function FormCadAlunos(props) {
                     <Form.Label>Observações:</Form.Label>
                     <Form.Control
                         type="text"
-                        placeholder="Observações"
+                        placeholder="Observações do aluno"
                         id="observacoes"
                         name="observacoes"
                         value={aluno.observacoes}
                         onChange={manipularMudancas}
                     />
                 </Form.Group>
+                <p>(*) Campos obrigatórios</p>
                 <Row>
                     <Col md={6} offset={5} className="d-flex justify-content-end">
                         <Button type="submit" variant={"primary"} onClick={() => {
@@ -218,6 +297,7 @@ export default function FormCadAlunos(props) {
                     <Col>
                         <Button type="submit" variant={"danger"} onClick={() => {
                             props.exibirFormulario(false);
+                            props.setModoEdicao(false);
                         }}>Voltar</Button>
                     </Col>
                 </Row>
