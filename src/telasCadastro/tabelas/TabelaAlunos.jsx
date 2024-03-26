@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import { Button, Container, Table } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarAlunos, removerAluno } from '../../redux/alunoReducer';
+import { buscarParentescosAluno } from '../../redux/parentescoReducer';
+import { buscarResponsaveis } from '../../redux/responsavelReducer';
 import { useEffect } from 'react';
 import { format } from 'date-fns';
 
 export default function TabelaAlunos(props) {
     const [termoBusca, setTermoBusca] = useState('');
     const { estado, mensagem, alunos } = useSelector(state => state.aluno);
+    const { estadoPar, mensagemPar, parentescos } = useSelector(state => state.parentesco);
+    const { estadoResp, mensagemResp, responsaveis } = useSelector(state => state.responsavel);
     const dispatch = useDispatch();
 
     const alunoVazio = {
@@ -15,7 +19,8 @@ export default function TabelaAlunos(props) {
         nome: '',
         rg: '',
         observacoes: '',
-        dataNasc: ''
+        dataNasc: '',
+        responsaveis: []
     };
 
     function excluirAluno(aluno) {
@@ -25,9 +30,22 @@ export default function TabelaAlunos(props) {
     }
 
     function editarAluno(aluno) {
-        props.setAlunoParaEdicao(aluno);
-        props.setModoEdicao(true);
-        props.exibirFormulario(true);
+        dispatch(buscarParentescosAluno(aluno.codigo)).then((retorno) => {
+            if (retorno.payload.status) {
+                const parentescos = retorno.payload.listaParentescos;
+                const responsaveis = parentescos.map(parentesco => ({
+                    codigoResponsavel: parentesco.codigoResponsavel,
+                    parentesco: parentesco.parentesco
+                }));
+                const alunoComResponsaveis = {
+                    ...aluno,
+                    responsaveis: responsaveis
+                };
+                props.setAlunoParaEdicao(alunoComResponsaveis);
+                props.setModoEdicao(true);
+                props.exibirFormulario(true);
+            }
+        });
     }
 
     useEffect(() => {
@@ -71,7 +89,6 @@ export default function TabelaAlunos(props) {
             <Table striped bordered hover>
                 <thead>
                     <tr>
-                        <th>Código</th>
                         <th>Nome</th>
                         <th>RG</th>
                         <th>Data de Nascimento</th>
@@ -82,7 +99,6 @@ export default function TabelaAlunos(props) {
                 <tbody>
                     {alunosFiltrados.map(aluno => (
                         <tr key={aluno.codigo}>
-                            <td>{aluno.codigo}</td>
                             <td>{aluno.nome}</td>
                             <td>{aluno.rg}</td>
                             <td>{format(new Date(aluno.dataNasc), 'dd/MM/yyyy')}</td>

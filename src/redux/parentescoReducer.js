@@ -29,6 +29,33 @@ export const buscarParentescos = createAsyncThunk('parentesco/buscar', async () 
     }
 });
 
+export const buscarParentescosAluno = createAsyncThunk('parentesco/buscar', async (codigoAluno) => {
+    try {
+        const resposta = await fetch(urlBase+"/aluno/"+codigoAluno, { method: 'GET' });
+        const dados = await resposta.json();
+        if (dados.status) {
+            return {
+                status: true,
+                listaParentescos: dados.listaParentescos,
+                mensagem: ''
+            }
+        }
+        else {
+            return {
+                status: false,
+                listaParentescos: [],
+                mensagem: 'Ocorreu um erro ao recuperar os parentescos da base de dados.'
+            }
+        }
+    } catch (erro) {
+        return {
+            status: false,
+            listaParentescos: [],
+            mensagem: 'Ocorreu um erro ao recuperar os parentescos da base de dados:' + erro.message
+        }
+    }
+});
+
 export const adicionarParentesco = createAsyncThunk('parentesco/adicionar', async (parentesco) => {
     const resposta = await fetch(urlBase, {
         method: 'POST',
@@ -44,8 +71,6 @@ export const adicionarParentesco = createAsyncThunk('parentesco/adicionar', asyn
     });
     if (resposta.ok) {
         const dados = await resposta.json();
-        console.log(dados);
-        console.log(parentesco);
         return {
             status: dados.status,
             mensagem: dados.mensagem,
