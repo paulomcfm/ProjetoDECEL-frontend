@@ -57,7 +57,7 @@ export default function FormCadEscolas(props) {
 
             <Form noValidate validated={formValidado} onSubmit={manipularSubmissao}>
                 <Form.Group className="mb-3">
-                    <Form.Label>Nome:</Form.Label>
+                    <Form.Label>Nome(*):</Form.Label>
                     <Form.Control
                         type="text"
                         placeholder="Nome"
@@ -69,7 +69,7 @@ export default function FormCadEscolas(props) {
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>Endereço:</Form.Label>
+                    <Form.Label>Endereço(*):</Form.Label>
                     <Form.Control
                         type="text"
                         placeholder="Endereço"
@@ -81,7 +81,7 @@ export default function FormCadEscolas(props) {
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>Selecione o tipo de escola:</Form.Label>
+                    <Form.Label>Selecione o tipo de escola(*):</Form.Label>
                     <Form.Select aria-label="Selecione..."
                         id='tipo'
                         name='tipo'
@@ -94,6 +94,7 @@ export default function FormCadEscolas(props) {
                         <option value='a'>Ambos</option>
                     </Form.Select>
                 </Form.Group>
+                <p>(*) Campos obrigatórios</p>
                 <Row className="justify-content-end">
                     <div className="d-flex justify-content-center">
                         <Button type="submit" variant="primary">

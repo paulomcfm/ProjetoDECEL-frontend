@@ -55,7 +55,7 @@ export default function FormCadPontosEmbarque(props) {
 
             <Form noValidate validated={formValidado} onSubmit={manipularSubmissao}>
                 <Form.Group className="mb-3">
-                    <Form.Label>Endereço:</Form.Label>
+                    <Form.Label>Endereço(*):</Form.Label>
                     <Form.Control
                         type="text"
                         placeholder="Endereço"
@@ -65,7 +65,7 @@ export default function FormCadPontosEmbarque(props) {
                         onChange={manipularMudancas}
                         required />
                 </Form.Group>
-
+                <p>(*) Campos obrigatórios</p>
                 <Row className="justify-content-end">
                     <div className="d-flex justify-content-center">
                         <Button type="submit" variant="primary">
