@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { Button, Container, Table } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarResponsaveis, removerResponsavel } from '../../redux/responsavelReducer';
+import { buscarParentescosResponsavel } from '../../redux/parentescoReducer';
 import { useEffect } from 'react';
 
 export default function TabelaResponsaveis(props) {
     const [termoBusca, setTermoBusca] = useState('');
     const { estado, mensagem, responsaveis } = useSelector(state => state.responsavel);
+    const {estadoPar, mensagemPar, parentescos} = useSelector(state => state.parentesco);
+    const {estadoResp, mensagemResp, alunos} = useSelector(state => state.aluno);
     const dispatch = useDispatch();
 
     const responsavelVazio = {
@@ -16,7 +19,8 @@ export default function TabelaResponsaveis(props) {
         cpf: '',
         email: '',
         telefone: '',
-        celular: '' //aluno se precisar
+        celular: '',
+        alunos: []
     };
 
     function excluirResponsavel(responsavel) {
@@ -26,9 +30,22 @@ export default function TabelaResponsaveis(props) {
     }
 
     function editarResponsavel(responsavel) {
-        props.setResponsavelParaEdicao(responsavel);
-        props.setModoEdicao(true);
-        props.exibirFormulario(true);
+        dispatch(buscarParentescosResponsavel(responsavel.codigo)).then((retorno) =>{
+            if(retorno.payload.status){
+                const parentesco = retorno.payload.listaParentescos;
+                const alunos = parentesco.map(parentesco => ({
+                    codigoAluno: parentesco.codigoAluno,
+                    parentesco: parentesco.parentesco
+                }));
+                const responsavelComAlunos = {
+                    ...responsavel,
+                    alunos: alunos
+                };
+                props.setResponsavelParaEdicao(responsavelComAlunos);
+                props.setModoEdicao(true);
+                props.exibirFormulario(true);
+            }
+        });
     }
 
     useEffect(() => {

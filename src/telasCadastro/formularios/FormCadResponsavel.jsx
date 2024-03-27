@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { Form, Button, Col, Row } from 'react-bootstrap';
 import { adicionarResponsavel, atualizarResponsavel } from '../../redux/responsavelReducer';
 import { useSelector, useDispatch } from 'react-redux';
-import { adicionarParentesco } from '../../redux/parentescoReducer';
+import { adicionarParentesco, atualizarParentesco, removerParentesco } from '../../redux/parentescoReducer';
 import { buscarAlunos } from '../../redux/alunoReducer';
+import InputMask from 'react-input-mask';
 
 export default function FormCadResponsavel(props) {
     const responsavelVazio = {
@@ -12,7 +13,8 @@ export default function FormCadResponsavel(props) {
         cpf: '',
         email: '',
         telefone: '',
-        celular: ''
+        celular: '',
+        alunos: []
     };
 
     const estadoInicialResponsavel = props.responsavelParaEdicao;
@@ -22,8 +24,37 @@ export default function FormCadResponsavel(props) {
     const [termoBusca, setTermoBusca] = useState('');
     const { estadoAlu, mensagemAlu, alunos } = useSelector((state) => state.aluno);
     const [alunosSelecionados, setAlunosSelecionados] = useState([]);
+    const [alunosAntes, setAlunosAntes] = useState([]);
 
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (termoBusca.trim() !== '') {
+            dispatch(buscarAlunos());
+        }
+    }, [dispatch, termoBusca]);
+
+    useEffect(() =>{
+        dispatch(buscarAlunos());
+    }, []);
+
+    useEffect(()=>{
+        if(props.responsavelParaEdicao.alunos.length > 0){
+            const alunosSelecionados = props.responsavelParaEdicao.alunos.map(aluno =>{
+                const alunoCompleto = alunos.find(a => a.codigo === aluno.codigoAluno);
+                if(alunoCompleto){
+                    return{
+                        ...alunoCompleto,
+                        parentesco: aluno.parentesco
+                    };
+                }
+                return null;
+            }).filter(aluno => aluno !== null);
+
+            setAlunosSelecionados(alunosSelecionados);
+            setAlunosAntes(alunosSelecionados);
+        }
+    }, [alunos])
 
     const alunosFiltrados = alunos.filter(aluno =>
         aluno.nome.toLowerCase().includes(termoBusca.toLowerCase())
@@ -45,12 +76,6 @@ export default function FormCadResponsavel(props) {
         novosAlunos.splice(index, 1);
         setAlunosSelecionados(novosAlunos);
     }
-
-    useEffect(() => {
-        if (termoBusca.trim() !== '') {
-            dispatch(buscarAlunos());
-        }
-    }, [dispatch, termoBusca]);
 
     function manipularSubmissao(e) {
         const form = e.currentTarget;
@@ -75,13 +100,51 @@ export default function FormCadResponsavel(props) {
                     }
                 });
             }
-            else {
-                dispatch(atualizarResponsavel(responsavel));
-                props.setMensagem('Responsável alterado com sucesso');
-                props.setTipoMensagem('success');
-                props.setMostrarMensagem(true);
-                props.setModoEdicao(false);
-                props.setResponsavelParaEdicao(responsavelVazio);
+            else
+            {
+                dispatch(atualizarResponsavel(responsavel)).then((retorno) => {
+                    if(retorno.payload.status){
+                        props.setMensagem('Responsável alterado com sucesso');
+                        props.setTipoMensagem('success');
+                        props.setMostrarMensagem(true);
+                        props.setModoEdicao(false);
+                        props.setResponsavelParaEdicao(responsavelVazio);
+                        alunosSelecionados.forEach(aluno => {
+                            if(!alunosAntes.find(a => a.codigo === aluno.codigo)){
+                                dispatch(adicionarParentesco({
+                                    codigoResponsavel: retorno.payload.responsavel.codigoGerado,
+                                    codigoAluno: aluno.codigo,
+                                    parentesco: aluno.parentesco
+                                }));
+                            }
+                        });
+
+                        alunosSelecionados.forEach(aluno => {
+                            if(!alunosAntes.find(a => a.codigo === aluno.codigo)){
+                                dispatch(atualizarParentesco({
+                                    codigoResponsavel: retorno.payload.responsavel.codigoGerado,
+                                    codigoAluno: aluno.codigo,
+                                    parentesco: aluno.parentesco
+                                }));
+                            }
+                        });
+
+                        alunosAntes.forEach(aluno => {
+                            if(!alunosSelecionados.find(a => a.codigo === aluno.codigo)){
+                                dispatch(removerParentesco({
+                                    codigoResponsavel: retorno.payload.responsavel.codigoGerado,
+                                    codigoAluno: aluno.codigo,
+                                    parentesco: aluno.parentesco
+                                }));
+                            }
+                        });
+                    }
+                    else{
+                        props.setMensagem('Responsável não alterado!');
+                        props.setTipoMensagem('danger');
+                        props.setMostrarMensagem(true);
+                    }
+                });
             }
             setResponsavel(responsavelVazio);
             setFormValidado(false);
@@ -100,7 +163,7 @@ export default function FormCadResponsavel(props) {
 
             <Form noValidate validated={formValidado} onSubmit={manipularSubmissao} id='formResponsavel'>
                 <Form.Group className="mb-3">
-                    <Form.Label>Nome:</Form.Label>
+                    <Form.Label>Nome completo(*):</Form.Label>
                     <Form.Control
                         type="text"
                         placeholder="Nome"
@@ -113,68 +176,87 @@ export default function FormCadResponsavel(props) {
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>RG:</Form.Label>
-                    <Form.Control
-                        type="text"
-                        placeholder="RG"
+                    <Form.Label>RG(*):</Form.Label>
+                    <InputMask
+                        mask="99.999.999-9" // Máscara para o RG
+                        maskChar="_"
+                        placeholder="XX.XXX.XXX-X"
                         id="rg"
                         name="rg"
                         value={responsavel.rg}
                         onChange={manipularMudancas}
                         required
                     />
+                    <Form.Control.Feedback type="invalid">
+                        RG inválido.
+                    </Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>CPF:</Form.Label>
-                    <Form.Control
-                        type="text"
-                        placeholder="CPF"
+                    <Form.Label>CPF(*):</Form.Label>
+                    <InputMask
+                        mask="999.999.999-99" // Máscara para o CPF
+                        maskChar="_"
+                        placeholder="XXX.XXX.XXX-XX"
                         id="cpf"
                         name="cpf"
                         value={responsavel.cpf}
                         onChange={manipularMudancas}
                         required
                     />
+                    <Form.Control.Feedback type="invalid">
+                        CPF inválido.
+                    </Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>E-mail:</Form.Label>
+                    <Form.Label>E-mail(*):</Form.Label>
                     <Form.Control
                         type="email"
-                        placeholder="E-mail"
+                        placeholder="abc123@email.com"
                         id="email"
                         name="email"
                         value={responsavel.email}
                         onChange={manipularMudancas}
                         required
+                        pattern="/\S+@\S+\.\S+/"
                     />
+                    <Form.Control.Feedback type="invalid">
+                        CPF inválido.
+                    </Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mb-3">
                     <Form.Label>Telefone:</Form.Label>
-                    <Form.Control
-                        type="text"
-                        placeholder="Telefone"
+                    <InputMask
+                        mask="(99) 9999-9999" // Máscara para o telefone
+                        maskChar="_"
+                        placeholder="(99) 9999-9999"
                         id="telefone"
                         name="telefone"
                         value={responsavel.telefone}
                         onChange={manipularMudancas}
-                        required
                     />
+                    <Form.Control.Feedback type="invalid">
+                        Telefone inválido.
+                    </Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>Celular:</Form.Label>
-                    <Form.Control
-                        type="text"
-                        placeholder="Celular"
+                    <Form.Label>Celular(*):</Form.Label>
+                    <InputMask
+                        mask="(99) 99999-9999" // Máscara para o telefone
+                        maskChar="_"
+                        placeholder="(99) 99999-9999"
                         id="celular"
                         name="celular"
                         value={responsavel.celular}
                         onChange={manipularMudancas}
                         required
                     />
+                    <Form.Control.Feedback type="invalid">
+                        Celular inválido.
+                    </Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mb-3">
@@ -216,7 +298,7 @@ export default function FormCadResponsavel(props) {
                                 </Button>
                                 <Form.Control
                                     type="text"
-                                    placeholder="Parentesco"
+                                    placeholder="Parentesco do aluno"
                                     className="mb-2 mt-3"
                                     value={aluno.parentesco}
                                     onChange={(e) => {
@@ -227,6 +309,7 @@ export default function FormCadResponsavel(props) {
                                         };
                                         setAlunosSelecionados(novosAlunos);
                                     }}
+                                    required
                                 />
                                 <Button
                                     variant="danger"
@@ -240,7 +323,7 @@ export default function FormCadResponsavel(props) {
                     </Form.Group>
 
                 </Form.Group>
-
+                <p>(*) Campos obrigatórios</p>
                 <Row>
                     <Col md={6} offset={5} className="d-flex justify-content-end">
                         <Button type="submit" variant={"primary"} onClick={() => {
