@@ -16,7 +16,8 @@ export default function TelaCadastroResponsavel(props) {
         cpf: '',
         email: '',
         telefone: '',
-        celular: '' //aluno se precisar
+        celular: '',
+        alunos: []
     });
     const [modoEdicao, setModoEdicao] = useState(false);
 
