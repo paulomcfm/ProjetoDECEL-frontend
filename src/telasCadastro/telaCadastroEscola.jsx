@@ -12,8 +12,14 @@ export default function TelaCadastroEscola(props) {
     const [tipoMensagem, setTipoMensagem] = useState("");
     const [escolaParaEdicao, setEscolaParaEdicao] = useState({
         nome: '',
-        endereco: '',
         tipo: '',
+        rua: '',
+        numero: '',
+        cidade: '',
+        bairro: '',
+        cep: '',
+        email:'',
+        telefone: ''
     });
     const [modoEdicao, setModoEdicao] = useState(false);
 

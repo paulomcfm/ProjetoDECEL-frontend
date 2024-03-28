@@ -12,8 +12,14 @@ export default function TabelaEscolas(props) {
     const escolaVazia = {
         codigo: '0',
         nome: '',
-        endereco: '',
-        tipo: ''
+        tipo: '',
+        rua: '',
+        numero: '',
+        cidade: '',
+        bairro: '',
+        cep: '',
+        email:'',
+        telefone: ''
     };
 
     function excluirEscola(escola) {
@@ -44,6 +50,7 @@ export default function TabelaEscolas(props) {
                 style={{ width: '142px' }}
                 onClick={() => {
                     props.setEscolaParaEdicao(escolaVazia);
+                    props.setModoEdicao(false);
                     props.exibirFormulario(true);
                 }}
             >
@@ -69,19 +76,21 @@ export default function TabelaEscolas(props) {
             <Table striped bordered hover>
                 <thead>
                     <tr>
-                        <th>Código</th>
                         <th>Nome</th>
                         <th>Endereço</th>
+                        <th>CEP</th>
                         <th>Tipo</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     {escolasFiltradas.map(escola => (
                         <tr key={escola.codigo}>
-                            <td>{escola.codigo}</td>
                             <td>{escola.nome}</td>
-                            <td>{escola.endereco}</td>
+                            <td>{escola.rua}, {escola.numero}, {escola.bairro}, {escola.cidade}</td>
+                            <td>{escola.cep}</td>                
                             <td>
                                 {escola.tipo === 'i'
                                     ? 'Educação Infantil'
@@ -91,6 +100,8 @@ export default function TabelaEscolas(props) {
                                             ? 'Educação Infantil e Ensino Fundamental'
                                             : ''}
                             </td>
+                            <td>{escola.email}</td>
+                            <td>{escola.telefone}</td>
                             <td>
                                 <Button variant="danger" onClick={() => {
                                     excluirEscola(escola);

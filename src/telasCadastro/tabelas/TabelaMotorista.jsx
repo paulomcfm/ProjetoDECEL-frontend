@@ -35,7 +35,7 @@
                         transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
                         width: '750px',
                     }} type="text" placeholder="Pesquisar" className="mr-sm-2" onChange={pesquisa}/>
-            <table className="table table-bordered" style={{marginTop:'20px'}}>
+            <table className="table table-bordered table-striped table-hover" style={{marginTop:'20px'}}>
               <thead>
                 <tr>
                   <th scope="col">Nome</th>
