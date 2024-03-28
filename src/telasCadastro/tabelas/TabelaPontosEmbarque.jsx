@@ -69,6 +69,7 @@ export default function TabelaPontosEmbarque(props) {
                     <tr>
                         <th>Código</th>
                         <th>Endereço</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
