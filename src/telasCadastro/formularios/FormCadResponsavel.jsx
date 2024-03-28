@@ -5,6 +5,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { adicionarParentesco, atualizarParentesco, removerParentesco } from '../../redux/parentescoReducer';
 import { buscarAlunos } from '../../redux/alunoReducer';
 import InputMask from 'react-input-mask';
+import validarCelular from '../../validacoes/validarCelular';
+import validarTelefone from '../../validacoes/validarTelefone';
+import validarCPF from '../../validacoes/validarCpf';
+import validarRG from '../../validacoes/validarRG';
 
 export default function FormCadResponsavel(props) {
     const responsavelVazio = {
@@ -79,77 +83,86 @@ export default function FormCadResponsavel(props) {
 
     function manipularSubmissao(e) {
         const form = e.currentTarget;
-        if (form.checkValidity()) {
+        let telefoneValido = true;
+        // Verifica se o campo de telefone não está vazio antes de validar
+        if (responsavel.telefone.trim() !== ''){
+            telefoneValido = validarTelefone(responsavel.telefone); // Verifica se o telefone é válido
+        }
+        console.log(validarCelular(responsavel.celular), validarRG(responsavel.rg), validarCPF(responsavel.cpf), telefoneValido)
+        if (form.checkValidity() && validarCelular(responsavel.celular) && validarRG(responsavel.rg) && validarCPF(responsavel.cpf)
+        && telefoneValido)
+        {
             if (!props.modoEdicao) {
-                dispatch(adicionarResponsavel(responsavel)).then((retorno) =>{
-                    if(retorno.payload.status){
-                        props.setMensagem('Responsável incluído com sucesso');
-                        props.setTipoMensagem('success');
-                        props.setMostrarMensagem(true);
-                        alunosSelecionados.forEach(aluno =>{
-                            dispatch(adicionarParentesco({
-                                codigoResponsavel: retorno.payload.responsavel.codigoGerado,
-                                codigoAluno: aluno.codigo,
-                                parentesco: aluno.parentesco
-                            }));
-                        });
-                    }else{
-                        props.setMensagem('Responsável não incluído!');
-                        props.setTipoMensagem('danger');
-                        props.setMostrarMensagem(true);
-                    }
-                });
-            }
-            else
-            {
-                dispatch(atualizarResponsavel(responsavel)).then((retorno) => {
-                    if(retorno.payload.status){
-                        props.setMensagem('Responsável alterado com sucesso');
-                        props.setTipoMensagem('success');
-                        props.setMostrarMensagem(true);
-                        props.setModoEdicao(false);
-                        props.setResponsavelParaEdicao(responsavelVazio);
-                        alunosSelecionados.forEach(aluno => {
-                            if(!alunosAntes.find(a => a.codigo === aluno.codigo)){
+                    dispatch(adicionarResponsavel(responsavel)).then((retorno) =>{
+                        if(retorno.payload.status){
+                            props.setMensagem('Responsável incluído com sucesso');
+                            props.setTipoMensagem('success');
+                            props.setMostrarMensagem(true);
+                            alunosSelecionados.forEach(aluno =>{
                                 dispatch(adicionarParentesco({
                                     codigoResponsavel: retorno.payload.responsavel.codigoGerado,
                                     codigoAluno: aluno.codigo,
                                     parentesco: aluno.parentesco
                                 }));
-                            }
-                        });
+                            });
+                        }else{
+                            props.setMensagem('Responsável não incluído!');
+                            props.setTipoMensagem('danger');
+                            props.setMostrarMensagem(true);
+                        }
+                    });
+            }
+            else
+            {
+                    dispatch(atualizarResponsavel(responsavel)).then((retorno) => {
+                        if(retorno.payload.status){
+                            props.setMensagem('Responsável alterado com sucesso');
+                            props.setTipoMensagem('success');
+                            props.setMostrarMensagem(true);
+                            props.setModoEdicao(false);
+                            props.setResponsavelParaEdicao(responsavelVazio);
+                            alunosSelecionados.forEach(aluno => {
+                                if(!alunosAntes.find(a => a.codigo === aluno.codigo)){
+                                    dispatch(adicionarParentesco({
+                                        codigoResponsavel: retorno.payload.responsavel.codigoGerado,
+                                        codigoAluno: aluno.codigo,
+                                        parentesco: aluno.parentesco
+                                    }));
+                                }
+                            });
 
-                        alunosSelecionados.forEach(aluno => {
-                            if(!alunosAntes.find(a => a.codigo === aluno.codigo)){
-                                dispatch(atualizarParentesco({
-                                    codigoResponsavel: retorno.payload.responsavel.codigoGerado,
-                                    codigoAluno: aluno.codigo,
-                                    parentesco: aluno.parentesco
-                                }));
-                            }
-                        });
+                            alunosSelecionados.forEach(aluno => {
+                                if(!alunosAntes.find(a => a.codigo === aluno.codigo)){
+                                    dispatch(atualizarParentesco({
+                                        codigoResponsavel: retorno.payload.responsavel.codigoGerado,
+                                        codigoAluno: aluno.codigo,
+                                        parentesco: aluno.parentesco
+                                    }));
+                                }
+                            });
 
-                        alunosAntes.forEach(aluno => {
-                            if(!alunosSelecionados.find(a => a.codigo === aluno.codigo)){
-                                dispatch(removerParentesco({
-                                    codigoResponsavel: retorno.payload.responsavel.codigoGerado,
-                                    codigoAluno: aluno.codigo,
-                                    parentesco: aluno.parentesco
-                                }));
-                            }
-                        });
-                    }
-                    else{
-                        props.setMensagem('Responsável não alterado!');
-                        props.setTipoMensagem('danger');
-                        props.setMostrarMensagem(true);
-                    }
-                });
+                            alunosAntes.forEach(aluno => {
+                                if(!alunosSelecionados.find(a => a.codigo === aluno.codigo)){
+                                    dispatch(removerParentesco({
+                                        codigoResponsavel: retorno.payload.responsavel.codigoGerado,
+                                        codigoAluno: aluno.codigo,
+                                        parentesco: aluno.parentesco
+                                    }));
+                                }
+                            });
+                        }
+                        else{
+                            props.setMensagem('Responsável não alterado!');
+                            props.setTipoMensagem('danger');
+                            props.setMostrarMensagem(true);
+                        }
+                    });
             }
             setResponsavel(responsavelVazio);
             setFormValidado(false);
         }
         else {
+            alert("Por favor, cheque os campos inseridos.");
             setFormValidado(true);
         }
 
@@ -210,7 +223,7 @@ export default function FormCadResponsavel(props) {
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>E-mail(*):</Form.Label>
+                <Form.Label>E-mail(*):</Form.Label>
                     <Form.Control
                         type="email"
                         placeholder="abc123@email.com"
@@ -219,10 +232,10 @@ export default function FormCadResponsavel(props) {
                         value={responsavel.email}
                         onChange={manipularMudancas}
                         required
-                        pattern="/\S+@\S+\.\S+/"
+                        pattern="\S+@\S+\.\S+"
                     />
                     <Form.Control.Feedback type="invalid">
-                        CPF inválido.
+                        E-mail inválido.
                     </Form.Control.Feedback>
                 </Form.Group>
 
