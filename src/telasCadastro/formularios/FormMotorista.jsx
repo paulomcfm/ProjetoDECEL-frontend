@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
+import validarCelular from '../../validacoes/validarCelular';
+import InputMask from 'react-input-mask';
 import { adicionarMotorista,atualizarMotorista } from '../../redux/motoristaReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import validarCNH from '../../validacoes/validarCnh';
@@ -27,8 +29,8 @@ export default function FormMotorista(props) {
 
           async function manipularEnvio(e){
               const form = e.target
-              console.log(validarCNH(motorista.cnh),validarTelefone(motorista.telefone))
-              if(validarTelefone(motorista.telefone) && validarCNH(motorista.cnh)){
+              console.log(validarCNH(motorista.cnh),validarCelular(motorista.telefone))
+              if(validarCelular(motorista.telefone) && validarCNH(motorista.cnh)){
                 
                 if(props.modo === 'gravar'){
                   dispatch(adicionarMotorista(motorista))
@@ -65,9 +67,8 @@ export default function FormMotorista(props) {
                 <Col xs={12} md={6}>
                   {/* Input do nome */}
                   <Form.Group>
-                      <FloatingLabel controlId="floatingNome" label="Nome:" className="mb-3">
+                        <Form.Label>Nome(*):</Form.Label><br/>
                         <Form.Control type="text" placeholder="" value={motorista.nome} name='nome' onChange={manipularMudancas} required/>
-                      </FloatingLabel>
                     <Form.Control.Feedback type="invalid">Informe o nome!</Form.Control.Feedback>
                   </Form.Group>
                 </Col>
@@ -76,18 +77,18 @@ export default function FormMotorista(props) {
               <Row className="justify-content-center">
                 <Col xs={12} md={6}>
                   {/* Input da CNH */}
-                  <FloatingLabel controlId="floatingCNH" label="CNH:" className="mb-3">
+                    <Form.Label>Cnh(*):</Form.Label><br/>
                     <Form.Control type="text" placeholder="" value={motorista.cnh} name='cnh' onChange={manipularMudancas} required disabled={props.modo !== 'gravar'} />
-                  </FloatingLabel>
                 </Col>
               </Row>
               
               <Row className="justify-content-center">
                 <Col xs={12} md={6}>
                   {/* Input do Telefone */}
-                  <FloatingLabel controlId="floatingTelefone" label="Telefone:" className="mb-3">
-                    <Form.Control type="tel" placeholder="" value={motorista.telefone} name='telefone' onChange={manipularMudancas} required/>
-                  </FloatingLabel>
+                  <Form.Label>Telefone(*):</Form.Label><br/>
+                  <InputMask mask="(99) 99999-9999" maskChar="_" placeholder="(99) 99999-9999"  name="telefone" value={motorista.telefone} onChange={manipularMudancas} required />
+                  
+                  
                 </Col>
               </Row>
               <Row className="justify-content-center">
