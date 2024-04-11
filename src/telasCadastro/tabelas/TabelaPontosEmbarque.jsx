@@ -67,7 +67,6 @@ export default function TabelaPontosEmbarque(props) {
             <Table striped bordered hover>
                 <thead>
                     <tr>
-                        <th>Código</th>
                         <th>Endereço</th>
                         <th>Ações</th>
                     </tr>
@@ -75,7 +74,6 @@ export default function TabelaPontosEmbarque(props) {
                 <tbody>
                     {pontoEmbarqueFiltrados.map(pontoEmbarque => (
                         <tr key={pontoEmbarque.codigo}>
-                            <td>{pontoEmbarque.codigo}</td>
                             <td>{pontoEmbarque.endereco}</td>
                             <td>
                                 <Button variant="danger" onClick={() => {
