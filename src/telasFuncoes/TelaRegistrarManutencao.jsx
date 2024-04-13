@@ -9,7 +9,7 @@ import imagemInscreverAluno from '../recursos/rosa.jpg';
 import imagemRegistrarManutencao from '../recursos/verde.jpg';
 import '../templates/style.css';
 
-export default function Menu(props) {
+export default function TelaRegistrarManutencao(props) {
     return (
         <Pagina>
             <Container fluid className="mt-4">

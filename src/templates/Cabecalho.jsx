@@ -19,7 +19,7 @@ export default function Cabecalho(props) {
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="ml-auto">
                     <NavLink exact to="/" className="nav-link">Início</NavLink>
-                    <Nav.Link href="#">Veículos</Nav.Link>
+                    <NavLink to="/veiculos" className="nav-link">Veículos</NavLink>
                     <NavLink to="/alunos" className="nav-link">Alunos</NavLink>
                     <NavLink to="/responsaveis" className="nav-link">Responsáveis</NavLink>
                     <NavLink to="/escolas" className="nav-link">Escolas</NavLink>
