@@ -18,7 +18,7 @@ export default function Cabecalho(props) {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="ml-auto">
-                    <NavLink exact to="/" className="nav-link">Início</NavLink>
+                    <NavLink exact to="/menu" className="nav-link">Início</NavLink>
                     <NavLink to="/veiculos" className="nav-link">Veículos</NavLink>
                     <NavLink to="/alunos" className="nav-link">Alunos</NavLink>
                     <NavLink to="/responsaveis" className="nav-link">Responsáveis</NavLink>
