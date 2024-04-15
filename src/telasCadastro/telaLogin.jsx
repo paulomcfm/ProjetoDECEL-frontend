@@ -54,6 +54,19 @@ export default function TelaLogin() {
               />
             </Form.Group>
 
+            <Form.Group controlId="formBasicCPF">
+              <Form.Label>CPF</Form.Label>
+              <Form.Control
+                  type="text"
+                  placeholder="CPF"
+                  id="cpf"
+                  // Adicione o estado e o método de alteração do estado para o CPF
+                  // value={cpf}
+                  // onChange={(e) => setCPF(e.target.value)}
+                  required
+              />
+            </Form.Group>
+
             <button onClick={handleLogin}>Login</button>
             {/* Redireciona para a página do menu se autenticado */}
             {autenticado && <Navigate to="/menu" />}

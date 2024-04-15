@@ -1,13 +1,14 @@
 import React from 'react';
 import logo from '../recursos/logodecel.png';
-import { Navbar, Nav } from 'react-bootstrap';
+import user from '../recursos/avatarPadrao.png'
+import { Navbar, Nav, Dropdown } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
 import './style.css';
 
 export default function Cabecalho(props) {
     return (
         <Navbar expand="lg" variant="light" bg="light" className="custom-navbar">
-            <Navbar.Brand as={NavLink} to="/" className="brandLogo mr-auto">
+            <Navbar.Brand as={NavLink} to="/menu" className="brandLogo mr-auto">
                 <img
                     src={logo}
                     alt="Logo DECEL"
@@ -27,6 +28,21 @@ export default function Cabecalho(props) {
                     <NavLink to="/motorista" className="nav-link">Motoristas</NavLink>
                 </Nav>
             </Navbar.Collapse>
+            <Dropdown>
+                <Dropdown.Toggle variant="light" id="dropdown-basic">
+                    <img
+                        src={user}
+                        alt="Imagem Usuário"
+                        className="img-fluid"
+                        style={{ maxHeight: '40px', cursor: 'pointer' , marginRight: '83px'}}
+                    />
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu>
+                    <Dropdown.Item href="#/action-1">Editar Usuário</Dropdown.Item>
+                    <Dropdown.Item href="#/action-2">Sair</Dropdown.Item>
+                </Dropdown.Menu>
+            </Dropdown>
         </Navbar>
     );
 }

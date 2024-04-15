@@ -34,52 +34,73 @@ export default function TelaCadastroUser() {
                 <Col xs={12} md={6}>
                     <h2>Cadastro</h2>
                     <Form>
-                        <Form.Group controlId="formBasicUsername">
-                            <Form.Label>Nome de Usuário</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Nome de Usuário"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                required
-                            />
-                        </Form.Group>
+            <Form.Group controlId="formBasicUsername">
+              <Form.Label>Nome de Usuário</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Nome de Usuário"
+                id="nome"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </Form.Group>
 
-                        <Form.Group controlId="formBasicPassword">
-                            <Form.Label>Senha</Form.Label>
-                            <Form.Control
-                                type="password"
-                                placeholder="Senha"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </Form.Group>
+            <Form.Group controlId="formBasicPassword">
+              <Form.Label>Senha</Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="Senha"
+                id="senha"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </Form.Group>
 
-                        <Form.Group controlId="formBasicCategory">
-                            <Form.Label>Categoria</Form.Label>
-                            <Form.Select as="select" value={category} onChange={handleCategoryChange} required>
-                                <option value="educacao">Educação</option>
-                                <option value="transporte">Transporte</option>
-                            </Form.Select>
-                            {category === 'educacao' && (
-                                <Form.Text className="text-muted">
-                                    Ao selecionar esta opção, seu usuário poderá cadastrar escolas, alunos e responsáveis, além de alocar alunos e inscrevê-los.
-                                </Form.Text>
-                            )}
-                            {category === 'transporte' && (
-                                <Form.Text className="text-muted">
-                                    Ao selecionar esta opção, seu usuário poderá cadastrar veículos, rotas e motoristas, além de definir rotas e registrar manutenções.
-                                </Form.Text>
-                            )}
-                        </Form.Group>
+            <Form.Group controlId="formBasicCPF">
+              <Form.Label>CPF</Form.Label>
+              <Form.Control
+                  type="text"
+                  placeholder="CPF"
+                  id="cpf"
+                  // Adicione o estado e o método de alteração do estado para o CPF
+                  // value={cpf}
+                  // onChange={(e) => setCPF(e.target.value)}
+                  required
+              />
+            </Form.Group>
 
-                        <Button variant="primary" onClick={handleCadastro}>
-                            Cadastrar
-                        </Button>
-                        {/* Redireciona para a página do menu se cadastrado */}
-                        {cadastrado && <Navigate to="/menu" />}
-                    </Form>
+            <Form.Group controlId="formBasicCPF">
+              <Form.Label>EMAIL</Form.Label>
+              <Form.Control
+                  type="email"
+                  placeholder="email"
+                  id="email"
+                  // Adicione o estado e o método de alteração do estado para o email
+                  // value={email}
+                  // onChange={(e) => setemail(e.target.value)}
+                  required
+              />
+            </Form.Group>
+
+            <Form.Group controlId="formBasicCPF">
+              <Form.Label>CELULAR</Form.Label>
+              <Form.Control
+                  type="text"
+                  placeholder="(xx) xxxxx-xxxx"
+                  id="celular"
+                  // Adicione o estado e o método de alteração do estado para o celular
+                  // value={celular}
+                  // onChange={(e) => setcelular(e.target.value)}
+                  required
+              />
+            </Form.Group>
+            
+            <button onClick={handleCadastro}>Cadastrar</button>
+            {/* Redireciona para a página do menu se autenticado */}
+            {cadastrado && <Navigate to="/menu" />}
+          </Form>
                 </Col>
             </Row>
         </Container>
