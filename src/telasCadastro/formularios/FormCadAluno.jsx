@@ -14,6 +14,7 @@ export default function FormCadAlunos(props) {
         rg: '',
         observacoes: '',
         dataNasc: '',
+        celular: '',
         responsaveis: []
     }
 
@@ -191,11 +192,7 @@ export default function FormCadAlunos(props) {
                         value={aluno.rg}
                         onChange={manipularMudancas}
                         required
-                        pattern="\d{2}\.\d{3}\.\d{3}-[\dxX]"
                     />
-                    <Form.Control.Feedback type="invalid">
-                        O RG deve estar no formato XX.XXX.XXX-X.
-                    </Form.Control.Feedback>
                 </Form.Group>
 
                 <Row>
@@ -244,15 +241,13 @@ export default function FormCadAlunos(props) {
                         {responsaveisSelecionados.map((responsavel, index) => (
                             <div key={index} className="d-flex align-items-center">
                                 <Button
-                                    variant="primary"
-                                    className="me-2 mb-2 mt-3"
+                                    variant="secondary"
+                                    className="me-2 mb-2 mt-3 w-75"
                                     onClick={() => addResponsavel(responsavel)}
                                 >
                                     {`${responsavel.nome} - RG: ${responsavel.rg}`}
                                 </Button>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Parentesco do responsável"
+                                <Form.Select
                                     className="mb-2 mt-3"
                                     value={responsavel.parentesco}
                                     onChange={(e) => {
@@ -264,7 +259,17 @@ export default function FormCadAlunos(props) {
                                         setResponsaveisSelecionados(novosResponsaveis);
                                     }}
                                     required
-                                />
+                                >
+                                    <option value="">Selecione o parentesco</option>
+                                    <option value="Pai">Pai</option>
+                                    <option value="Mãe">Mãe</option>
+                                    <option value="Avô">Avô</option>
+                                    <option value="Avó">Avó</option>
+                                    <option value="Tio">Tio</option>
+                                    <option value="Tia">Tia</option>
+                                    <option value="Padrasto">Padrasto</option>
+                                    <option value="Madrasta">Madrasta</option>
+                                </Form.Select>
                                 <Button
                                     variant="danger"
                                     className="mb-2 mt-3"
@@ -276,6 +281,17 @@ export default function FormCadAlunos(props) {
                         ))}
                     </Form.Group>
 
+                    <Form.Group className="mb-3">
+                        <Form.Label>Celular:</Form.Label>
+                        <Form.Control
+                            type="text"
+                            placeholder="Número de celular"
+                            id="celular"
+                            name="celular"
+                            value={aluno.celular}
+                            onChange={manipularMudancas}
+                        />
+                    </Form.Group>
                 </Form.Group>
                 <Form.Group className="mb-3">
                     <Form.Label>Observações:</Form.Label>

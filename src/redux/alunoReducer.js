@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ESTADO from '../recursos/estado';
-const urlBase = 'https://projetodecel-backend.onrender.com/aluno';
+const urlBase = 'http://localhost:8080/aluno';
+// const urlBase = 'https://projetodecel-backend.onrender.com/aluno';
 
 export const buscarAlunos = createAsyncThunk('aluno/buscar', async () => {
     try {
@@ -52,6 +53,7 @@ export const adicionarAluno = createAsyncThunk('aluno/adicionar', async (aluno) 
                 nome: aluno.nome,
                 rg: aluno.rg,
                 dataNasc: aluno.dataNasc,
+                celular: aluno.celular,
                 observacoes: aluno.observacoes
             }
         }
@@ -88,6 +90,7 @@ export const atualizarAluno = createAsyncThunk('aluno/atualizar', async (aluno) 
                 nome: aluno.nome,
                 rg: aluno.rg,
                 dataNasc: aluno.dataNasc,
+                celular: aluno.celular,
                 observacoes: aluno.observacoes
             }
         }
