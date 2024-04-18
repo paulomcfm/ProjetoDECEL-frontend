@@ -85,10 +85,18 @@ export default function FormMotorista(props) {
               <Row className="justify-content-center">
                 <Col xs={12} md={6}>
                   {/* Input do Telefone */}
-                  <Form.Label>Telefone(*):</Form.Label><br/>
-                  <InputMask mask="(99) 99999-9999" maskChar="_" placeholder="(99) 99999-9999"  name="telefone" value={motorista.telefone} onChange={manipularMudancas} required />
-                  
-                  
+                  <label htmlFor="telefone">Telefone</label>
+                  <InputMask
+                    style={{width:'300px'}}
+                    className="form-control"
+                    mask="(99) 99999-9999"
+                    maskChar="_"
+                    placeholder="(99) 99999-9999"
+                    name="telefone"
+                    value={motorista.telefone}
+                    onChange={manipularMudancas}
+                    required
+                  />
                 </Col>
               </Row>
               <Row className="justify-content-center">

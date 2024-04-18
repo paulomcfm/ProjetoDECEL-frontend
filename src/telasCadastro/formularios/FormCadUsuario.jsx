@@ -161,30 +161,6 @@ export default function FormCadUsuario(props) {
                     </Form.Control.Feedback>
                 </Form.Group>
 
-                <Form.Group className="mb-3">
-                    <Form.Label>Categoria(*):</Form.Label>
-                    <Form.Select
-                        id="categoria"
-                        name="categoria"
-                        value={usuario.categoria}
-                        onChange={manipularMudancas}
-                        required
-                    >
-                        <option value="educacao">Educação</option>
-                        <option value="transporte">Transporte</option>
-                    </Form.Select>
-                    {category === 'educacao' && (
-                                <Form.Text className="text-muted">
-                                    Ao selecionar esta opção, seu usuário poderá cadastrar escolas, alunos e responsáveis, além de alocar alunos e inscrevê-los.
-                                </Form.Text>
-                    )}
-                    {category === 'transporte' && (
-                        <Form.Text className="text-muted">
-                            Ao selecionar esta opção, seu usuário poderá cadastrar veículos, rotas e motoristas, além de definir rotas e registrar manutenções.
-                        </Form.Text>
-                    )}
-                </Form.Group>
-
                 <p>(*) Campos obrigatórios</p>
                 
                 <Row>
