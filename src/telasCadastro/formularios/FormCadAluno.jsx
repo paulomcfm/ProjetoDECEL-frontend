@@ -69,7 +69,18 @@ export default function FormCadAlunos(props) {
 
     function manipularMudancas(e) {
         const componente = e.currentTarget;
+        let valor = componente.value;
+
+        if (componente.name === 'celular') {
+            valor = formatarCelular(valor);
+        }
         setAluno({ ...aluno, [componente.name]: componente.value });
+    }
+
+    function manipularMudancasCelular(e) {
+        let celular = e.target.value;
+        celular = formatarCelular(celular);
+        setAluno({ ...aluno, celular: celular });
     }
 
 
@@ -85,6 +96,21 @@ export default function FormCadAlunos(props) {
         setResponsaveisSelecionados(novosResponsaveis);
     }
 
+    function formatarCelular(celular, cursorPos) {
+        if (!celular) return celular;
+        celular = celular.replace(/\D/g, '');
+    
+        const hasHyphen = celular.includes('-');
+        const formatted = celular.length < 11
+            ? celular.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3')
+            : celular.replace(/^(\d{2})(\d)(\d{4})(\d{0,4})$/, '($1) $2 $3-$4');
+    
+        if (hasHyphen && cursorPos <= formatted.indexOf('-')) {
+            return formatted.replace('-', '');
+        }
+    
+        return formatted;
+    }
 
     function manipularSubmissao(e) {
         const form = e.currentTarget;
@@ -285,11 +311,12 @@ export default function FormCadAlunos(props) {
                         <Form.Label>Celular:</Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder="Número de celular"
+                            placeholder="(00) 00000-0000"
                             id="celular"
                             name="celular"
-                            value={aluno.celular}
-                            onChange={manipularMudancas}
+                            value={formatarCelular(aluno.celular)}
+                            onChange={manipularMudancasCelular}
+                            maxLength="16"
                         />
                     </Form.Group>
                 </Form.Group>
