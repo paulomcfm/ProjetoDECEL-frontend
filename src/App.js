@@ -9,6 +9,7 @@ import TelaDefinirRota from './telasFuncoes/TelaDefinirRota.jsx';
 import TelaInscreverAluno from './telasFuncoes/TelaInscreverAluno.jsx';
 import TelaAlocarAluno from './telasFuncoes/TelaAlocarAluno.jsx';
 import TelaRegistrarManutencao from './telasFuncoes/TelaRegistrarManutencao.jsx';
+import MapaPagina from './telasSaida/MapaPagina.jsx'
 import TelaLogin from './telasCadastro/telaLogin.jsx';
 import TelaCadastroUser from './telasCadastro/telaCadastroUser.jsx';
 import Esqueci from './telasCadastro/telaEsqueci.jsx';
@@ -36,6 +37,7 @@ function App() {
             <Route path='/inscrever-aluno' element={<TelaInscreverAluno />} />
             <Route path='/alocar-aluno' element={<TelaAlocarAluno />} />
             <Route path='/registrar-manutencao' element={<TelaRegistrarManutencao />} />
+            <Route path='/mapa-rota' element={<MapaPagina />} />
             <Route path='*' element={<Tela404 />} />
           </Routes>
         </BrowserRouter>
@@ -45,5 +47,3 @@ function App() {
 }
 
 export default App;
-
-
