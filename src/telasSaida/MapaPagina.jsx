@@ -20,7 +20,7 @@ export default function MapaPagina(){
 
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
-        googleMapsApiKey: "AIzaSyB6ROCRauFaR5AXYnLuaLrKDnpiRaiYha4"
+        googleMapsApiKey: ""
     })
 
     const position={
