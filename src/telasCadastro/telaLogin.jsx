@@ -24,45 +24,52 @@ export default function TelaLogin() {
         }
     }
 
-  return (
-    <Container>
-      <Row className="justify-content-md-center">
-        <Col xs={12} md={6}>
-          <h2>Login</h2>
-          <Form>
-            <Form.Group controlId="formBasicUsername">
-              <Form.Label>Nome de Usuário</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Nome de Usuário"
-                id="nome"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-            </Form.Group>
+    return (
+        <Container className="mt-5">
+            <Row className="justify-content-md-center">
+                <Col xs={12} md={6}>
+                    <h2 className="text-center mb-4">Login</h2>
+                    <Form>
+                        <Form.Group controlId="formBasicUsername">
+                            <Form.Label>Nome de Usuário</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Nome de Usuário"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                            />
+                        </Form.Group>
 
-            <Form.Group controlId="formBasicPassword">
-              <Form.Label>Senha</Form.Label>
-              <Form.Control
-                type="password"
-                placeholder="Senha"
-                id="senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </Form.Group>
+                        <Form.Group controlId="formBasicPassword">
+                            <Form.Label>Senha</Form.Label>
+                            <Form.Control
+                                type="password"
+                                placeholder="Senha"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                        </Form.Group>
+                        <br />
+                        <Button
+                            variant="primary"
+                            type="button"
+                            onClick={handleLogin}
+                            className="w-auto mx-auto d-block mb-3"
+                        >
+                            Login
+                        </Button>
 
-            <button onClick={handleLogin}>Login</button>
-            {/* Redireciona para a página do menu se autenticado */}
-            {autenticado && <Navigate to="/menu" />}
-          </Form>
-          <p>
-            Não tem usuário? <Link to="/cadastro">Cadastre-se!</Link>
-          </p>
-        </Col>
-      </Row>
-    </Container>
-  );
+                        {/* Redireciona para a página do menu se autenticado */}
+                        {autenticado && <Navigate to="/menu" />}
+
+                        <Link to="/esqueci-minha-senha" className="d-block text-center">
+                            Esqueci minha senha
+                        </Link>
+                    </Form>
+                </Col>
+            </Row>
+        </Container>
+    );
 }
