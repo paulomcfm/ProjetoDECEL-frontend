@@ -59,9 +59,10 @@ export const adicionarAluno = createAsyncThunk('aluno/adicionar', async (aluno) 
         }
     }
     else {
+        const erro = await resposta.json();
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao adicionar o aluno.',
+            mensagem: erro.mensagem,
             aluno
         }
     }
@@ -96,9 +97,10 @@ export const atualizarAluno = createAsyncThunk('aluno/atualizar', async (aluno) 
         }
     }
     else {
+        const erro = await resposta.json();
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao atualizar o aluno.',
+            mensagem: erro.mensagem,
             aluno
         }
     }

@@ -6,7 +6,7 @@ export default function TelaMensagem(props) {
     useEffect(() => {
         setTimeout(() => {
             props.setMostrarMensagem(false);
-        }, 1200);
+        }, 5000);
     }, []);
     return (
         <Pagina>

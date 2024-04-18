@@ -129,7 +129,7 @@ export default function FormCadAlunos(props) {
                             }));
                         });
                     } else {
-                        props.setMensagem('Aluno não incluído!');
+                        props.setMensagem('Aluno não incluído! '+ retorno.payload.mensagem);
                         props.setTipoMensagem('danger');
                         props.setMostrarMensagem(true);
                     }
@@ -173,7 +173,7 @@ export default function FormCadAlunos(props) {
                             }
                         });
                     } else {
-                        props.setMensagem('Aluno não alterado!');
+                        props.setMensagem('Aluno não alterado! '+ retorno.payload.mensagem);
                         props.setTipoMensagem('danger');
                         props.setMostrarMensagem(true);
                     }
@@ -181,6 +181,7 @@ export default function FormCadAlunos(props) {
             }
             setAluno(alunoVazio);
             setFormValidado(false);
+            props.exibirFormulario(false);
         }
         else {
             setFormValidado(true);
