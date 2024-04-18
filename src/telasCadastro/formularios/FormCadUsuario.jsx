@@ -6,22 +6,19 @@ import { buscarAlunos } from '../../redux/alunoReducer';
 import InputMask from 'react-input-mask';
 import validarCelular from '../../validacoes/validarCelular';
 import validarCPF from '../../validacoes/validarCpf';
-import validarRG from '../../validacoes/validarRG';
 
 export default function FormCadUsuario(props) {
     const usuarioVazio = {
         nome: '',
-        rg: '',
+        senha: '',
         cpf: '',
         email: '',
-        celular: '',
-        categoria: 'educacao' // Defina o valor padrão para a categoria aqui
+        celular: ''
     };
 
     const estadoInicialUsuario = props.usuarioParaEdicao;
     const [usuario, setUsuario] = useState(estadoInicialUsuario);
     const [formValidado, setFormValidado] = useState(false);
-    const { estadoAlu, mensagemAlu, alunos } = useSelector((state) => state.aluno);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -33,13 +30,54 @@ export default function FormCadUsuario(props) {
         setUsuario({ ...usuario, [name]: value });
     }
 
+    async function handleInputChange(event) {
+        const { name, value } = event.target;
+
+        // Atualiza o estado do usuário com o valor formatado do CPF ou celular
+        if (name === 'cpf') {
+            const cpf = formatarCPF(value);
+            setUsuario(prevUsuario => ({
+                ...prevUsuario,
+                cpf: cpf
+            }));
+        } else if (name === 'celular') {
+            const celular = formatarCelular(value);
+            setUsuario(prevUsuario => ({
+                ...prevUsuario,
+                celular: celular
+            }));
+        }
+    }
+
+    function formatarCPF(cpf) {
+        if (!cpf) return cpf;
+        // Remove todos os caracteres não numéricos
+        cpf = cpf.replace(/\D/g, '');
+
+        // Aplica a máscara para CPF (xxx.xxx.xxx-xx)
+        cpf = cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+
+        return cpf;
+    }
+
+    function formatarCelular(celular) {
+        if (!celular) return celular;
+        // Remove todos os caracteres não numéricos
+        celular = celular.replace(/\D/g, '');
+
+        // Aplica a máscara para celular (xx) 9xxxx-xxxx
+        celular = celular.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) 9$2-$3');
+
+        return celular;
+    }
+
     function manipularSubmissao(e) {
         e.preventDefault();
         e.stopPropagation();
 
         const form = e.currentTarget;
 
-        if (form.checkValidity() && validarCelular(usuario.celular) && validarRG(usuario.rg) && validarCPF(usuario.cpf)) {
+        if (form.checkValidity() && validarCelular(usuario.celular) && validarCPF(usuario.cpf)) {
             if (!props.modoEdicao) {
                 dispatch(adicionarUsuario(usuario)).then((retorno) => {
                     if (retorno.payload.status) {
@@ -94,34 +132,29 @@ export default function FormCadUsuario(props) {
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>RG(*):</Form.Label>
-                    <InputMask
-                        mask="99.999.999-9" // Máscara para o RG
-                        maskChar="_"
-                        placeholder="XX.XXX.XXX-X"
-                        id="rg"
-                        name="rg"
-                        value={usuario.rg}
+                    <Form.Label>Senha(*):</Form.Label>
+                    <Form.Control
+                        type="password"
+                        placeholder="Senha"
+                        id="senha"
+                        name="senha"
+                        value={usuario.senha}
                         onChange={manipularMudancas}
                         required
                     />
-                    <Form.Control.Feedback type="invalid">
-                        RG inválido.
-                    </Form.Control.Feedback>
                 </Form.Group>
-
+      
                 <Form.Group className="mb-3">
                     <Form.Label>CPF(*):</Form.Label>
-                    <InputMask
-                        mask="999.999.999-99" // Máscara para o CPF
-                        maskChar="_"
-                        placeholder="XXX.XXX.XXX-XX"
+                    <Form.Control
+                        type="text"
+                        placeholder="00000-000"
                         id="cpf"
                         name="cpf"
                         value={usuario.cpf}
-                        onChange={manipularMudancas}
-                        required
-                    />
+                        onChange={handleInputChange}
+                        maxLength="14"
+                        required />
                     <Form.Control.Feedback type="invalid">
                         CPF inválido.
                     </Form.Control.Feedback>
@@ -146,43 +179,19 @@ export default function FormCadUsuario(props) {
 
                 <Form.Group className="mb-3">
                     <Form.Label>Celular(*):</Form.Label>
-                    <InputMask
-                        mask="(99) 99999-9999" // Máscara para o telefone
-                        maskChar="_"
-                        placeholder="(99) 99999-9999"
+                    <Form.Control
+                        type="text"
+                        placeholder="(00) 00000-0000"
                         id="celular"
                         name="celular"
                         value={usuario.celular}
-                        onChange={manipularMudancas}
-                        required
+                        onChange={handleInputChange}
+                        maxLength="16"
+                        required 
                     />
                     <Form.Control.Feedback type="invalid">
                         Celular inválido.
                     </Form.Control.Feedback>
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                    <Form.Label>Categoria(*):</Form.Label>
-                    <Form.Select
-                        id="categoria"
-                        name="categoria"
-                        value={usuario.categoria}
-                        onChange={manipularMudancas}
-                        required
-                    >
-                        <option value="educacao">Educação</option>
-                        <option value="transporte">Transporte</option>
-                    </Form.Select>
-                    {category === 'educacao' && (
-                                <Form.Text className="text-muted">
-                                    Ao selecionar esta opção, seu usuário poderá cadastrar escolas, alunos e responsáveis, além de alocar alunos e inscrevê-los.
-                                </Form.Text>
-                    )}
-                    {category === 'transporte' && (
-                        <Form.Text className="text-muted">
-                            Ao selecionar esta opção, seu usuário poderá cadastrar veículos, rotas e motoristas, além de definir rotas e registrar manutenções.
-                        </Form.Text>
-                    )}
                 </Form.Group>
 
                 <p>(*) Campos obrigatórios</p>
