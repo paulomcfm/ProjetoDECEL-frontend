@@ -99,16 +99,17 @@ export default function FormMotorista(props) {
                   />
                 </Col>
               </Row>
+              <br />
               <Row className="justify-content-center">
                 <Col xs={12} md={1}>
                     { props.modo === 'gravar'?
-                      <button type="submit"  className="btn btn-success">Gravar</button>
+                      <button type="submit"  className="btn btn-primary">Cadastrar</button>
                       :
-                      <button type="submit" className="btn btn-warning">Alterar</button>
+                      <button type="submit" className="btn btn-primary">Alterar</button>
                     }
                 </Col>
                 <Col xs={12} md={1}>
-                <button type="button" className="btn btn-primary" onClick={()=>{props.setTela(true)}}>Voltar</button>
+                <button type="button" className="btn btn-danger" onClick={()=>{props.setTela(true)}}>Voltar</button>
                 </Col>
               </Row>
               {
