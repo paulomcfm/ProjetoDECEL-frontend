@@ -3,7 +3,6 @@ import { Button, Container, Table } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarAlunos, removerAluno } from '../../redux/alunoReducer';
 import { buscarParentescosAluno } from '../../redux/parentescoReducer';
-import { buscarResponsaveis } from '../../redux/responsavelReducer';
 import { useEffect } from 'react';
 import { format } from 'date-fns';
 
@@ -20,6 +19,7 @@ export default function TabelaAlunos(props) {
         rg: '',
         observacoes: '',
         dataNasc: '',
+        celular: '',
         responsaveis: []
     };
 
@@ -92,6 +92,7 @@ export default function TabelaAlunos(props) {
                         <th>Nome</th>
                         <th>RG</th>
                         <th>Data de Nascimento</th>
+                        <th>Celular</th>
                         <th>Observações</th>
                         <th>Ações</th>
                     </tr>
@@ -102,6 +103,7 @@ export default function TabelaAlunos(props) {
                             <td>{aluno.nome}</td>
                             <td>{aluno.rg}</td>
                             <td>{format(new Date(aluno.dataNasc), 'dd/MM/yyyy')}</td>
+                            <td>{aluno.celular}</td>
                             <td>{aluno.observacoes}</td>
                             <td>
                                 <Button variant="danger" onClick={() => {

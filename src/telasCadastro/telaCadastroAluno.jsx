@@ -15,6 +15,7 @@ export default function TelaCadastroAluno(props) {
         rg: '',
         observacoes: '',
         dataNasc: '',
+        celular: '',
         responsaveis: []
     });
     const [modoEdicao, setModoEdicao] = useState(false);

@@ -160,9 +160,7 @@ export default function FormCadUsuario(props) {
                         Celular inválido.
                     </Form.Control.Feedback>
                 </Form.Group>
-
-                <p>(*) Campos obrigatórios</p>
-                
+                <p>(*) Campos obrigatórios</p>              
                 <Row>
                     <Col md={6} offset={5} className="d-flex justify-content-end">
                         <Button type="submit" variant="primary">
