@@ -11,7 +11,10 @@ export default function TabelaPontosEmbarque(props) {
 
     const PontoEmbarqueVazio = {
         codigo: '0',
-        endereco: ''
+        rua: '',
+        numero: '',
+        bairro: '',
+        cep: ''
     };
 
     function excluirPontoEmbarque(pontoEmbarque) {
@@ -31,7 +34,7 @@ export default function TabelaPontosEmbarque(props) {
     }, [dispatch]);
 
     const pontoEmbarqueFiltrados = pontosEmbarque.filter(pontoEmbarque =>
-        pontoEmbarque.endereco.toLowerCase().includes(termoBusca.toLowerCase())
+        pontoEmbarque.rua.toLowerCase().includes(termoBusca.toLowerCase())
     );
 
     return (
@@ -68,13 +71,15 @@ export default function TabelaPontosEmbarque(props) {
                 <thead>
                     <tr>
                         <th>Endereço</th>
+                        <th>CEP</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     {pontoEmbarqueFiltrados.map(pontoEmbarque => (
                         <tr key={pontoEmbarque.codigo}>
-                            <td>{pontoEmbarque.endereco}</td>
+                            <td>{pontoEmbarque.rua}, {pontoEmbarque.numero}, {pontoEmbarque.bairro}</td>
+                            <td>{pontoEmbarque.cep.replace(/^(\d{5})(\d{3})$/, '$1-$2')}</td>
                             <td>
                                 <Button variant="danger" onClick={() => {
                                     excluirPontoEmbarque(pontoEmbarque);
