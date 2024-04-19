@@ -1,15 +1,18 @@
 import React from 'react';
 import { useState } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import Pagina from '../templates/Pagina';
-import { Link } from 'react-router-dom';
-import { NavLink } from 'react-router-dom';
 import Select from 'react-select'
-
+import { useDispatch, useSelector } from 'react-redux';
+import { buscarPontosEmbarque } from '../redux/pontosEmbarqueReducer';
+import { useEffect } from 'react';
 import '../templates/style.css';
 
 export default function TelaDefinirRota(props) {
 
+  const { estado, mensagem, pontosEmbarque } = useSelector(state => state.pontoEmbarque);
+  const dispatch =  useDispatch()
+  
   const [placas,setPlacas] = useState([
     {
       "placa":"ABC123",
@@ -44,62 +47,18 @@ export default function TelaDefinirRota(props) {
     const [selecionado,setSelecionado] = useState([])
     const [pesquisa,setPesquisa] = new useState('')
     const [pesquisaSelecionado,setPesquisaSelecionado] = new useState('')
-    const [pontosDeParada,setPontosDeParada] = useState([
-      {
-        "id": 1,
-        "nome": "Ponto 1",
-        "endereco": "Rua A, 123"
-      },
-      {
-        "id": 2,
-        "nome": "Ponto 2",
-        "endereco": "Rua B, 456"
-      },
-      {
-        "id": 3,
-        "nome": "Ponto 3",
-        "endereco": "Rua C, 789"
-      },
-      {
-        "id": 4,
-        "nome": "Ponto 4",
-        "endereco": "Rua D, 987"
-      },
-      {
-        "id": 5,
-        "nome": "Ponto 5",
-        "endereco": "Rua E, 654"
-      },
-      {
-        "id": 6,
-        "nome": "Ponto 6",
-        "endereco": "Rua F, 321"
-      },
-      {
-        "id": 7,
-        "nome": "Ponto 7",
-        "endereco": "Rua G, 852"
-      },
-      {
-        "id": 8,
-        "nome": "Ponto 8",
-        "endereco": "Rua H, 741"
-      },
-      {
-        "id": 9,
-        "nome": "Ponto 9",
-        "endereco": "Rua I, 369"
-      },
-      {
-        "id": 10,
-        "nome": "Ponto 10",
-        "endereco": "Rua J, 258"
-      }
-    ])
-    
-      
+    const listPontos = pontosEmbarque
+    const [pontosDeParada,setPontosDeParada] = useState([])
 
-    
+    useEffect(() => {
+      dispatch(buscarPontosEmbarque());
+    }, [dispatch]);
+  
+    useEffect(() => {
+      if (pontosEmbarque.length > 0) {
+        setPontosDeParada(pontosEmbarque);
+      }
+    }, [pontosEmbarque]);
     
     
     function pesquisarPontos(e){
@@ -115,7 +74,7 @@ export default function TelaDefinirRota(props) {
     
     
     function addPonto(ponto){
-        setPontosDeParada(pontosDeParada.filter(pontoF => pontoF.id!==ponto.id))
+        setPontosDeParada(pontosDeParada.filter(pontoF => pontoF.codigo!==ponto.codigo))
         const lista = selecionado
         lista.push(ponto)
         setSelecionado(lista)
@@ -125,7 +84,7 @@ export default function TelaDefinirRota(props) {
       // usado para criar um copia do array 'selecionado'
       let novaListaSelecionados = [...selecionado]
       let i=0;
-      while(i<novaListaSelecionados.length && novaListaSelecionados[i].id!=sel.id)
+      while(i<novaListaSelecionados.length && novaListaSelecionados[i].codigo!=sel.codigo)
       i++;
     if(i>0){
       let aux = novaListaSelecionados[i];
@@ -136,15 +95,16 @@ export default function TelaDefinirRota(props) {
   }
 
   function retirarSelecionado(sel){
-    setSelecionado(selecionado.filter(selecionadoF => selecionadoF.id!==sel.id))
+    setSelecionado(selecionado.filter(selecionadoF => selecionadoF.codigo!==sel.codigo))
     const lista = pontosDeParada
     lista.push(sel)
     setPontosDeParada(lista)
   }
-  
   function listarPontos(ponto){
+    console.log(pontosEmbarque)
+    console.log(mensagem)
     return (
-      <div key={ponto.id}>
+      <div key={ponto.codigo}>
           <label style={{height:"30px"}}>
             <button type="button" style={{border:'none',background:'none'}} onClick={()=>{addPonto(ponto)}}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fillRule="currentColor" className="bi bi-plus-square" viewBox="0 0 16 16">
@@ -152,14 +112,15 @@ export default function TelaDefinirRota(props) {
                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
               </svg>
             </button>
-              {' '}{ponto.nome}, {ponto.endereco}
+              {' '}{ponto.rua}{'('}{ponto.numero}{')'}, {ponto.cep}
           </label>
       </div>
     );
   }
   function listaPontosSelecionados(sel){
+    
     return (
-      <div key={sel.id}>
+      <div key={sel.codigo}>
           <label style={{height:"30px"}}>
               <button type="button" style={{border:'none',background:'none'}} onClick={()=>{subirPos(sel)}}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fillRule="currentColor" className="bi bi-sort-up" viewBox="0 0 16 16">
@@ -171,7 +132,7 @@ export default function TelaDefinirRota(props) {
                   <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/>
               </svg>
               </button>
-              {' '}{sel.nome}, {sel.endereco}
+              {' '}{sel.rua}{'('}{sel.numero}{')'}, {sel.cep}
           </label>
         </div>
       )
@@ -275,7 +236,7 @@ export default function TelaDefinirRota(props) {
                 {
                   pontosDeParada.length>0?
                       pontosDeParada.map(ponto => {
-                        const pontoNomeLowerCase = ponto.nome.toLowerCase()+','+ponto.endereco.toLowerCase();
+                        const pontoNomeLowerCase = ponto.rua.toLowerCase()+'('+ponto.numero.toLowerCase()+') - '+ponto.cep;
                         const compNomeLowerCase = pesquisa.toLowerCase();
                         if(pesquisa == ''){
                             return listarPontos(ponto)
@@ -298,7 +259,7 @@ export default function TelaDefinirRota(props) {
                     {
                       selecionado.length>0?
                         selecionado.map(sel =>{
-                          const selecionadoL = sel.nome.toLowerCase()+','+sel.endereco.toLowerCase();
+                          const selecionadoL = sel.rua.toLowerCase()+'('+sel.numero.toLowerCase()+') - '+sel.cep;
                           const pesquisaL = pesquisaSelecionado.toLowerCase();
                           if(pesquisaL == ''){
                             return listaPontosSelecionados(sel)
