@@ -1,59 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Container, Table } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { buscarAlunos, removerAluno } from '../../redux/alunoReducer';
-import { buscarParentescosAluno } from '../../redux/parentescoReducer';
-import { useEffect } from 'react';
-import { format } from 'date-fns';
+import { buscarUsuarios, removerUsuario } from '../../redux/usuarioReducer';
 
-export default function TabelaAlunos(props) {
+export default function TabelaUsuarios(props) {
     const [termoBusca, setTermoBusca] = useState('');
-    const { estado, mensagem, alunos } = useSelector(state => state.aluno);
-    const { estadoPar, mensagemPar, parentescos } = useSelector(state => state.parentesco);
-    const { estadoResp, mensagemResp, responsaveis } = useSelector(state => state.responsavel);
+    const { usuarios, mensagem } = useSelector(state => state.usuario); // Removendo 'estado' da desestruturação
     const dispatch = useDispatch();
 
-    const alunoVazio = {
+    const usuarioVazio = {
         codigo: '0',
         nome: '',
         rg: '',
-        observacoes: '',
-        dataNasc: '',
+        cpf: '',
+        email: '',
         celular: '',
-        responsaveis: []
+        categoria: ''
     };
 
-    function excluirAluno(aluno) {
-        if (window.confirm('Deseja realmente excluir esse aluno?')) {
-            dispatch(removerAluno(aluno));
+    function excluirUsuario(usuario) {
+        if (window.confirm('Deseja realmente excluir esse usuário?')) {
+            dispatch(removerUsuario(usuario));
         }
     }
 
-    function editarAluno(aluno) {
-        dispatch(buscarParentescosAluno(aluno.codigo)).then((retorno) => {
-            if (retorno.payload.status) {
-                const parentescos = retorno.payload.listaParentescos;
-                const responsaveis = parentescos.map(parentesco => ({
-                    codigoResponsavel: parentesco.codigoResponsavel,
-                    parentesco: parentesco.parentesco
-                }));
-                const alunoComResponsaveis = {
-                    ...aluno,
-                    responsaveis: responsaveis
-                };
-                props.setAlunoParaEdicao(alunoComResponsaveis);
-                props.setModoEdicao(true);
-                props.exibirFormulario(true);
-            }
-        });
+    function editarUsuario(usuario) {
+        props.setUsuarioParaEdicao(usuario);
+        props.setModoEdicao(true);
+        props.exibirFormulario(true);
     }
 
     useEffect(() => {
-        dispatch(buscarAlunos());
+        dispatch(buscarUsuarios());
     }, [dispatch]);
 
-    const alunosFiltrados = alunos.filter(aluno =>
-        aluno.nome.toLowerCase().includes(termoBusca.toLowerCase())
+    const usuariosFiltrados = usuarios.filter(usuario =>
+        usuario.nome.toLowerCase().includes(termoBusca.toLowerCase())
     );
 
     return (
@@ -63,11 +45,12 @@ export default function TabelaAlunos(props) {
                 className="d-flex align-items-center mb-4 mt-2 mx-auto"
                 style={{ width: '142px' }}
                 onClick={() => {
-                    props.setAlunoParaEdicao(alunoVazio);
+                    props.setUsuarioParaEdicao(usuarioVazio);
+                    props.setModoEdicao(false);
                     props.exibirFormulario(true);
                 }}
             >
-                Cadastrar Aluno
+                Cadastrar Usuário
             </Button>
             <div className="mb-5 d-flex justify-content-center align-items-center">
                 <input
@@ -81,7 +64,7 @@ export default function TabelaAlunos(props) {
                         transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
                         width: '750px',
                     }}
-                    placeholder="Buscar alunos..."
+                    placeholder="Buscar usuários..."
                     value={termoBusca}
                     onChange={e => setTermoBusca(e.target.value)}
                 />
@@ -90,24 +73,24 @@ export default function TabelaAlunos(props) {
                 <thead>
                     <tr>
                         <th>Nome</th>
-                        <th>RG</th>
-                        <th>Data de Nascimento</th>
+                        <th>CPF</th>
+                        <th>Email</th>
                         <th>Celular</th>
-                        <th>Observações</th>
-                        <th>Ações</th>
+                        <th>Categoria</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {alunosFiltrados.map(aluno => (
-                        <tr key={aluno.codigo}>
-                            <td>{aluno.nome}</td>
-                            <td>{aluno.rg}</td>
-                            <td>{format(new Date(aluno.dataNasc), 'dd/MM/yyyy')}</td>
-                            <td>{aluno.celular}</td>
-                            <td>{aluno.observacoes}</td>
+                    {usuariosFiltrados.map(usuario => (
+                        <tr key={usuario.codigo}>
+                            <td>{usuario.nome}</td>
+                            <td>{usuario.cpf}</td>
+                            <td>{usuario.email}</td>
+                            <td>{usuario.celular}</td>
+                            <td>{usuario.categoria}</td>
                             <td>
                                 <Button variant="danger" onClick={() => {
-                                    excluirAluno(aluno);
+                                    excluirUsuario(usuario);
                                 }}>
                                     <svg xmlns="http://www.w3.org/2000/svg"
                                         width="16"
@@ -120,9 +103,8 @@ export default function TabelaAlunos(props) {
                                     </svg>
                                 </Button> {' '}
                                 <Button onClick={() => {
-                                    editarAluno(aluno);
+                                    editarUsuario(usuario);
                                 }
-
                                 } variant="warning">
                                     <svg xmlns="http://www.w3.org/2000/svg"
                                         width="16"

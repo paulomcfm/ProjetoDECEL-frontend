@@ -1,22 +1,22 @@
 import { Container, Row } from "react-bootstrap";
 import TelaMensagem from "./TelaMensagem";
 import Pagina from "../templates/Pagina";
-import FormCadAluno from "./formularios/FormCadAluno";
+import FormCadUsuario from "./formularios/FormCadUsuario";
 import { useState } from "react";
-import TabelaAlunos from "./tabelas/TabelaAlunos";
+import TabelaUsuarios from "./tabelas/tabelaUsuarios";
 
-export default function TelaCadastroAluno(props) {
+export default function TelaCadastroUser(props) {
     const [exibirFormulario, setExibirFormulario] = useState(false);
     const [mostrarMensagem, setMostrarMensagem] = useState(false);
     const [mensagem, setMensagem] = useState("");
     const [tipoMensagem, setTipoMensagem] = useState("");
-    const [alunoParaEdicao, setAlunoParaEdicao] = useState({
+    const [usuarioParaEdicao, setUsuarioParaEdicao] = useState({
         nome: '',
         rg: '',
-        observacoes: '',
-        dataNasc: '',
+        cpf: '',
+        email:'',
         celular: '',
-        responsaveis: []
+        categoria: ''
     });
     const [modoEdicao, setModoEdicao] = useState(false);
 
@@ -32,9 +32,9 @@ export default function TelaCadastroAluno(props) {
                     <Row className="justify-content-center">
                         {
                             exibirFormulario ?
-                                <FormCadAluno exibirFormulario={setExibirFormulario}
-                                    alunoParaEdicao={alunoParaEdicao}
-                                    setAlunoParaEdicao={setAlunoParaEdicao}
+                                <FormCadUsuario exibirFormulario={setExibirFormulario}
+                                    usuarioParaEdicao={usuarioParaEdicao}
+                                    setUsuarioParaEdicao={setUsuarioParaEdicao}
                                     modoEdicao={modoEdicao}
                                     setModoEdicao={setModoEdicao}
                                     setMostrarMensagem={setMostrarMensagem}
@@ -42,9 +42,9 @@ export default function TelaCadastroAluno(props) {
                                     setTipoMensagem={setTipoMensagem}
                                 />
                                 :
-                                <TabelaAlunos exibirFormulario={setExibirFormulario}
-                                    alunoParaEdicao={alunoParaEdicao}
-                                    setAlunoParaEdicao={setAlunoParaEdicao}
+                                <TabelaUsuarios exibirFormulario={setExibirFormulario}
+                                    usuarioParaEdicao={usuarioParaEdicao}
+                                    setUsuarioParaEdicao={setUsuarioParaEdicao}
                                     modoEdicao={modoEdicao}
                                     setModoEdicao={setModoEdicao}
                                 />

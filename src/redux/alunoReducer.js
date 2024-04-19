@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ESTADO from '../recursos/estado';
-const urlBase = 'https://projetodecel-backend.onrender.com/aluno';
+const urlBase = 'http://localhost:8080/aluno';
+// const urlBase = 'https://projetodecel-backend.onrender.com/aluno';
 
 export const buscarAlunos = createAsyncThunk('aluno/buscar', async () => {
     try {
@@ -52,14 +53,16 @@ export const adicionarAluno = createAsyncThunk('aluno/adicionar', async (aluno) 
                 nome: aluno.nome,
                 rg: aluno.rg,
                 dataNasc: aluno.dataNasc,
+                celular: aluno.celular,
                 observacoes: aluno.observacoes
             }
         }
     }
     else {
+        const erro = await resposta.json();
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao adicionar o aluno.',
+            mensagem: erro.mensagem,
             aluno
         }
     }
@@ -88,14 +91,16 @@ export const atualizarAluno = createAsyncThunk('aluno/atualizar', async (aluno) 
                 nome: aluno.nome,
                 rg: aluno.rg,
                 dataNasc: aluno.dataNasc,
+                celular: aluno.celular,
                 observacoes: aluno.observacoes
             }
         }
     }
     else {
+        const erro = await resposta.json();
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao atualizar o aluno.',
+            mensagem: erro.mensagem,
             aluno
         }
     }

@@ -191,6 +191,8 @@ export default function FormCadResponsavel(props) {
                 <Form.Group className="mb-3">
                     <Form.Label>RG(*):</Form.Label>
                     <InputMask
+                        style={{width:'300px'}}
+                        className="form-control"
                         mask="99.999.999-9" // Máscara para o RG
                         maskChar="_"
                         placeholder="XX.XXX.XXX-X"
@@ -208,6 +210,8 @@ export default function FormCadResponsavel(props) {
                 <Form.Group className="mb-3">
                     <Form.Label>CPF(*):</Form.Label>
                     <InputMask
+                        style={{width:'300px'}}
+                        className="form-control"
                         mask="999.999.999-99" // Máscara para o CPF
                         maskChar="_"
                         placeholder="XXX.XXX.XXX-XX"
@@ -242,6 +246,8 @@ export default function FormCadResponsavel(props) {
                 <Form.Group className="mb-3">
                     <Form.Label>Telefone:</Form.Label>
                     <InputMask
+                        style={{width:'300px'}}
+                        className="form-control"
                         mask="(99) 9999-9999" // Máscara para o telefone
                         maskChar="_"
                         placeholder="(99) 9999-9999"
@@ -258,6 +264,8 @@ export default function FormCadResponsavel(props) {
                 <Form.Group className="mb-3">
                     <Form.Label>Celular(*):</Form.Label>
                     <InputMask
+                        style={{width:'300px'}}
+                        className="form-control"
                         mask="(99) 99999-9999" // Máscara para o telefone
                         maskChar="_"
                         placeholder="(99) 99999-9999"

@@ -14,6 +14,7 @@ export default function FormCadAlunos(props) {
         rg: '',
         observacoes: '',
         dataNasc: '',
+        celular: '',
         responsaveis: []
     }
 
@@ -68,7 +69,18 @@ export default function FormCadAlunos(props) {
 
     function manipularMudancas(e) {
         const componente = e.currentTarget;
+        let valor = componente.value;
+
+        if (componente.name === 'celular') {
+            valor = formatarCelular(valor);
+        }
         setAluno({ ...aluno, [componente.name]: componente.value });
+    }
+
+    function manipularMudancasCelular(e) {
+        let celular = e.target.value;
+        celular = formatarCelular(celular);
+        setAluno({ ...aluno, celular: celular });
     }
 
 
@@ -84,6 +96,21 @@ export default function FormCadAlunos(props) {
         setResponsaveisSelecionados(novosResponsaveis);
     }
 
+    function formatarCelular(celular, cursorPos) {
+        if (!celular) return celular;
+        celular = celular.replace(/\D/g, '');
+    
+        const hasHyphen = celular.includes('-');
+        const formatted = celular.length < 11
+            ? celular.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3')
+            : celular.replace(/^(\d{2})(\d)(\d{4})(\d{0,4})$/, '($1) $2 $3-$4');
+    
+        if (hasHyphen && cursorPos <= formatted.indexOf('-')) {
+            return formatted.replace('-', '');
+        }
+    
+        return formatted;
+    }
 
     function manipularSubmissao(e) {
         const form = e.currentTarget;
@@ -102,7 +129,7 @@ export default function FormCadAlunos(props) {
                             }));
                         });
                     } else {
-                        props.setMensagem('Aluno não incluído!');
+                        props.setMensagem('Aluno não incluído! '+ retorno.payload.mensagem);
                         props.setTipoMensagem('danger');
                         props.setMostrarMensagem(true);
                     }
@@ -146,7 +173,7 @@ export default function FormCadAlunos(props) {
                             }
                         });
                     } else {
-                        props.setMensagem('Aluno não alterado!');
+                        props.setMensagem('Aluno não alterado! '+ retorno.payload.mensagem);
                         props.setTipoMensagem('danger');
                         props.setMostrarMensagem(true);
                     }
@@ -154,6 +181,7 @@ export default function FormCadAlunos(props) {
             }
             setAluno(alunoVazio);
             setFormValidado(false);
+            props.exibirFormulario(false);
         }
         else {
             setFormValidado(true);
@@ -191,11 +219,7 @@ export default function FormCadAlunos(props) {
                         value={aluno.rg}
                         onChange={manipularMudancas}
                         required
-                        pattern="\d{2}\.\d{3}\.\d{3}-[\dxX]"
                     />
-                    <Form.Control.Feedback type="invalid">
-                        O RG deve estar no formato XX.XXX.XXX-X.
-                    </Form.Control.Feedback>
                 </Form.Group>
 
                 <Row>
@@ -244,15 +268,13 @@ export default function FormCadAlunos(props) {
                         {responsaveisSelecionados.map((responsavel, index) => (
                             <div key={index} className="d-flex align-items-center">
                                 <Button
-                                    variant="primary"
-                                    className="me-2 mb-2 mt-3"
+                                    variant="secondary"
+                                    className="me-2 mb-2 mt-3 w-75"
                                     onClick={() => addResponsavel(responsavel)}
                                 >
                                     {`${responsavel.nome} - RG: ${responsavel.rg}`}
                                 </Button>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Parentesco do responsável"
+                                <Form.Select
                                     className="mb-2 mt-3"
                                     value={responsavel.parentesco}
                                     onChange={(e) => {
@@ -264,7 +286,17 @@ export default function FormCadAlunos(props) {
                                         setResponsaveisSelecionados(novosResponsaveis);
                                     }}
                                     required
-                                />
+                                >
+                                    <option value="">Selecione o parentesco</option>
+                                    <option value="Pai">Pai</option>
+                                    <option value="Mãe">Mãe</option>
+                                    <option value="Avô">Avô</option>
+                                    <option value="Avó">Avó</option>
+                                    <option value="Tio">Tio</option>
+                                    <option value="Tia">Tia</option>
+                                    <option value="Padrasto">Padrasto</option>
+                                    <option value="Madrasta">Madrasta</option>
+                                </Form.Select>
                                 <Button
                                     variant="danger"
                                     className="mb-2 mt-3"
@@ -276,6 +308,18 @@ export default function FormCadAlunos(props) {
                         ))}
                     </Form.Group>
 
+                    <Form.Group className="mb-3">
+                        <Form.Label>Celular:</Form.Label>
+                        <Form.Control
+                            type="text"
+                            placeholder="(00) 00000-0000"
+                            id="celular"
+                            name="celular"
+                            value={formatarCelular(aluno.celular)}
+                            onChange={manipularMudancasCelular}
+                            maxLength="16"
+                        />
+                    </Form.Group>
                 </Form.Group>
                 <Form.Group className="mb-3">
                     <Form.Label>Observações:</Form.Label>

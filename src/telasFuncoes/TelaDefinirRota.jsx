@@ -4,6 +4,7 @@ import { Container, Row, Col } from 'react-bootstrap';
 import Pagina from '../templates/Pagina';
 import { Link } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
+import Select from 'react-select'
 
 import '../templates/style.css';
 
@@ -27,6 +28,13 @@ export default function TelaDefinirRota(props) {
       "tipo":"Ônibus"
     }
   ])
+
+  const motoristas = [
+    {nome:"Valdemar"},
+    {nome:"Antonio"},
+    {nome:"Joao"},
+    {nome:"Maria"}
+  ]
   
   const pontoEstilo = {
     "id":0,
@@ -169,11 +177,18 @@ export default function TelaDefinirRota(props) {
       )
     }
 
-    
+    const [selecionadoM, setSelecionadoM] = useState([]);
+
+    const options = motoristas.map(motorista => ({
+      label: motorista.nome,
+      value: motorista.nome
+    }));
+
+    const handleChange = selectedOptions => {
+      setSelecionadoM(selectedOptions);
+    };
     return (
       <Pagina>
-
-                
                 <div className="container mt-5" >
                 <div>
                 <Row className='justify-content-center'>
@@ -190,7 +205,7 @@ export default function TelaDefinirRota(props) {
                     <select id="placaVeiculo" className="form-select mb-3">
                         {
                           placas.map(placa =>{
-                            return(<option value={placa.placa}>{placa.placa} ({placa.tipo})</option>)
+                            return(<option key={placa.placa} value={placa.placa}>{placa.placa} ({placa.tipo})</option>)
                           })
                         }
                     </select>
@@ -199,12 +214,13 @@ export default function TelaDefinirRota(props) {
                   <Col md>
                     <h4 className="mb-3">Motorista</h4>
                     <div className="mb-3">
-                        <select id="motorista" className="form-select" >
-                            <option value="Valdemar">Valdemar</option>
-                            <option value="Antonio">Antonio</option>
-                            <option value="Joao">Joao</option>
-                            <option value="Maria">Maria</option>
-                        </select>
+                    <Select
+                          options={options}
+                          isMulti
+                          value={selecionadoM}
+                          onChange={handleChange}
+                          placeholder="selecionar motorista"
+                    />
                     </div>
                   </Col>
                   
