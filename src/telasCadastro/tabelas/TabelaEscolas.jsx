@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Container, Table } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarEscolas, removerEscola } from '../../redux/escolaReducer';
-import { useEffect } from 'react';
+import { buscarPontosEmbarque } from '../../redux/pontosEmbarqueReducer';
 
 export default function TabelaEscolas(props) {
     const [termoBusca, setTermoBusca] = useState('');
@@ -10,17 +10,26 @@ export default function TabelaEscolas(props) {
     const dispatch = useDispatch();
 
     const escolaVazia = {
-        codigo: '0',
+        codigo: 0,
         nome: '',
         tipo: '',
-        rua: '',
-        numero: '',
-        cidade: '',
-        bairro: '',
-        cep: '',
-        email:'',
-        telefone: ''
-    };
+        email: '',
+        telefone: '',
+        pontoEmbarque: {
+            codigo: 0,
+            rua: '',
+            numero: '',
+            bairro: '',
+            cep: ''
+        }
+    }
+
+    useEffect(() => {
+        dispatch(buscarEscolas());
+        dispatch(buscarPontosEmbarque());
+    }, [dispatch]);
+
+    const { estadoPdE, mensagemPdE, pontosEmbarque } = useSelector(state => state.pontoEmbarque);
 
     function excluirEscola(escola) {
         if (window.confirm('Deseja realmente excluir essa escola?')) {
@@ -33,10 +42,6 @@ export default function TabelaEscolas(props) {
         props.setModoEdicao(true);
         props.exibirFormulario(true);
     }
-
-    useEffect(() => {
-        dispatch(buscarEscolas());
-    }, [dispatch]);
 
     const escolasFiltradas = escolas.filter(escola =>
         escola.nome.toLowerCase().includes(termoBusca.toLowerCase())
@@ -89,8 +94,11 @@ export default function TabelaEscolas(props) {
                     {escolasFiltradas.map(escola => (
                         <tr key={escola.codigo}>
                             <td>{escola.nome}</td>
-                            <td>{escola.rua}, {escola.numero}, {escola.bairro}, {escola.cidade}</td>
-                            <td>{escola.cep}</td>                
+                            <td>{pontosEmbarque.find(ponto => ponto.codigo === escola.pontoEmbarque.codigo)?.rua}
+                                , {pontosEmbarque.find(ponto => ponto.codigo === escola.pontoEmbarque.codigo)?.numero}
+                                , {pontosEmbarque.find(ponto => ponto.codigo === escola.pontoEmbarque.codigo)?.bairro}</td>
+                            <td>{pontosEmbarque.find(ponto => ponto.codigo === escola.pontoEmbarque.codigo)?.cep
+                                .replace(/^(\d{5})(\d{3})$/, '$1-$2')}</td>
                             <td>
                                 {escola.tipo === 'i'
                                     ? 'Educação Infantil'
