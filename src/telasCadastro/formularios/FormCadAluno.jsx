@@ -5,6 +5,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { buscarResponsaveis } from '../../redux/responsavelReducer';
 import { adicionarParentesco, atualizarParentesco, removerParentesco } from '../../redux/parentescoReducer';
 import { useEffect } from 'react';
+import validarCelular from '../../validacoes/validarCelular';
+import InputMask from 'react-input-mask';
+
 
 
 export default function FormCadAlunos(props) {
@@ -96,92 +99,97 @@ export default function FormCadAlunos(props) {
         setResponsaveisSelecionados(novosResponsaveis);
     }
 
-    function formatarCelular(celular, cursorPos) {
+    const formatarCelular = (celular) => {
         if (!celular) return celular;
-        celular = celular.replace(/\D/g, '');
-    
-        const hasHyphen = celular.includes('-');
-        const formatted = celular.length < 11
-            ? celular.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3')
-            : celular.replace(/^(\d{2})(\d)(\d{4})(\d{0,4})$/, '($1) $2 $3-$4');
-    
-        if (hasHyphen && cursorPos <= formatted.indexOf('-')) {
-            return formatted.replace('-', '');
+
+        let celularFormatado = celular.replace(/\D/g, '');
+
+        celularFormatado = celularFormatado.substring(0, 11);
+        if (celularFormatado.length === 8) {
+            celularFormatado = `${celularFormatado.substring(0, 4)}-${celularFormatado.substring(4)}`;
         }
-    
-        return formatted;
+        if (celularFormatado.length > 2) {
+            celularFormatado = `(${celularFormatado.substring(0, 2)}) ${celularFormatado.substring(2)}`;
+        }
+        if (celularFormatado.length > 9) {
+            celularFormatado = `${celularFormatado.substring(0, 9)}-${celularFormatado.substring(9)}`;
+        }
+
+        return celularFormatado;
     }
 
     function manipularSubmissao(e) {
         const form = e.currentTarget;
         if (form.checkValidity()) {
-            if (!props.modoEdicao) {
-                dispatch(adicionarAluno(aluno)).then((retorno) => {
-                    if (retorno.payload.status) {
-                        props.setMensagem('Aluno incluído com sucesso!');
-                        props.setTipoMensagem('success');
-                        props.setMostrarMensagem(true);
-                        responsaveisSelecionados.forEach(responsavel => {
-                            dispatch(adicionarParentesco({
-                                codigoAluno: retorno.payload.aluno.codigoGerado,
-                                codigoResponsavel: responsavel.codigo,
-                                parentesco: responsavel.parentesco
-                            }));
-                        });
-                    } else {
-                        props.setMensagem('Aluno não incluído! '+ retorno.payload.mensagem);
-                        props.setTipoMensagem('danger');
-                        props.setMostrarMensagem(true);
-                    }
-                });
-            }
-            else {
-                dispatch(atualizarAluno(aluno)).then((retorno) => {
-                    if (retorno.payload.status) {
-                        props.setMensagem('Aluno alterado com sucesso');
-                        props.setTipoMensagem('success');
-                        props.setMostrarMensagem(true);
-                        props.setModoEdicao(false);
-                        props.setAlunoParaEdicao(alunoVazio);
-                        responsaveisSelecionados.forEach(responsavel => {
-                            if (!responsaveisAntes.find(r => r.codigo === responsavel.codigo)) {
+            if(validarCelular(aluno.celular)) {
+                if (!props.modoEdicao) {
+                    dispatch(adicionarAluno(aluno)).then((retorno) => {
+                        if (retorno.payload.status) {
+                            props.setMensagem('Aluno incluído com sucesso!');
+                            props.setTipoMensagem('success');
+                            props.setMostrarMensagem(true);
+                            responsaveisSelecionados.forEach(responsavel => {
                                 dispatch(adicionarParentesco({
                                     codigoAluno: retorno.payload.aluno.codigoGerado,
                                     codigoResponsavel: responsavel.codigo,
                                     parentesco: responsavel.parentesco
                                 }));
-                            }
-                        });
+                            });
+                        } else {
+                            props.setMensagem('Aluno não incluído! ' + retorno.payload.mensagem);
+                            props.setTipoMensagem('danger');
+                            props.setMostrarMensagem(true);
+                        }
+                    });
+                }
+                else {
+                    dispatch(atualizarAluno(aluno)).then((retorno) => {
+                        if (retorno.payload.status) {
+                            props.setMensagem('Aluno alterado com sucesso');
+                            props.setTipoMensagem('success');
+                            props.setMostrarMensagem(true);
+                            props.setModoEdicao(false);
+                            props.setAlunoParaEdicao(alunoVazio);
+                            responsaveisSelecionados.forEach(responsavel => {
+                                if (!responsaveisAntes.find(r => r.codigo === responsavel.codigo)) {
+                                    dispatch(adicionarParentesco({
+                                        codigoAluno: retorno.payload.aluno.codigoGerado,
+                                        codigoResponsavel: responsavel.codigo,
+                                        parentesco: responsavel.parentesco
+                                    }));
+                                }
+                            });
 
-                        responsaveisSelecionados.forEach(responsavel => {
-                            if (responsaveisAntes.find(r => r.codigo === responsavel.codigo)) {
-                                dispatch(atualizarParentesco({
-                                    codigoAluno: retorno.payload.aluno.codigoGerado,
-                                    codigoResponsavel: responsavel.codigo,
-                                    parentesco: responsavel.parentesco
-                                }));
-                            }
-                        });
+                            responsaveisSelecionados.forEach(responsavel => {
+                                if (responsaveisAntes.find(r => r.codigo === responsavel.codigo)) {
+                                    dispatch(atualizarParentesco({
+                                        codigoAluno: retorno.payload.aluno.codigoGerado,
+                                        codigoResponsavel: responsavel.codigo,
+                                        parentesco: responsavel.parentesco
+                                    }));
+                                }
+                            });
 
-                        responsaveisAntes.forEach(responsavel => {
-                            if (!responsaveisSelecionados.find(r => r.codigo === responsavel.codigo)) {
-                                dispatch(removerParentesco({
-                                    codigoAluno: retorno.payload.aluno.codigoGerado,
-                                    codigoResponsavel: responsavel.codigo,
-                                    parentesco: responsavel.parentesco
-                                }));
-                            }
-                        });
-                    } else {
-                        props.setMensagem('Aluno não alterado! '+ retorno.payload.mensagem);
-                        props.setTipoMensagem('danger');
-                        props.setMostrarMensagem(true);
-                    }
-                });
+                            responsaveisAntes.forEach(responsavel => {
+                                if (!responsaveisSelecionados.find(r => r.codigo === responsavel.codigo)) {
+                                    dispatch(removerParentesco({
+                                        codigoAluno: retorno.payload.aluno.codigoGerado,
+                                        codigoResponsavel: responsavel.codigo,
+                                        parentesco: responsavel.parentesco
+                                    }));
+                                }
+                            });
+                        } else {
+                            props.setMensagem('Aluno não alterado! ' + retorno.payload.mensagem);
+                            props.setTipoMensagem('danger');
+                            props.setMostrarMensagem(true);
+                        }
+                    });
+                }
+                setAluno(alunoVazio);
+                setFormValidado(false);
+                props.exibirFormulario(false);
             }
-            setAluno(alunoVazio);
-            setFormValidado(false);
-            props.exibirFormulario(false);
         }
         else {
             setFormValidado(true);
@@ -310,14 +318,16 @@ export default function FormCadAlunos(props) {
 
                     <Form.Group className="mb-3">
                         <Form.Label>Celular:</Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder="(00) 00000-0000"
-                            id="celular"
+                        <InputMask
+                            style={{ width: '300px' }}
+                            className="form-control"
+                            mask="(99) 99999-9999"
+                            maskChar="_"
+                            placeholder="(99) 99999-9999"
                             name="celular"
-                            value={formatarCelular(aluno.celular)}
-                            onChange={manipularMudancasCelular}
-                            maxLength="16"
+                            value={aluno.celular}
+                            onChange={manipularMudancas}
+                            required
                         />
                     </Form.Group>
                 </Form.Group>
