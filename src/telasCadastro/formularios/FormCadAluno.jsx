@@ -80,13 +80,6 @@ export default function FormCadAlunos(props) {
         setAluno({ ...aluno, [componente.name]: componente.value });
     }
 
-    function manipularMudancasCelular(e) {
-        let celular = e.target.value;
-        celular = formatarCelular(celular);
-        setAluno({ ...aluno, celular: celular });
-    }
-
-
     function addResponsavel(responsavel) {
         if (!responsaveisSelecionados.find(r => r.codigo === responsavel.codigo)) {
             setResponsaveisSelecionados([...responsaveisSelecionados, responsavel]);
@@ -336,6 +329,11 @@ export default function FormCadAlunos(props) {
                         <Form.Control.Feedback type="invalid">
                             O celular deve estar no formato (99) 99999-9999.
                         </Form.Control.Feedback>
+                        {aluno.celular.length==15 && !validarCelular(aluno.celular) && (
+                            <Form.Text className="text-danger">
+                                Celular inválido.
+                            </Form.Text>
+                        )}
                     </Form.Group>
                 </Form.Group>
                 <Form.Group className="mb-3">
