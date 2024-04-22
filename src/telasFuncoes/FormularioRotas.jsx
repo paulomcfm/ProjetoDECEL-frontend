@@ -8,10 +8,13 @@ import { buscarPontosEmbarque } from '../redux/pontosEmbarqueReducer';
 import { useEffect } from 'react';
 import '../templates/style.css';
 
-export default function TelaDefinirRota(props) {
+export default function FormularioRotas(props) {
+
+  const [form,setForm] = useState(props.form)
 
   const { estado, mensagem, pontosEmbarque } = useSelector(state => state.pontoEmbarque);
   const dispatch =  useDispatch()
+
   
   const [placas,setPlacas] = useState([
     {
@@ -39,15 +42,10 @@ export default function TelaDefinirRota(props) {
     {nome:"Maria"}
   ]
   
-  const pontoEstilo = {
-    "id":0,
-    "nome":"",
-    "endereco":""
-  }
+  
     const [selecionado,setSelecionado] = useState([])
     const [pesquisa,setPesquisa] = new useState('')
     const [pesquisaSelecionado,setPesquisaSelecionado] = new useState('')
-    const listPontos = pontosEmbarque
     const [pontosDeParada,setPontosDeParada] = useState([])
 
     useEffect(() => {
@@ -69,7 +67,6 @@ export default function TelaDefinirRota(props) {
     function pesquisarPontosSelecionados(e){
       const componente = e.target
       setPesquisaSelecionado(componente.value)
-      console.log(pesquisaSelecionado)
     }
     
     
@@ -84,7 +81,7 @@ export default function TelaDefinirRota(props) {
       // usado para criar um copia do array 'selecionado'
       let novaListaSelecionados = [...selecionado]
       let i=0;
-      while(i<novaListaSelecionados.length && novaListaSelecionados[i].codigo!=sel.codigo)
+      while(i<novaListaSelecionados.length && novaListaSelecionados[i].codigo!==sel.codigo)
       i++;
     if(i>0){
       let aux = novaListaSelecionados[i];
@@ -94,6 +91,20 @@ export default function TelaDefinirRota(props) {
     }
   }
 
+  function descerPos(sel){
+    // usado para criar um copia do array 'selecionado'
+    let novaListaSelecionados = [...selecionado]
+    let i=0;
+    while(i<novaListaSelecionados.length && novaListaSelecionados[i].codigo!==sel.codigo)
+    i++;
+  if(i<novaListaSelecionados.length-1){
+    let aux = novaListaSelecionados[i];
+    novaListaSelecionados[i] = novaListaSelecionados[i + 1];
+    novaListaSelecionados[i + 1] = aux;
+    setSelecionado(novaListaSelecionados);
+  }
+}
+
   function retirarSelecionado(sel){
     setSelecionado(selecionado.filter(selecionadoF => selecionadoF.codigo!==sel.codigo))
     const lista = pontosDeParada
@@ -101,8 +112,6 @@ export default function TelaDefinirRota(props) {
     setPontosDeParada(lista)
   }
   function listarPontos(ponto){
-    console.log(pontosEmbarque)
-    console.log(mensagem)
     return (
       <div key={ponto.codigo}>
           <label style={{height:"30px"}}>
@@ -127,6 +136,11 @@ export default function TelaDefinirRota(props) {
                   <path d="M3.5 12.5a.5.5 0 0 1-1 0V3.707L1.354 4.854a.5.5 0 1 1-.708-.708l2-1.999.007-.007a.5.5 0 0 1 .7.006l2 2a.5.5 0 1 1-.707.708L3.5 3.707zm3.5-9a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5M7.5 6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1z"/>
               </svg>
               </button>
+              <button type="button" style={{border:'none',background:'none'}} onClick={()=>{descerPos(sel)}}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fillRule="currentColor" className="bi bi-sort-down-alt" viewBox="0 0 16 16">
+                <path d="M3.5 3.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 12.293zm4 .5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5"/>
+              </svg>
+              </button>
               <button type="button" style={{border:'none',background:'none'}} onClick={()=>{retirarSelecionado(sel)}}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fillRule="currentColor" className="bi bi-x-circle-fill" viewBox="0 0 16 16">
                   <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/>
@@ -149,7 +163,7 @@ export default function TelaDefinirRota(props) {
       setSelecionadoM(selectedOptions);
     };
     return (
-      <Pagina>
+      <>
                 <div className="container mt-5" >
                 <div>
                 <Row className='justify-content-center'>
@@ -238,7 +252,7 @@ export default function TelaDefinirRota(props) {
                       pontosDeParada.map(ponto => {
                         const pontoNomeLowerCase = ponto.rua.toLowerCase()+'('+ponto.numero.toLowerCase()+') - '+ponto.cep;
                         const compNomeLowerCase = pesquisa.toLowerCase();
-                        if(pesquisa == ''){
+                        if(pesquisa === ''){
                             return listarPontos(ponto)
                         }else{
                         if (pontoNomeLowerCase.includes(compNomeLowerCase)) {
@@ -261,7 +275,7 @@ export default function TelaDefinirRota(props) {
                         selecionado.map(sel =>{
                           const selecionadoL = sel.rua.toLowerCase()+'('+sel.numero.toLowerCase()+') - '+sel.cep;
                           const pesquisaL = pesquisaSelecionado.toLowerCase();
-                          if(pesquisaL == ''){
+                          if(pesquisaL === ''){
                             return listaPontosSelecionados(sel)
                           }
                           else
@@ -279,6 +293,6 @@ export default function TelaDefinirRota(props) {
                 <br/><br/><br/>
                 <button type="button" className="btn btn-primary" >Cadastrar</button>
             </div>
-        </Pagina>
+        </>
     );
 }

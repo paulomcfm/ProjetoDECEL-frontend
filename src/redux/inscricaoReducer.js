@@ -6,7 +6,6 @@ export const buscarInscricoes = createAsyncThunk('inscricao-aluno/buscar', async
     try {
         const resposta = await fetch(urlBase, { method: 'GET' });
         const dados = await resposta.json();
-        console.log(dados.status)
         if (dados.status) {
             return {
                 status: true,
@@ -60,6 +59,7 @@ export const adicionarInscricao = createAsyncThunk('inscricao-aluno/adicionar', 
     }
 });
 
+
 export const atualizarInscricao = createAsyncThunk('inscricao-aluno/atualizar', async (inscricao) => {
     const resposta = await fetch(urlBase, {
         method: 'PUT',
@@ -89,6 +89,7 @@ export const atualizarInscricao = createAsyncThunk('inscricao-aluno/atualizar', 
         }
     }
 });
+
 
 export const removerInscricao = createAsyncThunk('inscricao-aluno/remover', async (inscricao) => {
     const resposta = await fetch(urlBase, {
@@ -156,7 +157,7 @@ const inscricaoSlice = createSlice({
             state.estado = ESTADO.PENDENTE;
             state.mensagem = "Adicionando inscrição...";
         }).addCase(adicionarInscricao.rejected, (state, action) => {
-            state.mensagem = "Erro ao adicionar a inscricao: " + action.error.message;
+            state.mensagem = "Erro ao adicionar a inscrição: " + action.error.message;
             state.estado = ESTADO.ERRO;
         }).addCase(atualizarInscricao.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
