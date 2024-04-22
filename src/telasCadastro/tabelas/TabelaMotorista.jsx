@@ -15,7 +15,9 @@
     
 
     function remover(key){
-      dispatch(removerMotorista(key))
+      
+      if(window.confirm("Deseja realmente excluir esse motorista"))
+          dispatch(removerMotorista(key))
     }
     
     function pesquisa(event){
@@ -50,7 +52,7 @@
                   <tr key={motorista.id}>
                       <td>{motorista.nome}</td>
                       <td>{motorista.cnh}</td>
-                      <td>{motorista.telefone}</td>
+                      <td>{motorista.celular}</td>
                     <td>
                       <button type="button" className="btn btn-danger" onClick={()=>{remover(motorista.id)}}>
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-trash-fill" viewBox="0 0 16 16">
@@ -62,7 +64,7 @@
                           props.setMotorista({
                             nome:motorista.nome,
                             cnh:motorista.cnh,
-                            telefone:motorista.telefone
+                            celular:motorista.celular
                         })
                           props.setModo('edicao')
                           props.setTela(false)

@@ -5,7 +5,7 @@ import TelaCadastroAluno from './telasCadastro/telaCadastroAluno.jsx';
 import TelaCadastroPontoEmbarque from './telasCadastro/telaCadastroPontoEmbarque.jsx';
 import TelaMotorista from './telasCadastro/telaMotorista.jsx';
 import Tela404 from './telasCadastro/Tela404.jsx';
-import TelaDefinirRota from './telasFuncoes/TelaDefinirRota.jsx';
+import TelaDefinirRotas from './telasCadastro/TelaDefinirRotas.jsx';
 import TelaInscreverAluno from './telasFuncoes/TelaInscreverAluno.jsx';
 import TelaAlocarAluno from './telasFuncoes/TelaAlocarAluno.jsx';
 import TelaRegistrarManutencao from './telasFuncoes/TelaRegistrarManutencao.jsx';
@@ -33,7 +33,7 @@ function App() {
             <Route path='/responsaveis' element={<TelaCadastroResponsavel />} />
             <Route path='/escolas' element={<TelaCadastroEscola />} />
             <Route path='/menu' element={<TelaMenu />} />
-            <Route path='/definir-rota' element={<TelaDefinirRota />} />
+            <Route path='/definir-rota' element={<TelaDefinirRotas />} />
             <Route path='/inscrever-aluno' element={<TelaInscreverAluno />} />
             <Route path='/alocar-aluno' element={<TelaAlocarAluno />} />
             <Route path='/registrar-manutencao' element={<TelaRegistrarManutencao />} />
