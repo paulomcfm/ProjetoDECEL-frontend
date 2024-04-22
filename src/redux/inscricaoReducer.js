@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ESTADO from '../recursos/estado';
-const urlBase = 'http://localhost:8080/inscricao';
+const urlBase = 'http://localhost:8080/inscricao-aluno';
 
-export const buscarInscricoes = createAsyncThunk('inscricao/buscar', async () => {
+export const buscarInscricoes = createAsyncThunk('inscricao-aluno/buscar', async () => {
     try {
         const resposta = await fetch(urlBase, { method: 'GET' });
         const dados = await resposta.json();
@@ -29,7 +29,7 @@ export const buscarInscricoes = createAsyncThunk('inscricao/buscar', async () =>
     }
 });
 
-export const adicionarInscricao = createAsyncThunk('inscricao/adicionar', async (inscricao) => {
+export const adicionarInscricao = createAsyncThunk('inscricao-aluno/adicionar', async (inscricao) => {
     const resposta = await fetch(urlBase, {
         method: 'POST',
         headers: {
@@ -59,7 +59,8 @@ export const adicionarInscricao = createAsyncThunk('inscricao/adicionar', async 
     }
 });
 
-export const atualizarInscricao = createAsyncThunk('inscricao/atualizar', async (inscricao) => {
+
+export const atualizarInscricao = createAsyncThunk('inscricao-aluno/atualizar', async (inscricao) => {
     const resposta = await fetch(urlBase, {
         method: 'PUT',
         headers: {
@@ -89,7 +90,8 @@ export const atualizarInscricao = createAsyncThunk('inscricao/atualizar', async 
     }
 });
 
-export const removerInscricao = createAsyncThunk('inscricao/remover', async (inscricao) => {
+
+export const removerInscricao = createAsyncThunk('inscricao-aluno/remover', async (inscricao) => {
     const resposta = await fetch(urlBase, {
         method: 'DELETE',
         headers: {
@@ -134,7 +136,7 @@ const inscricaoSlice = createSlice({
     extraReducers: (builder) => {
         builder.addCase(buscarInscricoes.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
-            state.mensagem = "Buscando incrições...";
+            state.mensagem = "Buscando inscrições...";
         }).addCase(buscarInscricoes.fulfilled, (state, action) => {
             if (action.payload.status) {
                 state.estado = ESTADO.OCIOSO;

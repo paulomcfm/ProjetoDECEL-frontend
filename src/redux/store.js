@@ -18,8 +18,8 @@ const store = configureStore({
         pontoEmbarque: pontosEmbarqueReducer,
         motorista: motoristaSlice,
         usuario: usuarioSlice,
+        inscricao: inscricaoSlice,
         rota: rotaSlice,
-        inscricao: inscricaoSlice
     }
 });
 

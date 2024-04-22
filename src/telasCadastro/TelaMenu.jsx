@@ -28,7 +28,7 @@ export default function Menu(props) {
                         </NavLink>
                     </Col>
                     <Col xs={6} md={3} lg={3} className="mb-3 p-0">
-                        <NavLink to="/inscrever-aluno" className="nav-link">
+                        <NavLink to="/inscricao-aluno" className="nav-link">
                             <img src={imagemRegistrarManutencao} alt="Inscrever Aluno" className="imagem-botao w-100 hover-scale" />
                         </NavLink>
                     </Col>
