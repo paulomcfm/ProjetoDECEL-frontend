@@ -80,13 +80,6 @@ export default function FormCadAlunos(props) {
         setAluno({ ...aluno, [componente.name]: componente.value });
     }
 
-    function manipularMudancasCelular(e) {
-        let celular = e.target.value;
-        celular = formatarCelular(celular);
-        setAluno({ ...aluno, celular: celular });
-    }
-
-
     function addResponsavel(responsavel) {
         if (!responsaveisSelecionados.find(r => r.codigo === responsavel.codigo)) {
             setResponsaveisSelecionados([...responsaveisSelecionados, responsavel]);
@@ -120,76 +113,80 @@ export default function FormCadAlunos(props) {
 
     function manipularSubmissao(e) {
         const form = e.currentTarget;
-        if (form.checkValidity()) {
-            if(validarCelular(aluno.celular)) {
-                if (!props.modoEdicao) {
-                    dispatch(adicionarAluno(aluno)).then((retorno) => {
-                        if (retorno.payload.status) {
-                            props.setMensagem('Aluno incluído com sucesso!');
-                            props.setTipoMensagem('success');
-                            props.setMostrarMensagem(true);
-                            responsaveisSelecionados.forEach(responsavel => {
+        var celularValidado = false;
+        if (aluno.celular == '')
+            celularValidado = true;
+        else {
+            celularValidado = validarCelular(aluno.celular);
+        }
+        if (form.checkValidity() && celularValidado) {
+            if (!props.modoEdicao) {
+                dispatch(adicionarAluno(aluno)).then((retorno) => {
+                    if (retorno.payload.status) {
+                        props.setMensagem('Aluno incluído com sucesso!');
+                        props.setTipoMensagem('success');
+                        props.setMostrarMensagem(true);
+                        responsaveisSelecionados.forEach(responsavel => {
+                            dispatch(adicionarParentesco({
+                                codigoAluno: retorno.payload.aluno.codigoGerado,
+                                codigoResponsavel: responsavel.codigo,
+                                parentesco: responsavel.parentesco
+                            }));
+                        });
+                    } else {
+                        props.setMensagem('Aluno não incluído! ' + retorno.payload.mensagem);
+                        props.setTipoMensagem('danger');
+                        props.setMostrarMensagem(true);
+                    }
+                });
+            }
+            else {
+                dispatch(atualizarAluno(aluno)).then((retorno) => {
+                    if (retorno.payload.status) {
+                        props.setMensagem('Aluno alterado com sucesso');
+                        props.setTipoMensagem('success');
+                        props.setMostrarMensagem(true);
+                        props.setModoEdicao(false);
+                        props.setAlunoParaEdicao(alunoVazio);
+                        responsaveisSelecionados.forEach(responsavel => {
+                            if (!responsaveisAntes.find(r => r.codigo === responsavel.codigo)) {
                                 dispatch(adicionarParentesco({
                                     codigoAluno: retorno.payload.aluno.codigoGerado,
                                     codigoResponsavel: responsavel.codigo,
                                     parentesco: responsavel.parentesco
                                 }));
-                            });
-                        } else {
-                            props.setMensagem('Aluno não incluído! ' + retorno.payload.mensagem);
-                            props.setTipoMensagem('danger');
-                            props.setMostrarMensagem(true);
-                        }
-                    });
-                }
-                else {
-                    dispatch(atualizarAluno(aluno)).then((retorno) => {
-                        if (retorno.payload.status) {
-                            props.setMensagem('Aluno alterado com sucesso');
-                            props.setTipoMensagem('success');
-                            props.setMostrarMensagem(true);
-                            props.setModoEdicao(false);
-                            props.setAlunoParaEdicao(alunoVazio);
-                            responsaveisSelecionados.forEach(responsavel => {
-                                if (!responsaveisAntes.find(r => r.codigo === responsavel.codigo)) {
-                                    dispatch(adicionarParentesco({
-                                        codigoAluno: retorno.payload.aluno.codigoGerado,
-                                        codigoResponsavel: responsavel.codigo,
-                                        parentesco: responsavel.parentesco
-                                    }));
-                                }
-                            });
+                            }
+                        });
 
-                            responsaveisSelecionados.forEach(responsavel => {
-                                if (responsaveisAntes.find(r => r.codigo === responsavel.codigo)) {
-                                    dispatch(atualizarParentesco({
-                                        codigoAluno: retorno.payload.aluno.codigoGerado,
-                                        codigoResponsavel: responsavel.codigo,
-                                        parentesco: responsavel.parentesco
-                                    }));
-                                }
-                            });
+                        responsaveisSelecionados.forEach(responsavel => {
+                            if (responsaveisAntes.find(r => r.codigo === responsavel.codigo)) {
+                                dispatch(atualizarParentesco({
+                                    codigoAluno: retorno.payload.aluno.codigoGerado,
+                                    codigoResponsavel: responsavel.codigo,
+                                    parentesco: responsavel.parentesco
+                                }));
+                            }
+                        });
 
-                            responsaveisAntes.forEach(responsavel => {
-                                if (!responsaveisSelecionados.find(r => r.codigo === responsavel.codigo)) {
-                                    dispatch(removerParentesco({
-                                        codigoAluno: retorno.payload.aluno.codigoGerado,
-                                        codigoResponsavel: responsavel.codigo,
-                                        parentesco: responsavel.parentesco
-                                    }));
-                                }
-                            });
-                        } else {
-                            props.setMensagem('Aluno não alterado! ' + retorno.payload.mensagem);
-                            props.setTipoMensagem('danger');
-                            props.setMostrarMensagem(true);
-                        }
-                    });
-                }
-                setAluno(alunoVazio);
-                setFormValidado(false);
-                props.exibirFormulario(false);
+                        responsaveisAntes.forEach(responsavel => {
+                            if (!responsaveisSelecionados.find(r => r.codigo === responsavel.codigo)) {
+                                dispatch(removerParentesco({
+                                    codigoAluno: retorno.payload.aluno.codigoGerado,
+                                    codigoResponsavel: responsavel.codigo,
+                                    parentesco: responsavel.parentesco
+                                }));
+                            }
+                        });
+                    } else {
+                        props.setMensagem('Aluno não alterado! ' + retorno.payload.mensagem);
+                        props.setTipoMensagem('danger');
+                        props.setMostrarMensagem(true);
+                    }
+                });
             }
+            setAluno(alunoVazio);
+            setFormValidado(false);
+            props.exibirFormulario(false);
         }
         else {
             setFormValidado(true);
@@ -327,8 +324,16 @@ export default function FormCadAlunos(props) {
                             name="celular"
                             value={aluno.celular}
                             onChange={manipularMudancas}
-                            required
+                            pattern="\(\d{2}\) \d{5}-\d{4}"
                         />
+                        <Form.Control.Feedback type="invalid">
+                            O celular deve estar no formato (99) 99999-9999.
+                        </Form.Control.Feedback>
+                        {aluno.celular.length==15 && !validarCelular(aluno.celular) && (
+                            <Form.Text className="text-danger">
+                                Celular inválido.
+                            </Form.Text>
+                        )}
                     </Form.Group>
                 </Form.Group>
                 <Form.Group className="mb-3">

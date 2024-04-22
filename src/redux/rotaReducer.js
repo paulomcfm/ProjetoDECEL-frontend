@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ESTADO from '../recursos/estado';
+
 const urlBase = 'http://localhost:8080/definir-rota';
 
 
@@ -31,7 +32,7 @@ export const buscarRotas = createAsyncThunk('rotas/buscar', async () => {
 });
 
 export const adicionarRotas = createAsyncThunk('rotas/adicionar', async (rota) => {
-    const resposta = await fetch(urlBase, {
+const resposta = await fetch(urlBase, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -59,6 +60,7 @@ export const adicionarRotas = createAsyncThunk('rotas/adicionar', async (rota) =
         }
     }
 });
+
 
 export const atualizarRota = createAsyncThunk('rotas/atualizar', async (rota) => {
     const resposta = await fetch(urlBase, {
@@ -89,6 +91,7 @@ export const atualizarRota = createAsyncThunk('rotas/atualizar', async (rota) =>
         }
     }
 });
+
 
 export const removerRota = createAsyncThunk('rotas/remover', async (rota) => {
     const resposta = await fetch(urlBase, {
