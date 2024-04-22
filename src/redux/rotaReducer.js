@@ -1,8 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ESTADO from '../recursos/estado';
-const urlBase = 'http://localhost:8080/rota';
 
-export const buscarRotas = createAsyncThunk('rota/buscar', async () => {
+const urlBase = 'http://localhost:8080/definir-rota';
+
+
+export const buscarRotas = createAsyncThunk('rotas/buscar', async () => {
     try {
         const resposta = await fetch(urlBase, { method: 'GET' });
         const dados = await resposta.json();
@@ -29,8 +31,8 @@ export const buscarRotas = createAsyncThunk('rota/buscar', async () => {
     }
 });
 
-export const adicionarRota = createAsyncThunk('rota/adicionar', async (rota) => {
-    const resposta = await fetch(urlBase, {
+export const adicionarRotas = createAsyncThunk('rotas/adicionar', async (rota) => {
+const resposta = await fetch(urlBase, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -59,7 +61,8 @@ export const adicionarRota = createAsyncThunk('rota/adicionar', async (rota) => 
     }
 });
 
-export const atualizarRota = createAsyncThunk('rota/atualizar', async (rota) => {
+
+export const atualizarRota = createAsyncThunk('rotas/atualizar', async (rota) => {
     const resposta = await fetch(urlBase, {
         method: 'PUT',
         headers: {
@@ -89,7 +92,8 @@ export const atualizarRota = createAsyncThunk('rota/atualizar', async (rota) => 
     }
 });
 
-export const removerRota = createAsyncThunk('rota/remover', async (rota) => {
+
+export const removerRota = createAsyncThunk('rotas/remover', async (rota) => {
     const resposta = await fetch(urlBase, {
         method: 'DELETE',
         headers: {
@@ -147,22 +151,21 @@ const rotaSlice = createSlice({
         }).addCase(buscarRotas.rejected, (state, action) => {
             state.estado = ESTADO.ERRO;
             state.mensagem = action.error.message;
-        }).addCase(adicionarRota.fulfilled, (state, action) => {
+        }).addCase(adicionarRotas.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
             state.rotas.push(action.payload.rota);
             state.mensagem = action.payload.mensagem;
-        }).addCase(adicionarRota.pending, (state, action) => {
+        }).addCase(adicionarRotas.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
             state.mensagem = "Adicionando rota...";
-        }).addCase(adicionarRota.rejected, (state, action) => {
+        }).addCase(adicionarRotas.rejected, (state, action) => {
             state.mensagem = "Erro ao adicionar a rota: " + action.error.message;
             state.estado = ESTADO.ERRO;
         }).addCase(atualizarRota.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
             const indice = state.rotas.findIndex(rota => rota.codigo === action.payload.rota.codigo);
-            state.rotas[indice] = action.payload.rota;
+            state.escolas[indice] = action.payload.rota;
             state.mensagem = action.payload.mensagem;
-
         }).addCase(atualizarRota.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
             state.mensagem = "Atualizando rota...";
