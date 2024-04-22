@@ -39,7 +39,7 @@ export default function FormCadEscolas(props) {
     );
 
     const handleSelecionarPontoEmbarque = (pontoEmbarque) => {
-        setTermoBusca(`${pontoEmbarque.rua}, ${pontoEmbarque.numero}, ${pontoEmbarque.bairro}, ${pontoEmbarque.cep}`);
+        setTermoBusca(`${pontoEmbarque.rua}, ${pontoEmbarque.numero}, ${pontoEmbarque.bairro}, ${pontoEmbarque.cep.replace(/^(\d{5})(\d{3})$/, '$1-$2')}`);
         setEscola({ ...escola, pontoEmbarque: pontoEmbarque });
     };
 
@@ -175,7 +175,7 @@ export default function FormCadEscolas(props) {
                         <Form.Control
                             type="text"
                             placeholder="Buscar por rua ou CEP"
-                            value={termoBusca}
+                            value={props.modoEdicao ? (escola.pontoEmbarque?.rua + ', ' + escola.pontoEmbarque?.numero + ', ' + escola.pontoEmbarque?.bairro + ' - ' + escola.pontoEmbarque?.cep) : termoBusca}
                             onChange={(e) => setTermoBusca(e.target.value)}
                         />
                     </Form.Group>
