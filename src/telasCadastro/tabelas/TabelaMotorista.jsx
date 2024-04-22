@@ -42,7 +42,7 @@
                 <tr>
                   <th scope="col">Nome</th>
                   <th scope="col">CNH</th>
-                  <th scope="col">Telefone</th>
+                  <th scope="col">Celular</th>
                   <th scope="col" style={{width:'125px'}}>Ações</th>
                 </tr>
               </thead>
