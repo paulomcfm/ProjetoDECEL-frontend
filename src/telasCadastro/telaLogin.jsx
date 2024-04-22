@@ -11,11 +11,12 @@ function autenticarUsuario(username, password) {
 export default function TelaLogin() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [cpf, setCpf] = useState('');
     const [autenticado, setAutenticado] = useState(false);
 
     function handleLogin() {
         // Lógica de autenticação
-        const autenticacaoSucesso = autenticarUsuario(username, password);
+        const autenticacaoSucesso = autenticarUsuario(username, password, cpf);
         if (autenticacaoSucesso) {
             setAutenticado(true);
         } else {
@@ -48,6 +49,18 @@ export default function TelaLogin() {
                                 placeholder="Senha"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>CPF</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="999.999.999-99"
+                                id="cpf"
+                                name="cpf"
+                                value={cpf}
+                                onChange={(e) => setCpf(e.target.value)}
                                 required
                             />
                         </Form.Group>

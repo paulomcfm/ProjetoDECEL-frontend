@@ -3,7 +3,6 @@ import { Form, Button, Col, Row, InputGroup } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { adicionarUsuario, atualizarUsuario } from '../../redux/usuarioReducer';
 import { buscarAlunos } from '../../redux/alunoReducer';
-import InputMask from 'react-input-mask';
 import validarCelular from '../../validacoes/validarCelular';
 import validarCPF from '../../validacoes/validarCpf';
 
@@ -148,7 +147,7 @@ export default function FormCadUsuario(props) {
                     <Form.Label>CPF(*):</Form.Label>
                     <Form.Control
                         type="text"
-                        placeholder="00000-000"
+                        placeholder="999.999.999-99"
                         id="cpf"
                         name="cpf"
                         value={usuario.cpf}
