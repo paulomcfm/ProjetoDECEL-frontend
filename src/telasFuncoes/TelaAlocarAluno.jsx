@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import React from 'react';
-import { Container, Form, Table, OverlayTrigger, Popover, Card, Button, Col, Row, Dropdown } from 'react-bootstrap';
+import { Container, Form, Table, OverlayTrigger, Popover, Modal, Button } from 'react-bootstrap';
 import '../templates/style.css';
 import Pagina from "../templates/Pagina";
 import { GrContactInfo } from "react-icons/gr";
@@ -13,6 +13,8 @@ export default function TelaAlocarAluno(props) {
     const [inscricoesSelecionadas, setInscricoesSelecionadas] = useState([]);
     const [termoBusca, setTermoBusca] = useState('');
     const [inscricoesFiltradas, setInscricoesFiltradas] = useState([]);
+    const [mostrarModalConfirmacao, setMostrarModalConfirmacao] = useState(false);
+    const [novaRotaSelecionada, setNovaRotaSelecionada] = useState(null);
 
 
     var rota1 = {
@@ -21,17 +23,26 @@ export default function TelaAlocarAluno(props) {
         periodo: 'Matutino',
         tempoInicio: '08:00',
         tempoFinal: '12:00',
-        motorista: {
+        motoristas: [{
+            id: '  1',
             nome: 'João da Silva',
             cnh: '123456789',
             celular: '9999-9999'
         },
+        {
+            id: '  2',
+            nome: 'Pedro Oliveira',
+            cnh: '987654321',
+            celular: '8888-8888'
+        }],
         monitor: {
+            codigo: '1',
             nome: 'Maria Oliveira',
             cnh: '987654321',
             celular: '8888-8888'
         },
         veiculo: {
+            codigo: '1',
             placa: 'ABC-1234',
             renavam: '123456789',
             modelo: 'Fiat Uno',
@@ -39,12 +50,80 @@ export default function TelaAlocarAluno(props) {
             tipo: 'Micro-ônibus'
         },
         pontosDeEmbarque: [
-            { rua: 'Rua A', bairro: 'Bairro A', numero: '123', cep: '12345-678' },
-            { rua: 'Rua B', bairro: 'Bairro B', numero: '456', cep: '23456-789' }
+            { codigo: '1', rua: 'Rua A', bairro: 'Bairro A', numero: '123', cep: '12345-678' },
+            { codigo: '2', rua: 'Rua B', bairro: 'Bairro B', numero: '456', cep: '23456-789' }
         ],
         inscricoes: [
-            { nome: 'Aluno 1', rg: '1234567', dataNasc: '2000-01-01', celular: '1111-1111', observacoes: 'Observações do Aluno 1' },
-            { nome: 'Aluno 2', rg: '2345678', dataNasc: '2001-02-02', celular: '2222-2222', observacoes: 'Observações do Aluno 2' }
+            {
+                codigo: '1',
+                ano: '2022',
+                anoLetivo: '9',
+                turma: 'A',
+                etapa: 'f',
+                periodo: 'm',
+                dataAocacao: '2022-01-01',
+                aluno:
+                {
+                    codigo: '1',
+                    nome: 'Aluno 11',
+                    rg: '1234567',
+                    dataNasc: '2000-01-01',
+                    celular: '1111-1111',
+                    observacoes: 'Observacoes do Aluno 1'
+                },
+                escola:
+                {
+                    codigo: '1',
+                    nome: 'Escola 1',
+                    tipo: 'f',
+                    email: 'zQkKs@example.com',
+                    telefone: '1111-1111',
+                    observacoes: 'Observacoes da Escola 1'
+                },
+                pontoDeEmbarque:
+                {
+                    codigo: '1',
+                    rua: 'Rua 1',
+                    bairro: 'Bairro 1',
+                    numero: '123',
+                    cep: '12345-678'
+                }
+            },
+            {
+                codigo: '2',
+                ano: '2022',
+                anoLetivo: '9',
+                turma: 'A',
+                etapa: 'f',
+                periodo: 'm',
+                dataAocacao: '2022-01-01',
+                aluno:
+                {
+                    codigo: '2',
+                    nome: 'Aluno 12',
+                    rg: '1234567',
+                    dataNasc: '2000-01-01',
+                    celular: '1111-1111',
+                    observacoes: 'Observacoes do Aluno 1'
+                },
+                escola:
+                {
+                    codigo: '1',
+                    nome: 'Escola 1',
+                    tipo: 'f',
+                    email: 'zQkKs@example.com',
+                    telefone: '1111-1111',
+                    observacoes: 'Observacoes da Escola 1'
+                },
+                pontoDeEmbarque:
+                {
+                    codigo: '1',
+                    rua: 'Rua 1',
+                    bairro: 'Bairro 1',
+                    numero: '123',
+                    cep: '12345-678'
+                }
+            }
         ]
     };
 
@@ -54,17 +133,20 @@ export default function TelaAlocarAluno(props) {
         periodo: 'Vespertino',
         tempoInicio: '13:00',
         tempoFinal: '17:00',
-        motorista: {
+        motoristas: [{
+            id: '2',
             nome: 'Pedro Oliveira',
             cnh: '987654321',
             celular: '8888-8888'
-        },
+        }],
         monitor: {
+            codigo: '1',
             nome: 'Ana da Silva',
             cnh: '123456789',
             celular: '9999-9999'
         },
         veiculo: {
+            codigo: '1',
             placa: 'XYZ-9876',
             renavam: '987654321',
             modelo: 'Volkswagen Gol',
@@ -72,12 +154,80 @@ export default function TelaAlocarAluno(props) {
             tipo: 'Van'
         },
         pontosDeEmbarque: [
-            { rua: 'Rua A', bairro: 'Bairro A', numero: '123', cep: '12345-678' },
-            { rua: 'Rua B', bairro: 'Bairro B', numero: '456', cep: '23456-789' }
+            { codigo: '1', rua: 'Rua A', bairro: 'Bairro A', numero: '123', cep: '12345-678' },
+            { codigo: '2', rua: 'Rua B', bairro: 'Bairro B', numero: '456', cep: '23456-789' }
         ],
         inscricoes: [
-            { nome: 'Aluno 3', rg: '1234567', dataNasc: '2000-01-01', celular: '1111-1111', observacoes: 'Observações do Aluno 1' },
-            { nome: 'Aluno 4', rg: '2345678', dataNasc: '2001-02-02', celular: '2222-2222', observacoes: 'Observações do Aluno 2' }
+            {
+                codigo: '1',
+                ano: '2022',
+                anoLetivo: '9',
+                turma: 'A',
+                etapa: 'f',
+                periodo: 'm',
+                dataAocacao: '2022-01-01',
+                aluno:
+                {
+                    codigo: '1',
+                    nome: 'Aluno 13',
+                    rg: '1234567',
+                    dataNasc: '2000-01-01',
+                    celular: '1111-1111',
+                    observacoes: 'Observacoes do Aluno 1'
+                },
+                escola:
+                {
+                    codigo: '1',
+                    nome: 'Escola 1',
+                    tipo: 'f',
+                    email: 'zQkKs@example.com',
+                    telefone: '1111-1111',
+                    observacoes: 'Observacoes da Escola 1'
+                },
+                pontoDeEmbarque:
+                {
+                    codigo: '1',
+                    rua: 'Rua 1',
+                    bairro: 'Bairro 1',
+                    numero: '123',
+                    cep: '12345-678'
+                }
+            },
+            {
+                codigo: '2',
+                ano: '2022',
+                anoLetivo: '9',
+                turma: 'A',
+                etapa: 'f',
+                periodo: 'm',
+                dataAocacao: '2022-01-01',
+                aluno:
+                {
+                    codigo: '2',
+                    nome: 'Aluno 14',
+                    rg: '1234567',
+                    dataNasc: '2000-01-01',
+                    celular: '1111-1111',
+                    observacoes: 'Observacoes do Aluno 1'
+                },
+                escola:
+                {
+                    codigo: '1',
+                    nome: 'Escola 1',
+                    tipo: 'f',
+                    email: 'zQkKs@example.com',
+                    telefone: '1111-1111',
+                    observacoes: 'Observacoes da Escola 1'
+                },
+                pontoDeEmbarque:
+                {
+                    codigo: '1',
+                    rua: 'Rua 1',
+                    bairro: 'Bairro 1',
+                    numero: '123',
+                    cep: '12345-678'
+                }
+            }
         ]
     };
 
@@ -87,17 +237,20 @@ export default function TelaAlocarAluno(props) {
         periodo: 'Noturno',
         tempoInicio: '18:00',
         tempoFinal: '22:00',
-        motorista: {
+        motoristas: [{
+            id: '1',
             nome: 'Carlos Santos',
             cnh: '456789123',
             celular: '7777-7777'
-        },
+        }],
         monitor: {
+            codigo: '1',
             nome: 'Fernanda Lima',
             cnh: '789123456',
             celular: '6666-6666'
         },
         veiculo: {
+            codigo: '1',
             placa: 'DEF-5678',
             renavam: '456789123',
             modelo: 'Chevrolet Onix',
@@ -105,50 +258,336 @@ export default function TelaAlocarAluno(props) {
             tipo: 'Carro'
         },
         pontosDeEmbarque: [
-            { rua: 'Rua A', bairro: 'Bairro A', numero: '123', cep: '12345-678' },
-            { rua: 'Rua B', bairro: 'Bairro B', numero: '456', cep: '23456-789' }
+            { codigo: '1', rua: 'Rua A', bairro: 'Bairro A', numero: '123', cep: '12345-678' },
+            { codigo: '2', rua: 'Rua B', bairro: 'Bairro B', numero: '456', cep: '23456-789' }
         ],
         inscricoes: [
-            { nome: 'Aluno 5', rg: '1234567', dataNasc: '2000-01-01', celular: '1111-1111', observacoes: 'Observações do Aluno 1' },
-            { nome: 'Aluno 6', rg: '2345678', dataNasc: '2001-02-02', celular: '2222-2222', observacoes: 'Observações do Aluno 2' }
+            {
+                codigo: '1',
+                ano: '2022',
+                anoLetivo: '9',
+                turma: 'A',
+                etapa: 'f',
+                periodo: 'm',
+                dataAocacao: '2022-01-01',
+                aluno:
+                {
+                    codigo: '1',
+                    nome: 'Aluno 15',
+                    rg: '1234567',
+                    dataNasc: '2000-01-01',
+                    celular: '1111-1111',
+                    observacoes: 'Observacoes do Aluno 1'
+                },
+                escola:
+                {
+                    codigo: '1',
+                    nome: 'Escola 1',
+                    tipo: 'f',
+                    email: 'zQkKs@example.com',
+                    telefone: '1111-1111',
+                    observacoes: 'Observacoes da Escola 1'
+                },
+                pontoDeEmbarque:
+                {
+                    codigo: '1',
+                    rua: 'Rua 1',
+                    bairro: 'Bairro 1',
+                    numero: '123',
+                    cep: '12345-678'
+                }
+            },
+            {
+                codigo: '2',
+                ano: '2022',
+                anoLetivo: '9',
+                turma: 'A',
+                etapa: 'f',
+                periodo: 'm',
+                dataAocacao: '2022-01-01',
+                aluno:
+                {
+                    codigo: '2',
+                    nome: 'Aluno 16',
+                    rg: '1234567',
+                    dataNasc: '2000-01-01',
+                    celular: '1111-1111',
+                    observacoes: 'Observacoes do Aluno 1'
+                },
+                escola:
+                {
+                    codigo: '1',
+                    nome: 'Escola 1',
+                    tipo: 'f',
+                    email: 'zQkKs@example.com',
+                    telefone: '1111-1111',
+                    observacoes: 'Observacoes da Escola 1'
+                },
+                pontoDeEmbarque:
+                {
+                    codigo: '1',
+                    rua: 'Rua 1',
+                    bairro: 'Bairro 1',
+                    numero: '123',
+                    cep: '12345-678'
+                }
+            }
         ]
     };
 
     var inscricoes = [
-        { nome: 'Aluno 51', rg: '1234567', dataNasc: '2000-01-01', celular: '1111-1111', observacoes: 'Observações do Aluno 1' },
-        { nome: 'Aluno 52', rg: '1234567', dataNasc: '2000-01-01', celular: '1111-1111', observacoes: 'Observações do Aluno 1' },
-        { nome: 'Aluno 53', rg: '1234567', dataNasc: '2000-01-01', celular: '1111-1111', observacoes: 'Observações do Aluno 1' },
-        { nome: 'Aluno 54', rg: '1234567', dataNasc: '2000-01-01', celular: '1111-1111', observacoes: 'Observações do Aluno 1' },
-        { nome: 'Aluno 60', rg: '2345678', dataNasc: '2001-02-02', celular: '2222-2222', observacoes: 'Observações do Aluno 2' }
+        {
+            codigo: '1',
+            ano: '2022',
+            anoLetivo: '9',
+            turma: 'A',
+            etapa: 'f',
+            periodo: 'm',
+            dataAocacao: '2022-01-01',
+            aluno:
+            {
+                codigo: '1',
+                nome: 'Aluno 1',
+                rg: '1234567',
+                dataNasc: '2000-01-01',
+                celular: '1111-1111',
+                observacoes: 'Observacoes do Aluno 1'
+            },
+            escola:
+            {
+                codigo: '1',
+                nome: 'Escola 1',
+                tipo: 'f',
+                email: 'zQkKs@example.com',
+                telefone: '1111-1111',
+                observacoes: 'Observacoes da Escola 1'
+            },
+            pontoDeEmbarque:
+            {
+                codigo: '1',
+                rua: 'Rua 1',
+                bairro: 'Bairro 1',
+                numero: '123',
+                cep: '12345-678'
+            }
+        },
+        {
+            codigo: '2',
+            ano: '2022',
+            anoLetivo: '9',
+            turma: 'A',
+            etapa: 'f',
+            periodo: 'm',
+            dataAocacao: '2022-01-01',
+            aluno:
+            {
+                codigo: '2',
+                nome: 'Aluno 6',
+                rg: '1234567',
+                dataNasc: '2000-01-01',
+                celular: '1111-1111',
+                observacoes: 'Observacoes do Aluno 1'
+            },
+            escola:
+            {
+                codigo: '1',
+                nome: 'Escola 1',
+                tipo: 'f',
+                email: 'zQkKs@example.com',
+                telefone: '1111-1111',
+                observacoes: 'Observacoes da Escola 1'
+            },
+            pontoDeEmbarque:
+            {
+                codigo: '1',
+                rua: 'Rua 1',
+                bairro: 'Bairro 1',
+                numero: '123',
+                cep: '12345-678'
+            }
+        },
+        {
+            codigo: '2',
+            ano: '2022',
+            anoLetivo: '9',
+            turma: 'A',
+            etapa: 'f',
+            periodo: 'm',
+            dataAocacao: '2022-01-01',
+            aluno:
+            {
+                codigo: '2',
+                nome: 'Aluno 2',
+                rg: '1234567',
+                dataNasc: '2000-01-01',
+                celular: '1111-1111',
+                observacoes: 'Observacoes do Aluno 1'
+            },
+            escola:
+            {
+                codigo: '1',
+                nome: 'Escola 1',
+                tipo: 'f',
+                email: 'zQkKs@example.com',
+                telefone: '1111-1111',
+                observacoes: 'Observacoes da Escola 1'
+            },
+            pontoDeEmbarque:
+            {
+                codigo: '1',
+                rua: 'Rua 1',
+                bairro: 'Bairro 1',
+                numero: '123',
+                cep: '12345-678'
+            }
+        },
+        {
+            codigo: '3',
+            ano: '2022',
+            anoLetivo: '9',
+            turma: 'A',
+            etapa: 'f',
+            periodo: 'm',
+            dataAocacao: '2022-01-01',
+            aluno:
+            {
+                codigo: '3',
+                nome: 'Aluno 3',
+                rg: '1234567',
+                dataNasc: '2000-01-01',
+                celular: '1111-1111',
+                observacoes: 'Observacoes do Aluno 1'
+            },
+            escola:
+            {
+                codigo: '1',
+                nome: 'Escola 1',
+                tipo: 'f',
+                email: 'zQkKs@example.com',
+                telefone: '1111-1111',
+                observacoes: 'Observacoes da Escola 1'
+            },
+            pontoDeEmbarque:
+            {
+                codigo: '1',
+                rua: 'Rua 1',
+                bairro: 'Bairro 1',
+                numero: '123',
+                cep: '12345-678'
+            }
+        },
+        {
+            codigo: '4',
+            ano: '2022',
+            anoLetivo: '9',
+            turma: 'A',
+            etapa: 'f',
+            periodo: 'm',
+            dataAocacao: '2022-01-01',
+            aluno:
+            {
+                codigo: '4',
+                nome: 'Aluno 4',
+                rg: '1234567',
+                dataNasc: '2000-01-01',
+                celular: '1111-1111',
+                observacoes: 'Observacoes do Aluno 1'
+            },
+            escola:
+            {
+                codigo: '1',
+                nome: 'Escola 1',
+                tipo: 'f',
+                email: 'zQkKs@example.com',
+                telefone: '1111-1111',
+                observacoes: 'Observacoes da Escola 1'
+            },
+            pontoDeEmbarque:
+            {
+                codigo: '1',
+                rua: 'Rua 1',
+                bairro: 'Bairro 1',
+                numero: '123',
+                cep: '12345-678'
+            }
+        },
+        {
+            codigo: '5',
+            ano: '2022',
+            anoLetivo: '9',
+            turma: 'A',
+            etapa: 'f',
+            periodo: 'm',
+            dataAocacao: '2022-01-01',
+            aluno:
+            {
+                codigo: '5',
+                nome: 'Aluno 5',
+                rg: '1234567',
+                dataNasc: '2000-01-01',
+                celular: '1111-1111',
+                observacoes: 'Observacoes do Aluno 1'
+            },
+            escola:
+            {
+                codigo: '1',
+                nome: 'Escola 1',
+                tipo: 'f',
+                email: 'zQkKs@example.com',
+                telefone: '1111-1111',
+                observacoes: 'Observacoes da Escola 1'
+            },
+            pontoDeEmbarque:
+            {
+                codigo: '1',
+                rua: 'Rua 1',
+                bairro: 'Bairro 1',
+                numero: '123',
+                cep: '12345-678'
+            }
+        }
     ]
 
     var listaRotas = [rota1, rota2, rota3];
-
-    const handleBuscarAluno = () => {
-        const resultados = inscricoes.filter(inscricao =>
-            inscricao.nome.toLowerCase().includes(termoBusca.toLowerCase())
-        );
-        setInscricoesFiltradas(resultados);
-    };
 
     useEffect(() => {
         if (termoBusca.trim() === '') {
             setInscricoesFiltradas([]);
         } else {
             const inscricoesNaoAlocadas = inscricoes.filter(inscricao =>
-                inscricao.nome.toLowerCase().includes(termoBusca.toLowerCase()) &&
-                !inscricoesSelecionadas.find(a => a.nome === inscricao.nome)
+                inscricao.aluno.nome.toLowerCase().includes(termoBusca.toLowerCase()) &&
+                !inscricoesSelecionadas.find(a => a.aluno.nome === inscricao.aluno.nome)
             );
             setInscricoesFiltradas(inscricoesNaoAlocadas);
         }
-    }, [termoBusca, inscricoesSelecionadas]);
-
+    }, [termoBusca, inscricoes, inscricoesSelecionadas]);
 
     const handleSelecionarRota = (rota) => {
-        setRotaSelecionada(rota);
+        if (rota) {
+            if (rotaSelecionada && novaRotaSelecionada !== rota) {
+                setNovaRotaSelecionada(rota);
+                setMostrarModalConfirmacao(true);
+            } else {
+                setRotaSelecionada(rota);
+                setRotaEstaSelecionada(true);
+                setInscricoesSelecionadas(rota.inscricoes || []);
+                setTermoBusca('');
+            }
+        }
+    };
+
+    const confirmarTrocaRota = () => {
+        setRotaSelecionada(novaRotaSelecionada);
         setRotaEstaSelecionada(true);
-        setInscricoesSelecionadas(rota.inscricoes || []);
+        setInscricoesSelecionadas(novaRotaSelecionada.inscricoes || []);
         setTermoBusca('');
+        setMostrarModalConfirmacao(false);
+        setNovaRotaSelecionada(null);
+    };
+
+    const cancelarTrocaRota = () => {
+        setMostrarModalConfirmacao(false);
+        setNovaRotaSelecionada(null);
     };
 
     const handleRemoverInscricao = (index) => {
@@ -168,6 +607,9 @@ export default function TelaAlocarAluno(props) {
             inscricoes: inscricoesAtualizadas
         });
         setInscricoesSelecionadas(inscricoesAtualizadas);
+
+        const novaListaFiltrada = inscricoesFiltradas.filter((_, i) => i !== index);
+        setInscricoesFiltradas(novaListaFiltrada);
     };
 
     return (
@@ -183,13 +625,29 @@ export default function TelaAlocarAluno(props) {
                         ))}
                     </Form.Select>
                 </Form.Group>
+                {mostrarModalConfirmacao && (
+                    <Modal show={mostrarModalConfirmacao} onHide={cancelarTrocaRota}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Confirmar Troca de Rota</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>Deseja realmente trocar de rota?</Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={cancelarTrocaRota}>
+                                Cancelar
+                            </Button>
+                            <Button variant="primary" onClick={confirmarTrocaRota}>
+                                Confirmar
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+                )}
                 {rotaEstaSelecionada && rotaSelecionada && (
                     <>
                         <Table striped bordered className="mt-4">
                             <thead>
                                 <tr>
                                     <th>Nome da Rota</th>
-                                    <th>Motorista</th>
+                                    <th>Motoristas</th>
                                     <th>Monitor</th>
                                     <th>Placa do Veículo</th>
                                     <th>Pontos de Embarque</th>
@@ -199,15 +657,19 @@ export default function TelaAlocarAluno(props) {
                                 {rotaSelecionada && (
                                     <tr>
                                         <td className="text-center align-middle">{rotaSelecionada.nome}</td>
-                                        <td className="text-center align-middle">{rotaSelecionada.motorista.nome}</td>
+                                        <td>
+                                            <ul className="text-center align-middle list-unstyled mb-0">
+                                                {rotaSelecionada.motoristas.map((mot, index) => (
+                                                    <li key={index}>{mot.nome}</li>
+                                                ))}
+                                            </ul>
+                                        </td>
                                         <td className="text-center align-middle">{rotaSelecionada.monitor.nome}</td>
                                         <td className="text-center align-middle">{rotaSelecionada.veiculo.placa}</td>
                                         <td>
-                                            <ul className="list-unstyled mb-0">
+                                            <ul className="text-center align-middle list-unstyled mb-0">
                                                 {rotaSelecionada.pontosDeEmbarque.map((ponto, index) => (
-                                                    <li key={index}>
-                                                        {ponto.rua}, {ponto.numero}
-                                                    </li>
+                                                    <li key={index}>{ponto.rua}, {ponto.numero}</li>
                                                 ))}
                                             </ul>
                                         </td>
@@ -223,19 +685,19 @@ export default function TelaAlocarAluno(props) {
                                     key="bottom"
                                     placement="bottom"
                                     overlay={
-                                        <Popover id={`popover-positioned-bottom`}>
-                                            <Popover.Header as="h3">{inscricao.nome}</Popover.Header>
+                                        <Popover id="popover-positioned-bottom">
+                                            <Popover.Header as="h3">{inscricao.aluno.nome}</Popover.Header>
                                             <Popover.Body>
-                                                <p>RG: {inscricao.rg}</p>
-                                                <p>Data de Nascimento: {inscricao.dataNasc}</p>
-                                                <p>Celular: {inscricao.celular}</p>
-                                                <p>Observações: {inscricao.observacoes}</p>
+                                                <p>RG: {inscricao.aluno.rg}</p>
+                                                <p>Data de Nascimento: {inscricao.aluno.dataNasc}</p>
+                                                <p>Celular: {inscricao.aluno.celular}</p>
+                                                <p>Observações: {inscricao.aluno.observacoes}</p>
                                             </Popover.Body>
                                         </Popover>
                                     }
                                 >
                                     <Button variant="light" className="me-2 mb-2 mt-4 w-50">
-                                        <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.nome} - RG: ${inscricao.rg}`}
+                                        <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
                                     </Button>
                                 </OverlayTrigger>
                                 <Button variant="danger" className="mb-2 mt-4" onClick={() => handleRemoverInscricao(index)}>
@@ -261,19 +723,19 @@ export default function TelaAlocarAluno(props) {
                                         key="bottom"
                                         placement="bottom"
                                         overlay={
-                                            <Popover id={`popover-positioned-bottom`}>
-                                                <Popover.Header as="h3">{inscricao.nome}</Popover.Header>
+                                            <Popover id="popover-positioned-bottom">
+                                                <Popover.Header as="h3">{inscricao.aluno.nome}</Popover.Header>
                                                 <Popover.Body>
-                                                    <p>RG: {inscricao.rg}</p>
-                                                    <p>Data de Nascimento: {inscricao.dataNasc}</p>
-                                                    <p>Celular: {inscricao.celular}</p>
-                                                    <p>Observações: {inscricao.observacoes}</p>
+                                                    <p>RG: {inscricao.aluno.rg}</p>
+                                                    <p>Data de Nascimento: {inscricao.aluno.dataNasc}</p>
+                                                    <p>Celular: {inscricao.aluno.celular}</p>
+                                                    <p>Observações: {inscricao.aluno.observacoes}</p>
                                                 </Popover.Body>
                                             </Popover>
                                         }
                                     >
                                         <Button variant="light" className="me-2 mb-2 mt-4 w-50">
-                                            <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.nome} - RG: ${inscricao.rg}`}
+                                            <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
                                         </Button>
                                     </OverlayTrigger>
                                     <Button
