@@ -1,0 +1,9 @@
+.input-invalido {
+    border:solid 2px #ff0000 !important; /* Vermelho */
+    border-radius: 8px
+}
+.input-valido {
+    border:solid 2px #1eff00 !important; /* Verde claro */
+    border-radius: 8px
+
+}

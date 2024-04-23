@@ -758,7 +758,7 @@ export default function TelaAlocarAluno(props) {
                     </>
                 )}
 
-            </Container>
-        </Pagina>
+//             </Container>
+//         </Pagina>
     );
 }
