@@ -8,7 +8,7 @@ import { buscarPontosEmbarque } from '../../redux/pontosEmbarqueReducer';
 import { adicionarInscricao, atualizarInscricao } from '../../redux/inscricaoReducer';
 
 function FormCadInscricao(props) {
-    const { estado, mensagem, inscricoes } = useSelector(state => state.inscricao);
+    const { inscricoes } = useSelector(state => state.inscricao);
     const [formValidado, setFormValidado] = useState(false);
     const estadoInicialInscricao = props.inscricaoParaEdicao;
     const [inscricao, setInscricao] = useState(estadoInicialInscricao);
@@ -18,6 +18,7 @@ function FormCadInscricao(props) {
 
     const inscricaoVazia = {
         codigo: '0',
+        ano: '',
         etapa: '',
         periodo: '',
         turma: '',
@@ -75,9 +76,12 @@ function FormCadInscricao(props) {
         dispatch(buscarAlunos());
     }, [dispatch]);
 
+    const anoAtual = new Date().getFullYear();
+
     const alunosFiltrados = alunos.filter(aluno =>
-        aluno.nome.toLowerCase().includes(termoBuscaAlunos.toLowerCase()) ||
-        aluno.rg.includes(termoBuscaAlunos)
+        (aluno.nome.toLowerCase().includes(termoBuscaAlunos.toLowerCase()) ||
+            aluno.rg.includes(termoBuscaAlunos)) &&
+        !inscricoes.some(inscricao => inscricao.aluno.codigo === aluno.codigo && inscricao.ano === anoAtual)
     );
 
     const handleSelecionarAluno = (aluno) => {
@@ -113,32 +117,42 @@ function FormCadInscricao(props) {
         const form = e.currentTarget;
         if (cepRaw) {
             inscricao.cep = cepRaw;
-            if (form.checkValidity()) {
-                if (!props.modoEdicao) {
-                    dispatch(adicionarInscricao(inscricao));
-                    props.setMensagem('Inscrição incluída com sucesso');
-                    props.setTipoMensagem('success');
-                    props.setMostrarMensagem(true);
-                    props.exibirFormulario(false);
+            if (alunoSelecionado && escolaSelecionada && pontoEmbarqueSelecionado) {
+                if (form.checkValidity()) {
+                    if (inscricao.anoLetivo.includes('M'))
+                        inscricao.etapa = 'M';
+                    else if (inscricao.anoLetivo.includes('F'))
+                        inscricao.etapa = 'F';
+                    else
+                        inscricao.etapa = 'I';
+                    if (!props.modoEdicao) {
+                        dispatch(adicionarInscricao(inscricao));
+                        props.setMensagem('Inscrição incluída com sucesso');
+                        props.setTipoMensagem('success');
+                        props.setMostrarMensagem(true);
+                        props.exibirFormulario(false);
+                    } else {
+                        dispatch(atualizarInscricao(inscricao));
+                        props.setMensagem('Inscrição alterada com sucesso');
+                        props.setTipoMensagem('success');
+                        props.setMostrarMensagem(true);
+                        props.setModoEdicao(false);
+                        props.exibirFormulario(false);
+                        props.setInscricaoParaEdicao(inscricaoVazia);
+                    }
+                    setInscricao(inscricaoVazia);
+                    setFormValidado(false);
                 }
                 else {
-                    dispatch(atualizarInscricao(inscricao));
-                    props.setMensagem('Inscrição alterada com sucesso');
-                    props.setTipoMensagem('success');
-                    props.setMostrarMensagem(true);
-                    props.setModoEdicao(false);
-                    props.exibirFormulario(false);
-                    props.setInscricaoParaEdicao(inscricaoVazia);
+                    setFormValidado(true);
                 }
-                setInscricao(inscricaoVazia);
-                setFormValidado(false);
             }
             else {
                 setFormValidado(true);
             }
         }
         else {
-            console.error("Por favor, informe o CEP");
+            setFormValidado(true);
         }
         e.stopPropagation();
         e.preventDefault();
@@ -192,6 +206,17 @@ function FormCadInscricao(props) {
         }
     }
 
+    useEffect(() => {
+        if (props.modoEdicao) {
+            setTermoBuscaPontosEmbarque(`${inscricao.pontoEmbarque?.rua}, ${inscricao.pontoEmbarque.numero}, ${inscricao.pontoEmbarque.bairro} - ${inscricao.pontoEmbarque?.cep}`);
+            setTermoBuscaEscolas(inscricao.escola?.nome);
+            setAlunoSelecionado(true);
+            setEscolaSelecionada(true);
+            setPontoEmbarqueSelecionado(true);
+        }
+    }, [props.modoEdicao, inscricao]);
+
+
     return (
         <Container className="mt-4 mb-4">
             <h2 className="text-center">Inscrever Aluno</h2>
@@ -204,7 +229,12 @@ function FormCadInscricao(props) {
                         placeholder="Buscar por nome ou RG"
                         value={props.modoEdicao ? (inscricao.aluno?.nome + ' - ' + inscricao.aluno?.rg) : termoBuscaAlunos}
                         onChange={(e) => setTermoBuscaAlunos(e.target.value)}
+                        disabled={props.modoEdicao}
+                        isInvalid={formValidado && !alunoSelecionado}
                         required />
+                    <Form.Control.Feedback type="invalid">
+                        Por favor, selecione um aluno.
+                    </Form.Control.Feedback>
                 </Form.Group>
                 {termoBuscaAlunos.length > 0 && (
                     <Table striped bordered hover className="table-white" variant="white">
@@ -222,9 +252,13 @@ function FormCadInscricao(props) {
                     <Form.Control
                         type="text"
                         placeholder="Buscar por rua ou CEP"
-                        value={props.modoEdicao ? (inscricao.pontoEmbarque?.rua + ', ' + inscricao.pontoEmbarque.numero + ', ' + inscricao.pontoEmbarque.bairro + ' - ' + inscricao.pontoEmbarque?.cep) : termoBuscaPontosEmbarque}
+                        value={termoBuscaPontosEmbarque}
                         onChange={(e) => setTermoBuscaPontosEmbarque(e.target.value)}
+                        isInvalid={formValidado && !pontoEmbarqueSelecionado}
                         required />
+                    <Form.Control.Feedback type="invalid">
+                        Por favor, selecione um ponto de embarque.
+                    </Form.Control.Feedback>
                 </Form.Group>
                 {termoBuscaPontosEmbarque.length > 0 && (
                     <Table striped bordered hover className="table-white" variant="white">
@@ -242,14 +276,15 @@ function FormCadInscricao(props) {
                     <Form.Control
                         type="text"
                         placeholder="Buscar por nome"
-                        value={props.modoEdicao ? (inscricao.escola?.nome) : termoBuscaEscolas}
+                        value={termoBuscaEscolas}
                         onChange={(e) => {
                             setTermoBuscaEscolas(e.target.value)
-                            if (escolaSelecionada) {
-                                setEscolaSelecionada(false);
-                            }
                         }}
+                        isInvalid={formValidado && !escolaSelecionada}
                         required />
+                    <Form.Control.Feedback type="invalid">
+                        Por favor, selecione uma escola.
+                    </Form.Control.Feedback>
                 </Form.Group>
                 {(termoBuscaEscolas.length > 0 && !escolaSelecionada) && (
                     <Table striped bordered hover className="table-white" variant="white">
@@ -276,8 +311,12 @@ function FormCadInscricao(props) {
                                         value={formatarCEP(cepRaw)}
                                         onChange={manipularMudancasCEP}
                                         maxLength="9"
+                                        onInvalid={!cepRaw && formValidado}
                                         required />
                                 </Form.Group>
+                                <Form.Control.Feedback type="invalid">
+                                    Por favor, informe o CEP.
+                                </Form.Control.Feedback>
                             </Col>
                             <Col md={6}>
                                 <Form.Group className="mb-3">
@@ -290,6 +329,9 @@ function FormCadInscricao(props) {
                                         value={inscricao.rua}
                                         onChange={manipularMudancas}
                                         required />
+                                    <Form.Control.Feedback type="invalid">
+                                        Por favor, informe a rua.
+                                    </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
                             <Col md={1}>
@@ -303,6 +345,9 @@ function FormCadInscricao(props) {
                                         value={inscricao.numero}
                                         onChange={manipularMudancas}
                                         required />
+                                    <Form.Control.Feedback type="invalid">
+                                        Por favor, informe o número.
+                                    </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
                             <Col md={3}>
@@ -316,11 +361,14 @@ function FormCadInscricao(props) {
                                         value={inscricao.bairro}
                                         onChange={manipularMudancas}
                                         required />
+                                    <Form.Control.Feedback type="invalid">
+                                        Por favor, informe o bairro.
+                                    </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
                         </Row>
                         <Row>
-                            <Col md={3}>
+                            <Col md={4}>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Período Escolar(*):</Form.Label>
                                     <Form.Select aria-label="Selecione..."
@@ -330,28 +378,16 @@ function FormCadInscricao(props) {
                                         onChange={manipularMudancas}
                                         required>
                                         <option value="">Selecione...</option>
-                                        <option value='m'>Matinal</option>
-                                        <option value='v'>Vespertino</option>
-                                        <option value='i'>Integral</option>
+                                        <option value='M'>Matinal</option>
+                                        <option value='V'>Vespertino</option>
+                                        <option value='I'>Integral</option>
                                     </Form.Select>
+                                    <Form.Control.Feedback type="invalid">
+                                        Por favor, selecione o período.
+                                    </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
-                            <Col md={3}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Ensino(*):</Form.Label>
-                                    <Form.Select aria-label="Selecione..."
-                                        id='etapa'
-                                        name='etapa'
-                                        value={inscricao.etapa}
-                                        onChange={manipularMudancas}
-                                        required>
-                                        <option value="">Selecione...</option>
-                                        <option value='i'>Educação Infantil</option>
-                                        <option value='f'>Ensino Fundamental</option>
-                                    </Form.Select>
-                                </Form.Group>
-                            </Col>
-                            <Col md={3}>
+                            <Col md={4}>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Ano Letivo(*):</Form.Label>
                                     <Form.Select aria-label="Selecione..."
@@ -361,6 +397,8 @@ function FormCadInscricao(props) {
                                         onChange={manipularMudancas}
                                         required>
                                         <option value="">Selecione...</option>
+                                        <option value='1I'>Pré 1</option>
+                                        <option value='2I'>Pré 2</option>
                                         <option value='1F'>1° ano</option>
                                         <option value='2F'>2° ano</option>
                                         <option value='3F'>3° ano</option>
@@ -370,13 +408,16 @@ function FormCadInscricao(props) {
                                         <option value='7F'>7° ano</option>
                                         <option value='8F'>8° ano</option>
                                         <option value='9F'>9° ano</option>
-                                        <option value='1M'>1° ano do Ensino Fundamental</option>
-                                        <option value='2M'>2° ano do Ensino Fundamental</option>
-                                        <option value='3M'>3° ano do Ensino Fundamental</option>
+                                        <option value='1M'>1° ano do Ensino Médio</option>
+                                        <option value='2M'>2° ano do Ensino Médio</option>
+                                        <option value='3M'>3° ano do Ensino Médio</option>
                                     </Form.Select>
+                                    <Form.Control.Feedback type="invalid">
+                                        Por favor, selcione o ano letivo.
+                                    </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
-                            <Col md={3}>
+                            <Col md={4}>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Turma(*):</Form.Label>
                                     <Form.Select aria-label="Selecione..."
@@ -390,6 +431,9 @@ function FormCadInscricao(props) {
                                         <option value='B'>B</option>
                                         <option value='C'>C</option>
                                     </Form.Select>
+                                    <Form.Control.Feedback type="invalid">
+                                        Por favor, selecione a turma.
+                                    </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
                         </Row>

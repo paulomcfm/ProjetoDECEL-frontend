@@ -16,7 +16,7 @@ export default function FormCadPontosEmbarque(props) {
     const [pontoEmbarque, setPontoEmbarque] = useState(estadoInicialPontoEmbarque);
     const [cepRaw, setCepRaw] = useState('');
     const [formValidado, setFormValidado] = useState(false);
-    const { estado, mensagem, pontosEmbarque } = useSelector((state) => state.pontoEmbarque);
+
     const dispatch = useDispatch();
 
     function manipularMudancas(e) {
@@ -91,7 +91,7 @@ export default function FormCadPontosEmbarque(props) {
             }
         }
         else {
-            console.error("Por favor, informe o CEP");
+            setFormValidado(true);
         }
 
         e.stopPropagation();
@@ -121,7 +121,11 @@ export default function FormCadPontosEmbarque(props) {
                                 value={formatarCEP(cepRaw)}
                                 onChange={manipularMudancasCEP}
                                 maxLength="9"
+                                onInvalid={!cepRaw && formValidado}
                                 required />
+                            <Form.Control.Feedback type="invalid">
+                                Por favor, informe o CEP.
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
                     <Col md={6}>
@@ -135,6 +139,9 @@ export default function FormCadPontosEmbarque(props) {
                                 value={pontoEmbarque.rua}
                                 onChange={manipularMudancas}
                                 required />
+                            <Form.Control.Feedback type="invalid">
+                                Por favor, informe a rua.
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
                     <Col md={1}>
@@ -148,6 +155,9 @@ export default function FormCadPontosEmbarque(props) {
                                 value={pontoEmbarque.numero}
                                 onChange={manipularMudancas}
                                 required />
+                            <Form.Control.Feedback type="invalid">
+                                Por favor, informe o número.
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
                     <Col>
@@ -161,6 +171,9 @@ export default function FormCadPontosEmbarque(props) {
                                 value={pontoEmbarque.bairro}
                                 onChange={manipularMudancas}
                                 required />
+                            <Form.Control.Feedback type="invalid">
+                                Por favor, informe o CEP.
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
                 </Row>
