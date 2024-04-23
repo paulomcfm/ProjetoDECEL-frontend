@@ -77,7 +77,7 @@ export default function TelaLogin() {
                             <Form.Label>CPF</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="CPF"
+                                placeholder="999.999.999-99"
                                 id="cpf"
                                 name="cpf"
                                 value={cpf}

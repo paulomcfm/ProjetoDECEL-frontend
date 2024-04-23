@@ -146,7 +146,7 @@ export default function FormCadUsuario(props) {
                     <Form.Label>CPF(*):</Form.Label>
                     <Form.Control
                         type="text"
-                        placeholder="00000-000"
+                        placeholder="999.999.999-99"
                         id="cpf"
                         name="cpf"
                         value={usuario.cpf}
