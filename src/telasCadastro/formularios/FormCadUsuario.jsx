@@ -64,7 +64,7 @@ export default function FormCadUsuario(props) {
         celular = celular.replace(/\D/g, '');
 
         // Aplica a máscara para celular (xx) 9xxxx-xxxx
-        celular = celular.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) 9$2-$3');
+        celular = celular.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
 
         return celular;
     }
