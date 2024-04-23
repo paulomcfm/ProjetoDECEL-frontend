@@ -4,7 +4,10 @@ import { Container, Form, Table, OverlayTrigger, Popover, Modal, Button } from '
 import '../templates/style.css';
 import Pagina from "../templates/Pagina";
 import { GrContactInfo } from "react-icons/gr";
-
+import { buscarInscricoes, atualizarInscricoes } from '../redux/inscricaoReducer';
+import { useSelector, useDispatch } from 'react-redux';
+import { format } from 'date-fns';
+import TelaMensagem from '../telasCadastro/TelaMensagem';
 
 
 export default function TelaAlocarAluno(props) {
@@ -15,9 +18,15 @@ export default function TelaAlocarAluno(props) {
     const [inscricoesFiltradas, setInscricoesFiltradas] = useState([]);
     const [mostrarModalConfirmacao, setMostrarModalConfirmacao] = useState(false);
     const [novaRotaSelecionada, setNovaRotaSelecionada] = useState(null);
+    const {estadoInsc, mensagemIsnc, inscricoes } = useSelector(state => state.inscricao);
+    const [mostrarMensagem, setMostrarMensagem] = useState(false);
+    const [mensagem, setMensagem] = useState("");
+    const [tipoMensagem, setTipoMensagem] = useState("");
 
+    const dispatch = useDispatch();
 
     var rota1 = {
+        codigo: '1',
         nome: 'Rota 1',
         km: '10',
         periodo: 'Matutino',
@@ -61,7 +70,7 @@ export default function TelaAlocarAluno(props) {
                 turma: 'A',
                 etapa: 'f',
                 periodo: 'm',
-                dataAocacao: '2022-01-01',
+                dataAlocacao: '2022-01-01',
                 aluno:
                 {
                     codigo: '1',
@@ -96,7 +105,7 @@ export default function TelaAlocarAluno(props) {
                 turma: 'A',
                 etapa: 'f',
                 periodo: 'm',
-                dataAocacao: '2022-01-01',
+                dataAlocacao: '2022-01-01',
                 aluno:
                 {
                     codigo: '2',
@@ -128,6 +137,7 @@ export default function TelaAlocarAluno(props) {
     };
 
     var rota2 = {
+        codigo: '2',
         nome: 'Rota 2',
         km: '15',
         periodo: 'Vespertino',
@@ -165,7 +175,7 @@ export default function TelaAlocarAluno(props) {
                 turma: 'A',
                 etapa: 'f',
                 periodo: 'm',
-                dataAocacao: '2022-01-01',
+                dataAlocacao: '2022-01-01',
                 aluno:
                 {
                     codigo: '1',
@@ -200,7 +210,7 @@ export default function TelaAlocarAluno(props) {
                 turma: 'A',
                 etapa: 'f',
                 periodo: 'm',
-                dataAocacao: '2022-01-01',
+                dataAlocacao: '2022-01-01',
                 aluno:
                 {
                     codigo: '2',
@@ -232,6 +242,7 @@ export default function TelaAlocarAluno(props) {
     };
 
     var rota3 = {
+        codigo: '3',
         nome: 'Rota 3',
         km: '20',
         periodo: 'Noturno',
@@ -269,7 +280,7 @@ export default function TelaAlocarAluno(props) {
                 turma: 'A',
                 etapa: 'f',
                 periodo: 'm',
-                dataAocacao: '2022-01-01',
+                dataAlocacao: '2022-01-01',
                 aluno:
                 {
                     codigo: '1',
@@ -304,7 +315,7 @@ export default function TelaAlocarAluno(props) {
                 turma: 'A',
                 etapa: 'f',
                 periodo: 'm',
-                dataAocacao: '2022-01-01',
+                dataAlocacao: '2022-01-01',
                 aluno:
                 {
                     codigo: '2',
@@ -335,220 +346,11 @@ export default function TelaAlocarAluno(props) {
         ]
     };
 
-    var inscricoes = [
-        {
-            codigo: '1',
-            ano: '2022',
-            anoLetivo: '9',
-            turma: 'A',
-            etapa: 'f',
-            periodo: 'm',
-            dataAocacao: '2022-01-01',
-            aluno:
-            {
-                codigo: '1',
-                nome: 'Aluno 1',
-                rg: '1234567',
-                dataNasc: '2000-01-01',
-                celular: '1111-1111',
-                observacoes: 'Observacoes do Aluno 1'
-            },
-            escola:
-            {
-                codigo: '1',
-                nome: 'Escola 1',
-                tipo: 'f',
-                email: 'zQkKs@example.com',
-                telefone: '1111-1111',
-                observacoes: 'Observacoes da Escola 1'
-            },
-            pontoDeEmbarque:
-            {
-                codigo: '1',
-                rua: 'Rua 1',
-                bairro: 'Bairro 1',
-                numero: '123',
-                cep: '12345-678'
-            }
-        },
-        {
-            codigo: '2',
-            ano: '2022',
-            anoLetivo: '9',
-            turma: 'A',
-            etapa: 'f',
-            periodo: 'm',
-            dataAocacao: '2022-01-01',
-            aluno:
-            {
-                codigo: '2',
-                nome: 'Aluno 6',
-                rg: '1234567',
-                dataNasc: '2000-01-01',
-                celular: '1111-1111',
-                observacoes: 'Observacoes do Aluno 1'
-            },
-            escola:
-            {
-                codigo: '1',
-                nome: 'Escola 1',
-                tipo: 'f',
-                email: 'zQkKs@example.com',
-                telefone: '1111-1111',
-                observacoes: 'Observacoes da Escola 1'
-            },
-            pontoDeEmbarque:
-            {
-                codigo: '1',
-                rua: 'Rua 1',
-                bairro: 'Bairro 1',
-                numero: '123',
-                cep: '12345-678'
-            }
-        },
-        {
-            codigo: '2',
-            ano: '2022',
-            anoLetivo: '9',
-            turma: 'A',
-            etapa: 'f',
-            periodo: 'm',
-            dataAocacao: '2022-01-01',
-            aluno:
-            {
-                codigo: '2',
-                nome: 'Aluno 2',
-                rg: '1234567',
-                dataNasc: '2000-01-01',
-                celular: '1111-1111',
-                observacoes: 'Observacoes do Aluno 1'
-            },
-            escola:
-            {
-                codigo: '1',
-                nome: 'Escola 1',
-                tipo: 'f',
-                email: 'zQkKs@example.com',
-                telefone: '1111-1111',
-                observacoes: 'Observacoes da Escola 1'
-            },
-            pontoDeEmbarque:
-            {
-                codigo: '1',
-                rua: 'Rua 1',
-                bairro: 'Bairro 1',
-                numero: '123',
-                cep: '12345-678'
-            }
-        },
-        {
-            codigo: '3',
-            ano: '2022',
-            anoLetivo: '9',
-            turma: 'A',
-            etapa: 'f',
-            periodo: 'm',
-            dataAocacao: '2022-01-01',
-            aluno:
-            {
-                codigo: '3',
-                nome: 'Aluno 3',
-                rg: '1234567',
-                dataNasc: '2000-01-01',
-                celular: '1111-1111',
-                observacoes: 'Observacoes do Aluno 1'
-            },
-            escola:
-            {
-                codigo: '1',
-                nome: 'Escola 1',
-                tipo: 'f',
-                email: 'zQkKs@example.com',
-                telefone: '1111-1111',
-                observacoes: 'Observacoes da Escola 1'
-            },
-            pontoDeEmbarque:
-            {
-                codigo: '1',
-                rua: 'Rua 1',
-                bairro: 'Bairro 1',
-                numero: '123',
-                cep: '12345-678'
-            }
-        },
-        {
-            codigo: '4',
-            ano: '2022',
-            anoLetivo: '9',
-            turma: 'A',
-            etapa: 'f',
-            periodo: 'm',
-            dataAocacao: '2022-01-01',
-            aluno:
-            {
-                codigo: '4',
-                nome: 'Aluno 4',
-                rg: '1234567',
-                dataNasc: '2000-01-01',
-                celular: '1111-1111',
-                observacoes: 'Observacoes do Aluno 1'
-            },
-            escola:
-            {
-                codigo: '1',
-                nome: 'Escola 1',
-                tipo: 'f',
-                email: 'zQkKs@example.com',
-                telefone: '1111-1111',
-                observacoes: 'Observacoes da Escola 1'
-            },
-            pontoDeEmbarque:
-            {
-                codigo: '1',
-                rua: 'Rua 1',
-                bairro: 'Bairro 1',
-                numero: '123',
-                cep: '12345-678'
-            }
-        },
-        {
-            codigo: '5',
-            ano: '2022',
-            anoLetivo: '9',
-            turma: 'A',
-            etapa: 'f',
-            periodo: 'm',
-            dataAocacao: '2022-01-01',
-            aluno:
-            {
-                codigo: '5',
-                nome: 'Aluno 5',
-                rg: '1234567',
-                dataNasc: '2000-01-01',
-                celular: '1111-1111',
-                observacoes: 'Observacoes do Aluno 1'
-            },
-            escola:
-            {
-                codigo: '1',
-                nome: 'Escola 1',
-                tipo: 'f',
-                email: 'zQkKs@example.com',
-                telefone: '1111-1111',
-                observacoes: 'Observacoes da Escola 1'
-            },
-            pontoDeEmbarque:
-            {
-                codigo: '1',
-                rua: 'Rua 1',
-                bairro: 'Bairro 1',
-                numero: '123',
-                cep: '12345-678'
-            }
-        }
-    ]
-
     var listaRotas = [rota1, rota2, rota3];
+
+    useEffect(() => {
+        dispatch(buscarInscricoes());
+    }, [dispatch]);
 
     useEffect(() => {
         if (termoBusca.trim() === '') {
@@ -612,111 +414,102 @@ export default function TelaAlocarAluno(props) {
         setInscricoesFiltradas(novaListaFiltrada);
     };
 
-    return (
-        <Pagina>
-            <Container className="mt-4 mb-4 text-center">
-                <h2>Alocar Aluno</h2>
-                <Form.Group className="mb-3" controlId="selecionarRota">
-                    <Form.Label>Selecione a rota:</Form.Label>
-                    <Form.Select onChange={(e) => handleSelecionarRota(listaRotas.find(rota => rota.nome === e.target.value))}>
-                        <option value="">Selecione...</option>
-                        {listaRotas.map((rota, index) => (
-                            <option key={index} value={rota.nome}>{rota.nome}</option>
-                        ))}
-                    </Form.Select>
-                </Form.Group>
-                {mostrarModalConfirmacao && (
-                    <Modal show={mostrarModalConfirmacao} onHide={cancelarTrocaRota}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Confirmar Troca de Rota</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>Deseja realmente trocar de rota?</Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary" onClick={cancelarTrocaRota}>
-                                Cancelar
-                            </Button>
-                            <Button variant="primary" onClick={confirmarTrocaRota}>
-                                Confirmar
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>
-                )}
-                {rotaEstaSelecionada && rotaSelecionada && (
-                    <>
-                        <Table striped bordered className="mt-4">
-                            <thead>
-                                <tr>
-                                    <th>Nome da Rota</th>
-                                    <th>Motoristas</th>
-                                    <th>Monitor</th>
-                                    <th>Placa do Veículo</th>
-                                    <th>Pontos de Embarque</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {rotaSelecionada && (
-                                    <tr>
-                                        <td className="text-center align-middle">{rotaSelecionada.nome}</td>
-                                        <td>
-                                            <ul className="text-center align-middle list-unstyled mb-0">
-                                                {rotaSelecionada.motoristas.map((mot, index) => (
-                                                    <li key={index}>{mot.nome}</li>
-                                                ))}
-                                            </ul>
-                                        </td>
-                                        <td className="text-center align-middle">{rotaSelecionada.monitor.nome}</td>
-                                        <td className="text-center align-middle">{rotaSelecionada.veiculo.placa}</td>
-                                        <td>
-                                            <ul className="text-center align-middle list-unstyled mb-0">
-                                                {rotaSelecionada.pontosDeEmbarque.map((ponto, index) => (
-                                                    <li key={index}>{ponto.rua}, {ponto.numero}</li>
-                                                ))}
-                                            </ul>
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </Table>
+    const handleSubmissao = () => {
+        const dataAtual = new Date();
+        const inscricoesAtualizadas = inscricoesSelecionadas.map((inscricao) => ({
+            ...inscricao,
+            dataAlocacao: format(dataAtual, 'yyyy-MM-dd'),
+            rota: rotaSelecionada.codigo
+        }));
 
-                        {inscricoesSelecionadas.map((inscricao, index) => (
-                            <div key={index} className="d-flex justify-content-center align-items-center">
-                                <OverlayTrigger
-                                    trigger="click"
-                                    key="bottom"
-                                    placement="bottom"
-                                    overlay={
-                                        <Popover id="popover-positioned-bottom">
-                                            <Popover.Header as="h3">{inscricao.aluno.nome}</Popover.Header>
-                                            <Popover.Body>
-                                                <p>RG: {inscricao.aluno.rg}</p>
-                                                <p>Data de Nascimento: {inscricao.aluno.dataNasc}</p>
-                                                <p>Celular: {inscricao.aluno.celular}</p>
-                                                <p>Observações: {inscricao.aluno.observacoes}</p>
-                                            </Popover.Body>
-                                        </Popover>
-                                    }
-                                >
-                                    <Button variant="light" className="me-2 mb-2 mt-4 w-50">
-                                        <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
-                                    </Button>
-                                </OverlayTrigger>
-                                <Button variant="danger" className="mb-2 mt-4" onClick={() => handleRemoverInscricao(index)}>
-                                    Remover
+        dispatch(atualizarInscricoes(inscricoesAtualizadas)).then((retorno) => {
+            if (retorno.payload.status) {
+                setMensagem('Inscricão alterada com sucesso!');
+                setTipoMensagem('success');
+                setMostrarMensagem(true);
+            } else {
+                setMensagem('Inscrição não alterada! ' + retorno.payload.mensagem);
+                setTipoMensagem('danger');
+                setMostrarMensagem(true);
+            }
+        })
+        setRotaSelecionada(null);
+        setInscricoesSelecionadas([]);
+    };
+
+    if (mostrarMensagem) {
+        return (
+            <TelaMensagem mensagem={mensagem} tipo={tipoMensagem} setMostrarMensagem={setMostrarMensagem} />
+        );
+    }
+    else {
+        return (
+            <Pagina>
+                <Container className="mt-4 mb-4 text-center">
+                    <h2>Alocar Aluno</h2>
+                    <Form.Group className="mb-3" controlId="selecionarRota">
+                        <Form.Label>Selecione a rota:</Form.Label>
+                        <Form.Select onChange={(e) => handleSelecionarRota(listaRotas.find(rota => rota.nome === e.target.value))}>
+                            <option value="">Selecione...</option>
+                            {listaRotas.map((rota, index) => (
+                                <option key={index} value={rota.nome}>{rota.nome}</option>
+                            ))}
+                        </Form.Select>
+                    </Form.Group>
+                    {mostrarModalConfirmacao && (
+                        <Modal show={mostrarModalConfirmacao} onHide={cancelarTrocaRota}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Confirmar Troca de Rota</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>Deseja realmente trocar de rota?</Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={cancelarTrocaRota}>
+                                    Cancelar
                                 </Button>
-                            </div>
-                        ))}
+                                <Button variant="primary" onClick={confirmarTrocaRota}>
+                                    Confirmar
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
+                    )}
+                    {rotaEstaSelecionada && rotaSelecionada && (
+                        <>
+                            <Table striped bordered className="mt-4">
+                                <thead>
+                                    <tr>
+                                        <th>Nome da Rota</th>
+                                        <th>Motoristas</th>
+                                        <th>Monitor</th>
+                                        <th>Placa do Veículo</th>
+                                        <th>Pontos de Embarque</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {rotaSelecionada && (
+                                        <tr>
+                                            <td className="text-center align-middle">{rotaSelecionada.nome}</td>
+                                            <td>
+                                                <ul className="text-center align-middle list-unstyled mb-0">
+                                                    {rotaSelecionada.motoristas.map((mot, index) => (
+                                                        <li key={index}>{mot.nome}</li>
+                                                    ))}
+                                                </ul>
+                                            </td>
+                                            <td className="text-center align-middle">{rotaSelecionada.monitor.nome}</td>
+                                            <td className="text-center align-middle">{rotaSelecionada.veiculo.placa}</td>
+                                            <td>
+                                                <ul className="text-center align-middle list-unstyled mb-0">
+                                                    {rotaSelecionada.pontosDeEmbarque.map((ponto, index) => (
+                                                        <li key={index}>{ponto.rua}, {ponto.numero}</li>
+                                                    ))}
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </Table>
 
-                        <Form.Label className="mt-4">Alunos:</Form.Label>
-                        <div className="d-flex">
-                            <Form.Control
-                                type="text"
-                                placeholder="Busque um aluno"
-                                value={termoBusca}
-                                onChange={(e) => setTermoBusca(e.target.value)}
-                            />
-                        </div>
-                        <div className="mt-2">
-                            {inscricoesFiltradas.map((inscricao, index) => (
+                            {inscricoesSelecionadas.map((inscricao, index) => (
                                 <div key={index} className="d-flex justify-content-center align-items-center">
                                     <OverlayTrigger
                                         trigger="click"
@@ -727,7 +520,7 @@ export default function TelaAlocarAluno(props) {
                                                 <Popover.Header as="h3">{inscricao.aluno.nome}</Popover.Header>
                                                 <Popover.Body>
                                                     <p>RG: {inscricao.aluno.rg}</p>
-                                                    <p>Data de Nascimento: {inscricao.aluno.dataNasc}</p>
+                                                    <p>Data de Nascimento: {format(new Date(inscricao.aluno.dataNasc), 'dd/MM/yyyy')}</p>
                                                     <p>Celular: {inscricao.aluno.celular}</p>
                                                     <p>Observações: {inscricao.aluno.observacoes}</p>
                                                 </Popover.Body>
@@ -738,27 +531,65 @@ export default function TelaAlocarAluno(props) {
                                             <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
                                         </Button>
                                     </OverlayTrigger>
-                                    <Button
-                                        variant="primary"
-                                        className="mb-2 mt-4"
-                                        onClick={() => handleAdicionarInscricao(index)}
-                                    >
-                                        Adicionar
+                                    <Button variant="danger" className="mb-2 mt-4" onClick={() => handleRemoverInscricao(index)}>
+                                        Remover
                                     </Button>
                                 </div>
                             ))}
-                        </div>
-                        <Button
-                            variant="primary"
-                            className="mb-2 mt-4"
-                            onClick={() => { }}
-                        >
-                            Confirmar Alocação
-                        </Button>
-                    </>
-                )}
 
-//             </Container>
-//         </Pagina>
-    );
+                            <Form.Label className="mt-4">Alunos:</Form.Label>
+                            <div className="d-flex">
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Busque um aluno"
+                                    value={termoBusca}
+                                    onChange={(e) => setTermoBusca(e.target.value)}
+                                />
+                            </div>
+                            <div className="mt-2">
+                                {inscricoesFiltradas.map((inscricao, index) => (
+                                    <div key={index} className="d-flex justify-content-center align-items-center">
+                                        <OverlayTrigger
+                                            trigger="click"
+                                            key="bottom"
+                                            placement="bottom"
+                                            overlay={
+                                                <Popover id="popover-positioned-bottom">
+                                                    <Popover.Header as="h3">{inscricao.aluno.nome}</Popover.Header>
+                                                    <Popover.Body>
+                                                        <p>RG: {inscricao.aluno.rg}</p>
+                                                        <p>Data de Nascimento: {format(new Date(inscricao.aluno.dataNasc), 'dd/MM/yyyy')}</p>
+                                                        <p>Celular: {inscricao.aluno.celular}</p>
+                                                        <p>Observações: {inscricao.aluno.observacoes}</p>
+                                                    </Popover.Body>
+                                                </Popover>
+                                            }
+                                        >
+                                            <Button variant="light" className="me-2 mb-2 mt-4 w-50">
+                                                <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
+                                            </Button>
+                                        </OverlayTrigger>
+                                        <Button
+                                            variant="primary"
+                                            className="mb-2 mt-4"
+                                            onClick={() => handleAdicionarInscricao(index)}
+                                        >
+                                            Adicionar
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                            <Button
+                                variant="primary"
+                                className="mb-2 mt-4"
+                                onClick={() => { handleSubmissao() }}
+                            >
+                                Confirmar Alocação
+                            </Button>
+                        </>
+                    )}
+                </Container>
+            </Pagina>
+        );
+    }
 }
