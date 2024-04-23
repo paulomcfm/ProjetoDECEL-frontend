@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Form, Button, Col, Row, InputGroup } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { adicionarUsuario, atualizarUsuario } from '../../redux/usuarioReducer';
-import { buscarAlunos } from '../../redux/alunoReducer';
-import InputMask from 'react-input-mask';
+import { adicionarUsuario, atualizarUsuario, buscarUsuarios } from '../../redux/usuarioReducer';
 import validarCelular from '../../validacoes/validarCelular';
 import validarCPF from '../../validacoes/validarCpf';
 
@@ -22,7 +20,7 @@ export default function FormCadUsuario(props) {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(buscarAlunos());
+        dispatch(buscarUsuarios());
     }, [dispatch]);
 
     function manipularMudancas(e) {
