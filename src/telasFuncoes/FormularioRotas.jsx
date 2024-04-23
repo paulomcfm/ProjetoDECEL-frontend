@@ -244,7 +244,7 @@ export default function FormularioRotas(props) {
                 <Row className='justify-content-center'>
                     <Col md className='text-center'>
                       <h4>Nome da Rota(*):</h4>
-                      <input type="text" id="searchInput" className="form-control mb-3 mx-auto"  placeholder="Rota Escola A" style={{width:'400px'}} name='nome' id="nome" onChange={manipularMudancas}/>
+                      <input type="text" id="nome" className="form-control mb-3 mx-auto"  placeholder="Rota Escola A" style={{width:'400px'}} name='nome'  onChange={manipularMudancas}/>
                     </Col>
                 </Row>
 
