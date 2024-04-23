@@ -47,6 +47,9 @@ export default function TelaCadastroAluno(props) {
                                     setAlunoParaEdicao={setAlunoParaEdicao}
                                     modoEdicao={modoEdicao}
                                     setModoEdicao={setModoEdicao}
+                                    setMostrarMensagem={setMostrarMensagem}
+                                    setMensagem={setMensagem}
+                                    setTipoMensagem={setTipoMensagem}
                                 />
                         }
                     </Row>

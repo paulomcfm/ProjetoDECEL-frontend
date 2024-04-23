@@ -129,9 +129,10 @@ export const removerAluno = createAsyncThunk('aluno/remover', async (aluno) => {
         }
     }
     else {
+        const erro = await resposta.json();
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao remover o aluno.',
+            mensagem: erro.mensagem,
             aluno
         }
     }
