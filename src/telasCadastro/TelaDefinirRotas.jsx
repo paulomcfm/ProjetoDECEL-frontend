@@ -7,11 +7,11 @@ export default function TelaDefinirRotas(){
 
     const formVazio = {
         nome:'',
-        periodo:'',
+        periodo:'Manhã',
         ida:'',
         volta:'',
-        veiculo:0,
-        monitor:0,
+        veiculo:1,
+        monitor:1,
         motoristas:[],
         pontos:[]
     }
@@ -22,7 +22,7 @@ export default function TelaDefinirRotas(){
 
     return (
         <Pagina>
-            {modo? <TabelaRotas/>:<FormularioRotas/>}
+            {modo? <TabelaRotas/>:<FormularioRotas formVazio={formVazio}/>}
         </Pagina>
     )
 }
