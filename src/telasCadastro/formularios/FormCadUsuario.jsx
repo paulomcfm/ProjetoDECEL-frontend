@@ -15,6 +15,7 @@ export default function FormCadUsuario(props) {
     };
 
     const estadoInicialUsuario = props.usuarioParaEdicao;
+    const { estado, mensagem, usuarios } = useSelector(state => state.usuario);
     const [usuario, setUsuario] = useState(estadoInicialUsuario);
     const [formValidado, setFormValidado] = useState(false);
     const dispatch = useDispatch();
