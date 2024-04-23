@@ -1,27 +1,49 @@
 import { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import TelaMenu from './TelaMenu';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
-
-function autenticarUsuario(username, password) {
-    // Lógica de autenticação aqui
-    return true; // ou false, dependendo do sucesso da autenticação
-}
+import { useDispatch } from 'react-redux';
+import { autenticarUsuario } from '../redux/usuarioReducer'; // Importa a função de autenticação
 
 export default function TelaLogin() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [cpf, setCpf] = useState('');
     const [autenticado, setAutenticado] = useState(false);
+    const dispatch = useDispatch(); // Obtém a função dispatch do Redux
 
-    function handleLogin() {
-        // Lógica de autenticação
-        const autenticacaoSucesso = autenticarUsuario(username, password);
-        if (autenticacaoSucesso) {
-            setAutenticado(true);
-        } else {
-            // Tratamento para autenticação inválida
-            alert('Usuário ou senha inválidos.');
-        }
+    async function handleLogin() {
+        // Despacha a action para autenticar o usuário
+        dispatch(autenticarUsuario({ nome: username, cpf }))
+            .then((retorno) => {
+                if (retorno.payload.status) {
+                    setAutenticado(true); // Define autenticado como true se a autenticação for bem-sucedida
+                } else {
+                    // Tratamento para autenticação inválida
+                    alert('Usuário ou CPF inválidos.');
+                }
+            })
+            .catch((error) => {
+                console.error('Erro ao autenticar usuário:', error);
+                // Tratamento para erros de autenticação
+                alert('Erro ao autenticar usuário. Por favor, tente novamente mais tarde.');
+            });
+    }
+
+    function formatarCPF(cpf) {
+        if (!cpf) return cpf;
+        // Remove todos os caracteres não numéricos
+        cpf = cpf.replace(/\D/g, '');
+
+        // Aplica a máscara para CPF (xxx.xxx.xxx-xx)
+        cpf = cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+
+        return cpf;
+    }
+
+    function handleCpfChange(event) {
+        const cpfDigitado = event.target.value;
+        const cpfFormatado = formatarCPF(cpfDigitado);
+        setCpf(cpfFormatado);
     }
 
     return (
@@ -48,6 +70,18 @@ export default function TelaLogin() {
                                 placeholder="Senha"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>CPF</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="999.999.999-99"
+                                id="cpf"
+                                name="cpf"
+                                value={cpf}
+                                onChange={handleCpfChange} // Utiliza a função handleCpfChange para formatar o CPF
                                 required
                             />
                         </Form.Group>
