@@ -5,6 +5,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { buscarResponsaveis } from '../../redux/responsavelReducer';
 import { adicionarParentesco, atualizarParentesco, removerParentesco } from '../../redux/parentescoReducer';
 import { useEffect } from 'react';
+import validarCelular from '../../validacoes/validarCelular';
+import InputMask from 'react-input-mask';
+
 
 
 export default function FormCadAlunos(props) {
@@ -77,13 +80,6 @@ export default function FormCadAlunos(props) {
         setAluno({ ...aluno, [componente.name]: componente.value });
     }
 
-    function manipularMudancasCelular(e) {
-        let celular = e.target.value;
-        celular = formatarCelular(celular);
-        setAluno({ ...aluno, celular: celular });
-    }
-
-
     function addResponsavel(responsavel) {
         if (!responsaveisSelecionados.find(r => r.codigo === responsavel.codigo)) {
             setResponsaveisSelecionados([...responsaveisSelecionados, responsavel]);
@@ -96,25 +92,34 @@ export default function FormCadAlunos(props) {
         setResponsaveisSelecionados(novosResponsaveis);
     }
 
-    function formatarCelular(celular, cursorPos) {
+    const formatarCelular = (celular) => {
         if (!celular) return celular;
-        celular = celular.replace(/\D/g, '');
-    
-        const hasHyphen = celular.includes('-');
-        const formatted = celular.length < 11
-            ? celular.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3')
-            : celular.replace(/^(\d{2})(\d)(\d{4})(\d{0,4})$/, '($1) $2 $3-$4');
-    
-        if (hasHyphen && cursorPos <= formatted.indexOf('-')) {
-            return formatted.replace('-', '');
+
+        let celularFormatado = celular.replace(/\D/g, '');
+
+        celularFormatado = celularFormatado.substring(0, 11);
+        if (celularFormatado.length === 8) {
+            celularFormatado = `${celularFormatado.substring(0, 4)}-${celularFormatado.substring(4)}`;
         }
-    
-        return formatted;
+        if (celularFormatado.length > 2) {
+            celularFormatado = `(${celularFormatado.substring(0, 2)}) ${celularFormatado.substring(2)}`;
+        }
+        if (celularFormatado.length > 9) {
+            celularFormatado = `${celularFormatado.substring(0, 9)}-${celularFormatado.substring(9)}`;
+        }
+
+        return celularFormatado;
     }
 
     function manipularSubmissao(e) {
         const form = e.currentTarget;
-        if (form.checkValidity()) {
+        var celularValidado = false;
+        if (aluno.celular == '')
+            celularValidado = true;
+        else {
+            celularValidado = validarCelular(aluno.celular);
+        }
+        if (form.checkValidity() && celularValidado) {
             if (!props.modoEdicao) {
                 dispatch(adicionarAluno(aluno)).then((retorno) => {
                     if (retorno.payload.status) {
@@ -129,7 +134,7 @@ export default function FormCadAlunos(props) {
                             }));
                         });
                     } else {
-                        props.setMensagem('Aluno não incluído! '+ retorno.payload.mensagem);
+                        props.setMensagem('Aluno não incluído! ' + retorno.payload.mensagem);
                         props.setTipoMensagem('danger');
                         props.setMostrarMensagem(true);
                     }
@@ -173,7 +178,7 @@ export default function FormCadAlunos(props) {
                             }
                         });
                     } else {
-                        props.setMensagem('Aluno não alterado! '+ retorno.payload.mensagem);
+                        props.setMensagem('Aluno não alterado! ' + retorno.payload.mensagem);
                         props.setTipoMensagem('danger');
                         props.setMostrarMensagem(true);
                     }
@@ -310,15 +315,25 @@ export default function FormCadAlunos(props) {
 
                     <Form.Group className="mb-3">
                         <Form.Label>Celular:</Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder="(00) 00000-0000"
-                            id="celular"
+                        <InputMask
+                            style={{ width: '300px' }}
+                            className="form-control"
+                            mask="(99) 99999-9999"
+                            maskChar="_"
+                            placeholder="(99) 99999-9999"
                             name="celular"
-                            value={formatarCelular(aluno.celular)}
-                            onChange={manipularMudancasCelular}
-                            maxLength="16"
+                            value={aluno.celular}
+                            onChange={manipularMudancas}
+                            pattern="\(\d{2}\) \d{5}-\d{4}"
                         />
+                        <Form.Control.Feedback type="invalid">
+                            O celular deve estar no formato (99) 99999-9999.
+                        </Form.Control.Feedback>
+                        {aluno.celular.length==15 && !validarCelular(aluno.celular) && (
+                            <Form.Text className="text-danger">
+                                Celular inválido.
+                            </Form.Text>
+                        )}
                     </Form.Group>
                 </Form.Group>
                 <Form.Group className="mb-3">

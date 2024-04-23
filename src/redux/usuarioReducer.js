@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ESTADO from '../recursos/estado';
-const urlBase = 'https://projetodecel-backend.onrender.com/usuario';
+const urlBase = 'http://localhost:8080/usuario';
 
 export const buscarUsuarios = createAsyncThunk('usuario/buscar', async () => {
     try {
@@ -48,13 +48,11 @@ export const adicionarUsuario = createAsyncThunk('usuario/adicionar', async (usu
             status: dados.status,
             mensagem: dados.mensagem,
             usuario: {
-                codigoGerado: dados.codigoGerado,
                 nome: usuario.nome,
                 senha: usuario.senha,
                 cpf: usuario.cpf,
                 email: usuario.email,
-                celular: usuario.celular,
-                categoria: usuario.categoria
+                celular: usuario.celular
             }
         }
     }
@@ -64,6 +62,25 @@ export const adicionarUsuario = createAsyncThunk('usuario/adicionar', async (usu
             mensagem: 'Ocorreu um erro ao adicionar o usuário.',
             usuario
         }
+    }
+});
+
+export const autenticarUsuario = createAsyncThunk('usuario/autenticar', async (credenciais) => {
+    const { nome, cpf } = credenciais;
+    console.log(credenciais);
+    try {
+        const resposta = await fetch(urlBase, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: credenciais
+        });
+
+        const dados = await resposta.json();
+        return dados;
+    } catch (erro) {
+        return { status: false, mensagem: 'Ocorreu um erro ao autenticar o usuário: ' + erro.message };
     }
 });
 
@@ -86,13 +103,11 @@ export const atualizarUsuario = createAsyncThunk('usuario/atualizar', async (usu
             status: dados.status,
             mensagem: dados.mensagem,
             usuario: {
-                codigoGerado: dados.codigoGerado,
                 nome: usuario.nome,
                 senha: usuario.senha,
                 cpf: usuario.cpf,
                 email: usuario.email,
-                celular: usuario.celular,
-                categoria: usuario.categoria
+                celular: usuario.celular
             }
         }
     }
