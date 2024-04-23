@@ -6,7 +6,7 @@ import { buscarPontosEmbarque } from '../../redux/pontosEmbarqueReducer';
 
 export default function TabelaEscolas(props) {
     const [termoBusca, setTermoBusca] = useState('');
-    const { estado, mensagem, escolas } = useSelector(state => state.escola);
+    const { escolas } = useSelector(state => state.escola);
     const dispatch = useDispatch();
 
     const escolaVazia = {
@@ -29,7 +29,7 @@ export default function TabelaEscolas(props) {
         dispatch(buscarPontosEmbarque());
     }, [dispatch]);
 
-    const { estadoPdE, mensagemPdE, pontosEmbarque } = useSelector(state => state.pontoEmbarque);
+    const { pontosEmbarque } = useSelector(state => state.pontoEmbarque);
 
     function excluirEscola(escola) {
         if (window.confirm('Deseja realmente excluir essa escola?')) {
@@ -100,13 +100,15 @@ export default function TabelaEscolas(props) {
                             <td>{pontosEmbarque.find(ponto => ponto.codigo === escola.pontoEmbarque.codigo)?.cep
                                 .replace(/^(\d{5})(\d{3})$/, '$1-$2')}</td>
                             <td>
-                                {escola.tipo === 'i'
+                                {escola.tipo === 'I'
                                     ? 'Educação Infantil'
-                                    : escola.tipo === 'f'
+                                    : escola.tipo === 'F'
                                         ? 'Ensino Fundamental'
-                                        : escola.tipo === 'a'
+                                        : escola.tipo === 'A'
                                             ? 'Educação Infantil e Ensino Fundamental'
-                                            : ''}
+                                            : escola.tipo === 'M'
+                                                ? 'Ensino Médio'
+                                                : ''}
                             </td>
                             <td>{escola.email}</td>
                             <td>{escola.telefone}</td>

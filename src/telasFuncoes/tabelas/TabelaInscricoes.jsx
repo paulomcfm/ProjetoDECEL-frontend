@@ -8,11 +8,12 @@ import { buscarAlunos } from '../../redux/alunoReducer';
 
 export default function TabelaInscricoes(props) {
     const [termoBusca, setTermoBusca] = useState('');
-    const { estado, mensagem, inscricoes } = useSelector(state => state.inscricao);
+    const { inscricoes } = useSelector(state => state.inscricao);
     const dispatch = useDispatch();
 
     const inscricaoVazia = {
         codigo: '0',
+        ano: '',
         ensino: '',
         periodo: '',
         turma: '',
@@ -59,9 +60,9 @@ export default function TabelaInscricoes(props) {
         dispatch(buscarAlunos());
     }, [dispatch]);
 
-    const { estadoPdE, mensagemPdE, pontosEmbarque } = useSelector(state => state.pontoEmbarque);
-    const { estadoEsc, mensagemEsc, escolas } = useSelector(state => state.escola);
-    const { estadoAlu, mensagemAlu, alunos } = useSelector(state => state.aluno);
+    const { pontosEmbarque } = useSelector(state => state.pontoEmbarque);
+    const { escolas } = useSelector(state => state.escola);
+    const { alunos } = useSelector(state => state.aluno);
 
     function excluirInscricao(inscricao) {
         if (window.confirm('Deseja realmente excluir essa inscrição?')) {
@@ -122,7 +123,9 @@ export default function TabelaInscricoes(props) {
                         <th>Ponto de Embarque</th>
                         <th>Escola</th>
                         <th>Turma</th>
+                        <th>Etapa</th>
                         <th>Período</th>
+                        <th>Ano</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -135,9 +138,56 @@ export default function TabelaInscricoes(props) {
                             <td>{pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.rua : 'Carregando...'}, {pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.numero : 'Carregando...'}, {pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.bairro : 'Carregando...'}, {pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.cep.replace(/^(\d{5})(\d{3})$/, '$1-$2') : 'Carregando...'}</td>
                             <td>{escolas ? escolas.find(esc => esc.codigo === inscricao.escola.codigo)?.nome : 'Carregando...'}</td>
                             <td>
-                                {inscricao.turma}
+                                {inscricao.anoLetivo === '1I'
+                                    ? 'Pré 1' :
+                                    inscricao.anoLetivo === '2I'
+                                        ? 'Pré 2' :
+                                        inscricao.anoLetivo.includes('1')
+                                            ? '1º Ano' :
+                                            inscricao.anoLetivo.includes('2')
+                                                ? '2º Ano'
+                                                : inscricao.anoLetivo.includes('3')
+                                                    ? '3º Ano'
+                                                    : inscricao.anoLetivo.includes('4')
+                                                        ? '4º Ano'
+                                                        : inscricao.anoLetivo.includes('5')
+                                                            ? '5º Ano'
+                                                            : inscricao.anoLetivo.includes('6')
+                                                                ? '6º Ano'
+                                                                : inscricao.anoLetivo.includes('7')
+                                                                    ? '7º Ano'
+                                                                    : inscricao.anoLetivo.includes('8')
+                                                                        ? '8º Ano'
+                                                                        : inscricao.anoLetivo.includes('9')
+                                                                            ? '9º Ano'
+                                                                            : ''} {inscricao.turma}
                             </td>
-                            <td>{inscricao.periodo}</td>
+                            <td>{inscricao.etapa === 'I'
+                                ? 'Educação Infantil'
+                                : inscricao.etapa === 'F'
+                                    ? 'Ensino Fundamental'
+                                    : inscricao.etapa === 'M'
+                                        ? 'Ensino Médio'
+                                        : ''} {inscricao.etapa === 'F' ?
+                                                (inscricao.anoLetivo.includes('1') ||
+                                                inscricao.anoLetivo.includes('2') ||
+                                                inscricao.anoLetivo.includes('3') ||
+                                                inscricao.anoLetivo.includes('4') ||
+                                                inscricao.anoLetivo.includes('5') ||
+                                                inscricao.anoLetivo.includes('6'))
+                                                ? 'I'
+                                                : 'II'
+                                            : ''}
+                            </td>
+                            <td>{inscricao.periodo === 'M'
+                                ? 'Matinal'
+                                : inscricao.periodo === 'V'
+                                    ? 'Vespertino'
+                                    : inscricao.periodo === 'I'
+                                        ? 'Integral'
+                                        : ''}
+                            </td>
+                            <td>{inscricao.ano}</td>
                             <td>
                                 <Button variant="danger" onClick={() => {
                                     excluirInscricao(inscricao);

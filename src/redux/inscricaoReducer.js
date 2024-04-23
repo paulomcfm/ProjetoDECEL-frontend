@@ -90,6 +90,35 @@ export const atualizarInscricao = createAsyncThunk('inscricao-aluno/atualizar', 
     }
 });
 
+export const atualizarInscricoes = createAsyncThunk('inscricao-aluno/atualizar-inscricoes', async (inscricoes) => {
+    const resposta = await fetch(urlBase + '/atualizar-inscricoes', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(inscricoes)
+    }).catch(erro => {
+        return {
+            status: false,
+            mensagem: 'Ocorreu um erro ao atualizar a inscrição:' + erro.message
+        }
+    });
+    if (resposta.ok) {
+        const dados = await resposta.json();
+        return {
+            status: dados.status,
+            mensagem: dados.mensagem,
+            inscricoes
+        }
+    }
+    else {
+        return {
+            status: false,
+            mensagem: 'Ocorreu um erro ao atualizar a inscrição.',
+            inscricoes
+        }
+    }
+});
 
 export const removerInscricao = createAsyncThunk('inscricao-aluno/remover', async (inscricao) => {
     const resposta = await fetch(urlBase, {

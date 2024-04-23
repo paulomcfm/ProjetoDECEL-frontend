@@ -12,6 +12,7 @@ export default function TelaCadastroInscricao(props) {
     const [tipoMensagem, setTipoMensagem] = useState("");
     const [inscricaoParaEdicao, setInscricaoParaEdicao] = useState({
         codigo: '0',
+        ano: '',
         rua: '',
         numero: '',
         bairro: '',
