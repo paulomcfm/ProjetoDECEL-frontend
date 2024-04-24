@@ -5,7 +5,7 @@ import Pagina from '../templates/Pagina';
 import Select from 'react-select'
 import { useDispatch, useSelector } from 'react-redux';
 import { buscarPontosEmbarque } from '../redux/pontosEmbarqueReducer';
-import { adicionarRotas } from '../redux/rotaReducer';
+import { adicionarRotas,buscarRotas } from '../redux/rotaReducer';
 import { useEffect } from 'react';
 
 import '../templates/style.css';
@@ -252,8 +252,8 @@ export default function FormularioRotas(props) {
           }
           json.pontos = JSON.stringify(vetor)
           setForm(json)
-          dispatch(adicionarRotas(json))
           console.log(json)
+          dispatch(adicionarRotas(json))
         }
       }
     }
@@ -397,7 +397,10 @@ export default function FormularioRotas(props) {
                 
 
                 <br/><br/><br/>
-                <button type="button" className="btn btn-primary" onClick={()=>{submissao()}}>Cadastrar</button>
+                <button type="button" className="btn btn-primary" onClick={()=>{submissao()}}>Cadastrar</button>{' '}
+                <button type="button" className="btn btn-danger" onClick={()=>{
+                  props.setTela(true)
+                  }}> Voltar</button>
             </div>
         </>
     );
