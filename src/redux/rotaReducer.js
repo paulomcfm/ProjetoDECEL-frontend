@@ -153,7 +153,7 @@ const rotaSlice = createSlice({
             state.mensagem = action.error.message;
         }).addCase(adicionarRotas.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
-            state.rotas.push(action.payload.rota);
+            // state.rotas.push(action.payload.rota);
             state.mensagem = action.payload.mensagem;
         }).addCase(adicionarRotas.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
