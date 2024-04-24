@@ -190,10 +190,10 @@ const inscricaoSlice = createSlice({
             state.estado = ESTADO.ERRO;
         }).addCase(atualizarInscricao.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
-            const indice = state.inscricoes.findIndex(inscricao => inscricao.codigo === action.payload.inscricao.codigo);
+            const { ano, aluno: { codigo } } = action.payload.inscricao;
+            const indice = state.inscricoes.findIndex(inscricao => inscricao.ano === ano && inscricao.aluno.codigo === codigo);
             state.inscricoes[indice] = action.payload.inscricao;
             state.mensagem = action.payload.mensagem;
-
         }).addCase(atualizarInscricao.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
             state.mensagem = "Atualizando inscrição...";
@@ -203,7 +203,8 @@ const inscricaoSlice = createSlice({
         }).addCase(removerInscricao.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
             state.mensagem = action.payload.mensagem;
-            state.inscricoes = state.inscricoes.filter(inscricao => inscricao.codigo !== action.payload.inscricao.codigo);
+            const { ano, aluno: { codigo } } = action.payload.inscricao;
+            state.inscricoes = state.inscricoes.filter(inscricao => inscricao.ano !== ano || inscricao.aluno.codigo !== codigo);
         }).addCase(removerInscricao.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
             state.mensagem = "Removendo inscrição...";

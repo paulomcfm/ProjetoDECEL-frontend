@@ -17,7 +17,6 @@ function FormCadInscricao(props) {
     const [pontoEmbarqueSelecionado, setPontoEmbarqueSelecionado] = useState(false);
 
     const inscricaoVazia = {
-        codigo: '0',
         ano: '',
         etapa: '',
         periodo: '',
@@ -296,7 +295,7 @@ function FormCadInscricao(props) {
                             ))}
                         </tbody>
                     </Table>
-                )}
+                )} {console.log(inscricao)}
                 {((alunoSelecionado && escolaSelecionada && pontoEmbarqueSelecionado) || props.modoEdicao) && (
                     <>
                         <Row>
@@ -441,16 +440,17 @@ function FormCadInscricao(props) {
                 )}
                 <p>(*) Campos obrigatórios</p>
                 <Row>
-                    <Col md={6} offset={5} className="d-flex justify-content-end">
-                        <Button type="submit" variant={"primary"}>
-                            {props.modoEdicao ? "Alterar inscrição" : "Inscrever Aluno"}</Button>
-                    </Col>
-                    <Col>
-                        <Button type="submit" variant={"danger"} onClick={() => {
+                    <div className="d-flex justify-content-center">
+                        <Button type="submit" variant="primary">
+                            {props.modoEdicao ? "Alterar Inscricao" : "Inscrever Aluno"}
+                        </Button>
+                        <Button type="submit" variant="danger" className="ms-2" onClick={() => {
                             props.exibirFormulario(false);
                             props.setModoEdicao(false);
-                        }}>Voltar</Button>
-                    </Col>
+                        }}>
+                            Voltar
+                        </Button>
+                    </div>
                 </Row>
             </Form>
         </Container>
