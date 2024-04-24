@@ -14,8 +14,7 @@ export default function FormCadUsuario(props) {
         rg: '',
         cpf: '',
         email: '',
-        celular: '',
-        categoria: 'educacao' // Defina o valor padrão para a categoria aqui
+        celular: ''
     };
 
     const estadoInicialUsuario = props.usuarioParaEdicao;

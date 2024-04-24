@@ -15,8 +15,7 @@ export default function TelaCadastroUser(props) {
         rg: '',
         cpf: '',
         email:'',
-        celular: '',
-        categoria: ''
+        celular: ''
     });
     const [modoEdicao, setModoEdicao] = useState(false);
 

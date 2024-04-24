@@ -9,13 +9,11 @@ export default function TabelaUsuarios(props) {
     const dispatch = useDispatch();
 
     const usuarioVazio = {
-        codigo: '0',
         nome: '',
         rg: '',
         cpf: '',
         email: '',
-        celular: '',
-        categoria: ''
+        celular: ''
     };
 
     function excluirUsuario(usuario) {
@@ -76,18 +74,16 @@ export default function TabelaUsuarios(props) {
                         <th>CPF</th>
                         <th>Email</th>
                         <th>Celular</th>
-                        <th>Categoria</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     {usuariosFiltrados.map(usuario => (
-                        <tr key={usuario.codigo}>
+                        <tr key={usuario.nome}>
                             <td>{usuario.nome}</td>
                             <td>{usuario.cpf}</td>
                             <td>{usuario.email}</td>
                             <td>{usuario.celular}</td>
-                            <td>{usuario.categoria}</td>
                             <td>
                                 <Button variant="danger" onClick={() => {
                                     excluirUsuario(usuario);
