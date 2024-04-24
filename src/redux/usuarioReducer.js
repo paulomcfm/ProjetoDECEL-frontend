@@ -67,6 +67,25 @@ export const adicionarUsuario = createAsyncThunk('usuario/adicionar', async (usu
     }
 });
 
+export const autenticarUsuario = createAsyncThunk('usuario/autenticar', async (credenciais) => {
+    const { nome, cpf } = credenciais;
+
+    try {
+        const resposta = await fetch(`${urlBase}/autenticar`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: credenciais
+        });
+
+        const dados = await resposta.json();
+        return dados;
+    } catch (erro) {
+        return { status: false, mensagem: 'Ocorreu um erro ao autenticar o usuário: ' + erro.message };
+    }
+});
+
 export const atualizarUsuario = createAsyncThunk('usuario/atualizar', async (usuario) => {
     const resposta = await fetch(urlBase, {
         method: 'PUT',
