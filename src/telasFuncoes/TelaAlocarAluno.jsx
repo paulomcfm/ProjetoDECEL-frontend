@@ -19,8 +19,8 @@ export default function TelaAlocarAluno(props) {
     const [inscricoesFiltradas, setInscricoesFiltradas] = useState([]);
     const [mostrarModalConfirmacao, setMostrarModalConfirmacao] = useState(false);
     const [novaRotaSelecionada, setNovaRotaSelecionada] = useState(null);
-    const {estadoInsc, mensagemIsnc, inscricoes } = useSelector(state => state.inscricao);
-    const {estadoRota, mensagemRota, rotas } = useSelector(state => state.rota);
+    const { estadoInsc, mensagemIsnc, inscricoes } = useSelector(state => state.inscricao);
+    const { estadoRota, mensagemRota, rotas } = useSelector(state => state.rota);
     const [mostrarMensagem, setMostrarMensagem] = useState(false);
     const [mensagem, setMensagem] = useState("");
     const [tipoMensagem, setTipoMensagem] = useState("");
@@ -132,7 +132,9 @@ export default function TelaAlocarAluno(props) {
                         <Form.Select onChange={(e) => handleSelecionarRota(rotas.find(rota => rota.nome === e.target.value))}>
                             <option value="">Selecione...</option>
                             {rotas.map((rota, index) => (
-                                <option key={index} value={rota.nome}>{rota.nome}</option>
+                                <option key={index} value={rota.nome}>
+                                    {rota.nome} - {rota.veiculo[0].vei_placa} - {rota.motoristas.map((motorista) => motorista.nome).join('- ')}
+                                </option>
                             ))}
                         </Form.Select>
                     </Form.Group>
@@ -175,8 +177,8 @@ export default function TelaAlocarAluno(props) {
                                                     ))}
                                                 </ul>
                                             </td>
-                                            <td className="text-center align-middle">{rotaSelecionada.monitor.nome}</td>
-                                            <td className="text-center align-middle">{rotaSelecionada.veiculo.placa}</td>
+                                            <td className="text-center align-middle">{rotaSelecionada.monitor[0].mon_nome}</td>
+                                            <td className="text-center align-middle">{rotaSelecionada.veiculo[0].vei_placa}</td>
                                             <td>
                                                 <ul className="text-center align-middle list-unstyled mb-0">
                                                     {rotaSelecionada.pontos.map((ponto, index) => (
