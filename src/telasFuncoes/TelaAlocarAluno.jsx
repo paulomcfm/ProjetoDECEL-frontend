@@ -8,6 +8,7 @@ import { buscarInscricoes, atualizarInscricoes } from '../redux/inscricaoReducer
 import { useSelector, useDispatch } from 'react-redux';
 import { format } from 'date-fns';
 import TelaMensagem from '../telasCadastro/TelaMensagem';
+import { buscarRotas } from '../redux/rotaReducer';
 
 
 export default function TelaAlocarAluno(props) {
@@ -18,338 +19,17 @@ export default function TelaAlocarAluno(props) {
     const [inscricoesFiltradas, setInscricoesFiltradas] = useState([]);
     const [mostrarModalConfirmacao, setMostrarModalConfirmacao] = useState(false);
     const [novaRotaSelecionada, setNovaRotaSelecionada] = useState(null);
-    const {estadoInsc, mensagemIsnc, inscricoes } = useSelector(state => state.inscricao);
+    const { estadoInsc, mensagemIsnc, inscricoes } = useSelector(state => state.inscricao);
+    const { estadoRota, mensagemRota, rotas } = useSelector(state => state.rota);
     const [mostrarMensagem, setMostrarMensagem] = useState(false);
     const [mensagem, setMensagem] = useState("");
     const [tipoMensagem, setTipoMensagem] = useState("");
 
     const dispatch = useDispatch();
 
-    var rota1 = {
-        codigo: '1',
-        nome: 'Rota 1',
-        km: '10',
-        periodo: 'Matutino',
-        tempoInicio: '08:00',
-        tempoFinal: '12:00',
-        motoristas: [{
-            id: '  1',
-            nome: 'João da Silva',
-            cnh: '123456789',
-            celular: '9999-9999'
-        },
-        {
-            id: '  2',
-            nome: 'Pedro Oliveira',
-            cnh: '987654321',
-            celular: '8888-8888'
-        }],
-        monitor: {
-            codigo: '1',
-            nome: 'Maria Oliveira',
-            cnh: '987654321',
-            celular: '8888-8888'
-        },
-        veiculo: {
-            codigo: '1',
-            placa: 'ABC-1234',
-            renavam: '123456789',
-            modelo: 'Fiat Uno',
-            capacidade: '5',
-            tipo: 'Micro-ônibus'
-        },
-        pontosDeEmbarque: [
-            { codigo: '1', rua: 'Rua A', bairro: 'Bairro A', numero: '123', cep: '12345-678' },
-            { codigo: '2', rua: 'Rua B', bairro: 'Bairro B', numero: '456', cep: '23456-789' }
-        ],
-        inscricoes: [
-            {
-                codigo: '1',
-                ano: '2022',
-                anoLetivo: '9',
-                turma: 'A',
-                etapa: 'f',
-                periodo: 'm',
-                dataAlocacao: '2022-01-01',
-                aluno:
-                {
-                    codigo: '1',
-                    nome: 'Aluno 11',
-                    rg: '1234567',
-                    dataNasc: '2000-01-01',
-                    celular: '1111-1111',
-                    observacoes: 'Observacoes do Aluno 1'
-                },
-                escola:
-                {
-                    codigo: '1',
-                    nome: 'Escola 1',
-                    tipo: 'f',
-                    email: 'zQkKs@example.com',
-                    telefone: '1111-1111',
-                    observacoes: 'Observacoes da Escola 1'
-                },
-                pontoDeEmbarque:
-                {
-                    codigo: '1',
-                    rua: 'Rua 1',
-                    bairro: 'Bairro 1',
-                    numero: '123',
-                    cep: '12345-678'
-                }
-            },
-            {
-                codigo: '2',
-                ano: '2022',
-                anoLetivo: '9',
-                turma: 'A',
-                etapa: 'f',
-                periodo: 'm',
-                dataAlocacao: '2022-01-01',
-                aluno:
-                {
-                    codigo: '2',
-                    nome: 'Aluno 12',
-                    rg: '1234567',
-                    dataNasc: '2000-01-01',
-                    celular: '1111-1111',
-                    observacoes: 'Observacoes do Aluno 1'
-                },
-                escola:
-                {
-                    codigo: '1',
-                    nome: 'Escola 1',
-                    tipo: 'f',
-                    email: 'zQkKs@example.com',
-                    telefone: '1111-1111',
-                    observacoes: 'Observacoes da Escola 1'
-                },
-                pontoDeEmbarque:
-                {
-                    codigo: '1',
-                    rua: 'Rua 1',
-                    bairro: 'Bairro 1',
-                    numero: '123',
-                    cep: '12345-678'
-                }
-            }
-        ]
-    };
-
-    var rota2 = {
-        codigo: '2',
-        nome: 'Rota 2',
-        km: '15',
-        periodo: 'Vespertino',
-        tempoInicio: '13:00',
-        tempoFinal: '17:00',
-        motoristas: [{
-            id: '2',
-            nome: 'Pedro Oliveira',
-            cnh: '987654321',
-            celular: '8888-8888'
-        }],
-        monitor: {
-            codigo: '1',
-            nome: 'Ana da Silva',
-            cnh: '123456789',
-            celular: '9999-9999'
-        },
-        veiculo: {
-            codigo: '1',
-            placa: 'XYZ-9876',
-            renavam: '987654321',
-            modelo: 'Volkswagen Gol',
-            capacidade: '4',
-            tipo: 'Van'
-        },
-        pontosDeEmbarque: [
-            { codigo: '1', rua: 'Rua A', bairro: 'Bairro A', numero: '123', cep: '12345-678' },
-            { codigo: '2', rua: 'Rua B', bairro: 'Bairro B', numero: '456', cep: '23456-789' }
-        ],
-        inscricoes: [
-            {
-                codigo: '1',
-                ano: '2022',
-                anoLetivo: '9',
-                turma: 'A',
-                etapa: 'f',
-                periodo: 'm',
-                dataAlocacao: '2022-01-01',
-                aluno:
-                {
-                    codigo: '1',
-                    nome: 'Aluno 13',
-                    rg: '1234567',
-                    dataNasc: '2000-01-01',
-                    celular: '1111-1111',
-                    observacoes: 'Observacoes do Aluno 1'
-                },
-                escola:
-                {
-                    codigo: '1',
-                    nome: 'Escola 1',
-                    tipo: 'f',
-                    email: 'zQkKs@example.com',
-                    telefone: '1111-1111',
-                    observacoes: 'Observacoes da Escola 1'
-                },
-                pontoDeEmbarque:
-                {
-                    codigo: '1',
-                    rua: 'Rua 1',
-                    bairro: 'Bairro 1',
-                    numero: '123',
-                    cep: '12345-678'
-                }
-            },
-            {
-                codigo: '2',
-                ano: '2022',
-                anoLetivo: '9',
-                turma: 'A',
-                etapa: 'f',
-                periodo: 'm',
-                dataAlocacao: '2022-01-01',
-                aluno:
-                {
-                    codigo: '2',
-                    nome: 'Aluno 14',
-                    rg: '1234567',
-                    dataNasc: '2000-01-01',
-                    celular: '1111-1111',
-                    observacoes: 'Observacoes do Aluno 1'
-                },
-                escola:
-                {
-                    codigo: '1',
-                    nome: 'Escola 1',
-                    tipo: 'f',
-                    email: 'zQkKs@example.com',
-                    telefone: '1111-1111',
-                    observacoes: 'Observacoes da Escola 1'
-                },
-                pontoDeEmbarque:
-                {
-                    codigo: '1',
-                    rua: 'Rua 1',
-                    bairro: 'Bairro 1',
-                    numero: '123',
-                    cep: '12345-678'
-                }
-            }
-        ]
-    };
-
-    var rota3 = {
-        codigo: '3',
-        nome: 'Rota 3',
-        km: '20',
-        periodo: 'Noturno',
-        tempoInicio: '18:00',
-        tempoFinal: '22:00',
-        motoristas: [{
-            id: '1',
-            nome: 'Carlos Santos',
-            cnh: '456789123',
-            celular: '7777-7777'
-        }],
-        monitor: {
-            codigo: '1',
-            nome: 'Fernanda Lima',
-            cnh: '789123456',
-            celular: '6666-6666'
-        },
-        veiculo: {
-            codigo: '1',
-            placa: 'DEF-5678',
-            renavam: '456789123',
-            modelo: 'Chevrolet Onix',
-            capacidade: '4',
-            tipo: 'Carro'
-        },
-        pontosDeEmbarque: [
-            { codigo: '1', rua: 'Rua A', bairro: 'Bairro A', numero: '123', cep: '12345-678' },
-            { codigo: '2', rua: 'Rua B', bairro: 'Bairro B', numero: '456', cep: '23456-789' }
-        ],
-        inscricoes: [
-            {
-                codigo: '1',
-                ano: '2022',
-                anoLetivo: '9',
-                turma: 'A',
-                etapa: 'f',
-                periodo: 'm',
-                dataAlocacao: '2022-01-01',
-                aluno:
-                {
-                    codigo: '1',
-                    nome: 'Aluno 15',
-                    rg: '1234567',
-                    dataNasc: '2000-01-01',
-                    celular: '1111-1111',
-                    observacoes: 'Observacoes do Aluno 1'
-                },
-                escola:
-                {
-                    codigo: '1',
-                    nome: 'Escola 1',
-                    tipo: 'f',
-                    email: 'zQkKs@example.com',
-                    telefone: '1111-1111',
-                    observacoes: 'Observacoes da Escola 1'
-                },
-                pontoDeEmbarque:
-                {
-                    codigo: '1',
-                    rua: 'Rua 1',
-                    bairro: 'Bairro 1',
-                    numero: '123',
-                    cep: '12345-678'
-                }
-            },
-            {
-                codigo: '2',
-                ano: '2022',
-                anoLetivo: '9',
-                turma: 'A',
-                etapa: 'f',
-                periodo: 'm',
-                dataAlocacao: '2022-01-01',
-                aluno:
-                {
-                    codigo: '2',
-                    nome: 'Aluno 16',
-                    rg: '1234567',
-                    dataNasc: '2000-01-01',
-                    celular: '1111-1111',
-                    observacoes: 'Observacoes do Aluno 1'
-                },
-                escola:
-                {
-                    codigo: '1',
-                    nome: 'Escola 1',
-                    tipo: 'f',
-                    email: 'zQkKs@example.com',
-                    telefone: '1111-1111',
-                    observacoes: 'Observacoes da Escola 1'
-                },
-                pontoDeEmbarque:
-                {
-                    codigo: '1',
-                    rua: 'Rua 1',
-                    bairro: 'Bairro 1',
-                    numero: '123',
-                    cep: '12345-678'
-                }
-            }
-        ]
-    };
-
-    var listaRotas = [rota1, rota2, rota3];
-
     useEffect(() => {
         dispatch(buscarInscricoes());
+        dispatch(buscarRotas());
     }, [dispatch]);
 
     useEffect(() => {
@@ -449,10 +129,12 @@ export default function TelaAlocarAluno(props) {
                     <h2>Alocar Aluno</h2>
                     <Form.Group className="mb-3" controlId="selecionarRota">
                         <Form.Label>Selecione a rota:</Form.Label>
-                        <Form.Select onChange={(e) => handleSelecionarRota(listaRotas.find(rota => rota.nome === e.target.value))}>
+                        <Form.Select onChange={(e) => handleSelecionarRota(rotas.find(rota => rota.nome === e.target.value))}>
                             <option value="">Selecione...</option>
-                            {listaRotas.map((rota, index) => (
-                                <option key={index} value={rota.nome}>{rota.nome}</option>
+                            {rotas.map((rota, index) => (
+                                <option key={index} value={rota.nome}>
+                                    {rota.nome} - {rota.veiculo[0].vei_placa} - {rota.motoristas.map((motorista) => motorista.nome).join('- ')}
+                                </option>
                             ))}
                         </Form.Select>
                     </Form.Group>
@@ -495,11 +177,11 @@ export default function TelaAlocarAluno(props) {
                                                     ))}
                                                 </ul>
                                             </td>
-                                            <td className="text-center align-middle">{rotaSelecionada.monitor.nome}</td>
-                                            <td className="text-center align-middle">{rotaSelecionada.veiculo.placa}</td>
+                                            <td className="text-center align-middle">{rotaSelecionada.monitor[0].mon_nome}</td>
+                                            <td className="text-center align-middle">{rotaSelecionada.veiculo[0].vei_placa}</td>
                                             <td>
                                                 <ul className="text-center align-middle list-unstyled mb-0">
-                                                    {rotaSelecionada.pontosDeEmbarque.map((ponto, index) => (
+                                                    {rotaSelecionada.pontos.map((ponto, index) => (
                                                         <li key={index}>{ponto.rua}, {ponto.numero}</li>
                                                     ))}
                                                 </ul>
@@ -517,18 +199,18 @@ export default function TelaAlocarAluno(props) {
                                         placement="bottom"
                                         overlay={
                                             <Popover id="popover-positioned-bottom">
-                                                <Popover.Header as="h3">{inscricao.aluno.nome}</Popover.Header>
+                                                <Popover.Header as="h3">{inscricao.aluno.aluno_nome}</Popover.Header>
                                                 <Popover.Body>
-                                                    <p>RG: {inscricao.aluno.rg}</p>
-                                                    <p>Data de Nascimento: {format(new Date(inscricao.aluno.dataNasc), 'dd/MM/yyyy')}</p>
-                                                    <p>Celular: {inscricao.aluno.celular}</p>
-                                                    <p>Observações: {inscricao.aluno.observacoes}</p>
+                                                    <p>RG: {inscricao.aluno.aluno_rg}</p>
+                                                    <p>Data de Nascimento: {format(new Date(inscricao.aluno.aluno_datanasc), 'dd/MM/yyyy')}</p>
+                                                    <p>Celular: {inscricao.aluno.aluno_celular}</p>
+                                                    <p>Observações: {inscricao.aluno.aluno_observacoes}</p>
                                                 </Popover.Body>
                                             </Popover>
                                         }
                                     >
                                         <Button variant="light" className="me-2 mb-2 mt-4 w-50">
-                                            <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
+                                            <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.aluno.aluno_nome} - RG: ${inscricao.aluno.aluno_rg}`}
                                         </Button>
                                     </OverlayTrigger>
                                     <Button variant="danger" className="mb-2 mt-4" onClick={() => handleRemoverInscricao(index)}>
