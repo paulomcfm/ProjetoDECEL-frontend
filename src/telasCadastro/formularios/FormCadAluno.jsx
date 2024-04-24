@@ -111,6 +111,10 @@ export default function FormCadAlunos(props) {
         return celularFormatado;
     }
 
+    function limparString(texto) {
+        return texto.replace(/[^A-Za-z0-9-]/g, '');
+    }
+
     function manipularSubmissao(e) {
         const form = e.currentTarget;
         var celularValidado = false;
@@ -119,20 +123,15 @@ export default function FormCadAlunos(props) {
         else {
             celularValidado = validarCelular(aluno.celular);
         }
+        aluno.rg = limparString(aluno.rg);
         if (form.checkValidity() && celularValidado) {
             if (!props.modoEdicao) {
+                aluno.responsaveis = responsaveisSelecionados;
                 dispatch(adicionarAluno(aluno)).then((retorno) => {
                     if (retorno.payload.status) {
                         props.setMensagem('Aluno incluído com sucesso!');
                         props.setTipoMensagem('success');
                         props.setMostrarMensagem(true);
-                        responsaveisSelecionados.forEach(responsavel => {
-                            dispatch(adicionarParentesco({
-                                codigoAluno: retorno.payload.aluno.codigoGerado,
-                                codigoResponsavel: responsavel.codigo,
-                                parentesco: responsavel.parentesco
-                            }));
-                        });
                     } else {
                         props.setMensagem('Aluno não incluído! ' + retorno.payload.mensagem);
                         props.setTipoMensagem('danger');
@@ -141,6 +140,7 @@ export default function FormCadAlunos(props) {
                 });
             }
             else {
+                aluno.responsaveis = responsaveisSelecionados;
                 dispatch(atualizarAluno(aluno)).then((retorno) => {
                     if (retorno.payload.status) {
                         props.setMensagem('Aluno alterado com sucesso');
@@ -148,35 +148,6 @@ export default function FormCadAlunos(props) {
                         props.setMostrarMensagem(true);
                         props.setModoEdicao(false);
                         props.setAlunoParaEdicao(alunoVazio);
-                        responsaveisSelecionados.forEach(responsavel => {
-                            if (!responsaveisAntes.find(r => r.codigo === responsavel.codigo)) {
-                                dispatch(adicionarParentesco({
-                                    codigoAluno: retorno.payload.aluno.codigoGerado,
-                                    codigoResponsavel: responsavel.codigo,
-                                    parentesco: responsavel.parentesco
-                                }));
-                            }
-                        });
-
-                        responsaveisSelecionados.forEach(responsavel => {
-                            if (responsaveisAntes.find(r => r.codigo === responsavel.codigo)) {
-                                dispatch(atualizarParentesco({
-                                    codigoAluno: retorno.payload.aluno.codigoGerado,
-                                    codigoResponsavel: responsavel.codigo,
-                                    parentesco: responsavel.parentesco
-                                }));
-                            }
-                        });
-
-                        responsaveisAntes.forEach(responsavel => {
-                            if (!responsaveisSelecionados.find(r => r.codigo === responsavel.codigo)) {
-                                dispatch(removerParentesco({
-                                    codigoAluno: retorno.payload.aluno.codigoGerado,
-                                    codigoResponsavel: responsavel.codigo,
-                                    parentesco: responsavel.parentesco
-                                }));
-                            }
-                        });
                     } else {
                         props.setMensagem('Aluno não alterado! ' + retorno.payload.mensagem);
                         props.setTipoMensagem('danger');
@@ -211,6 +182,7 @@ export default function FormCadAlunos(props) {
                         name="nome"
                         value={aluno.nome}
                         onChange={manipularMudancas}
+                        maxLength={255}
                         required />
                 </Form.Group>
 
@@ -223,6 +195,7 @@ export default function FormCadAlunos(props) {
                         name="rg"
                         value={aluno.rg}
                         onChange={manipularMudancas}
+                        maxLength={20}
                         required
                     />
                 </Form.Group>
@@ -345,6 +318,7 @@ export default function FormCadAlunos(props) {
                         name="observacoes"
                         value={aluno.observacoes}
                         onChange={manipularMudancas}
+                        maxLength={255}
                     />
                 </Form.Group>
                 <p>(*) Campos obrigatórios</p>

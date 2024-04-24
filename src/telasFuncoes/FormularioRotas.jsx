@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useState } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import Pagina from '../templates/Pagina';
 import Select from 'react-select'
 import { useDispatch, useSelector } from 'react-redux';
 import { buscarPontosEmbarque } from '../redux/pontosEmbarqueReducer';
+import { adicionarRotas,buscarRotas } from '../redux/rotaReducer';
 import { useEffect } from 'react';
+
 import '../templates/style.css';
 import '../styles/rota.css'
 
@@ -13,6 +15,7 @@ export default function FormularioRotas(props) {
 
   const [form,setForm] = useState(props.formVazio)
 
+  const {estadoR,mensagemR,rotas} = useSelector(state => state.rota)
   const { estado, mensagem, pontosEmbarque } = useSelector(state => state.pontoEmbarque);
   const dispatch =  useDispatch()
 
@@ -123,6 +126,7 @@ export default function FormularioRotas(props) {
 }
 
   function retirarSelecionado(sel){
+    console.log(sel)
     setSelecionado(selecionado.filter(selecionadoF => selecionadoF.codigo!==sel.codigo))
     const lista = pontosDeParada
     lista.push(sel)
@@ -186,11 +190,14 @@ export default function FormularioRotas(props) {
         setForm({...form,[input.name]:input.value})
     }
 
-    function submissao(){
+
+    
+
+    async function submissao(){
       const nomes = Object.keys(form)
       let teste = true
       for(let i=0;i<nomes.length-2;i++){
-        if(i!=1){
+        if(i!=2){
           const valor = form[nomes[i]]
           let elem = document.getElementById(nomes[i])
           if(valor != ''){
@@ -205,12 +212,13 @@ export default function FormularioRotas(props) {
       }
 
       if(selecionadoM.length==0){
+        console.log("passou aqui teste")
         teste = false
-        let elem = document.getElementById(nomes[6])
+        let elem = document.getElementById(nomes[7])
         elem.classList.remove('input-valido')
         elem.classList.add('input-invalido')
       }else{
-        let elem = document.getElementById(nomes[6])
+        let elem = document.getElementById(nomes[7])
         elem.classList.remove('input-invalido')
         elem.classList.add('input-valido')
       }
@@ -229,13 +237,27 @@ export default function FormularioRotas(props) {
       
       
       if(teste){
-        console.log("Passou")
-        form.motoristas = selecionadoM
-        form.pontos = selecionado
-        console.log(form)
+        if(props.modoEdicao == 'gravar'){
+          
+          const json = {...form}
+          //  Passando os vetores de selecionado para os seus respectivos atributos
+          let vetorM = []
+          for(let i=0;i<selecionadoM.length;i++){
+              vetorM.push(selecionadoM[i].value)
+          }
+          json.motoristas = JSON.stringify(vetorM)
+          let vetor = []
+          for(let i=0;i<selecionado.length;i++){
+            vetor.push(selecionado[i].codigo)
+          }
+          json.pontos = JSON.stringify(vetor)
+          setForm(json)
+          console.log(json)
+          dispatch(adicionarRotas(json))
+        }
       }
     }
-
+    // console.log(form)
 
     return (
       <>
@@ -245,6 +267,10 @@ export default function FormularioRotas(props) {
                     <Col md className='text-center'>
                       <h4>Nome da Rota(*):</h4>
                       <input type="text" id="nome" className="form-control mb-3 mx-auto"  placeholder="Rota Escola A" style={{width:'400px'}} name='nome'  onChange={manipularMudancas}/>
+                    </Col>
+                    <Col md className='text-center'>
+                      <h4>Quilometragem da Rota(*):</h4>
+                      <input type="text" id="km" className="form-control mb-3 mx-auto"  placeholder="Escreva a Quilometragem" style={{width:'400px'}} name='km'  onChange={manipularMudancas}/>
                     </Col>
                 </Row>
 
@@ -279,11 +305,11 @@ export default function FormularioRotas(props) {
                   <Col md>
                     <h4 className="mb-3">Monitor(*):</h4>
                     <div className="mb-3">
-                        <select id="monitor" className="form-select" >
-                            <option value="Valdemar">Valdemar</option>
-                            <option value="Antonio">Antonio</option>
-                            <option value="Joao">Joao</option>
-                            <option value="Maria">Maria</option>
+                        <select id="monitor" className="form-select" name='monitor' onChange={manipularMudancas}>
+                            <option value="1">Valdemar</option>
+                            <option value="2">Antonio</option>
+                            <option value="3">Joao</option>
+                            <option value="4">Maria</option>
                         </select>
                     </div>
                   </Col>
@@ -297,15 +323,15 @@ export default function FormularioRotas(props) {
                     <h4 className="mb-3">Período:</h4>
                     <div className="mb-3" >
                         <div className="form-check form-check-inline">
-                            <input style={{border:'solid 1px #A6A6A6'}} className="form-check-input" type="radio" name="periodo" id='periodo'  value="Manhã" defaultChecked/>
+                            <input style={{border:'solid 1px #A6A6A6'}} className="form-check-input" type="radio" name="periodo" id='periodo'  value="M" defaultChecked/>
                             <label className="form-check-label" htmlFor="manha">Manhã</label>
                         </div>
                         <div className="form-check form-check-inline">
-                            <input style={{border:'solid 1px #A6A6A6'}} className="form-check-input" type="radio" name="periodo" id='periodo' value="Tarde" />
+                            <input style={{border:'solid 1px #A6A6A6'}} className="form-check-input" type="radio" name="periodo" id='periodo' value="T" />
                             <label className="form-check-label" htmlFor="tarde">Tarde</label>
                         </div>
                         <div className="form-check form-check-inline">
-                            <input style={{border:'solid 1px #A6A6A6'}} className="form-check-input" type="radio" name="periodo" id='periodo' value="Noite" />
+                            <input style={{border:'solid 1px #A6A6A6'}} className="form-check-input" type="radio" name="periodo" id='periodo' value="N" />
                             <label className="form-check-label" htmlFor="noite">Noite</label>
                         </div>
                     </div>
@@ -314,10 +340,10 @@ export default function FormularioRotas(props) {
                   <Col md>
                   <h4 className='mb-3'>Horários(*):</h4>
                       <label htmlFor="inicio">Início:</label>{' '}
-                      <input style={{border:'solid 1px black',width:'80px',textAlign:'center',borderRadius:'3px'}} type="time" name="ida" id="ida" onChange={manipularMudancas}/>
+                      <input style={{border:'solid 1px #8a8282a1',width:'80px',textAlign:'center',borderRadius:'3px'}} className='mb-3 mx-auto' type="time" name="ida" id="ida" onChange={manipularMudancas}/>
                       {' '}
                       <label htmlFor="volta">Volta:</label>{' '}
-                      <input style={{border:'solid 1px black',width:'80px',textAlign:'center',borderRadius:'3px'}} type="time" name="volta" id="volta" onChange={manipularMudancas}/>
+                      <input style={{border:'solid 1px #8a8282a1',width:'80px',textAlign:'center',borderRadius:'3px'}} className='mb-3 mx-auto' type="time" name="volta" id="volta" onChange={manipularMudancas}/>
                       
                   </Col>
                 </Row>
@@ -371,7 +397,10 @@ export default function FormularioRotas(props) {
                 
 
                 <br/><br/><br/>
-                <button type="button" className="btn btn-primary" onClick={()=>{submissao()}}>Cadastrar</button>
+                <button type="button" className="btn btn-primary" onClick={()=>{submissao()}}>Cadastrar</button>{' '}
+                <button type="button" className="btn btn-danger" onClick={()=>{
+                  props.setTela(true)
+                  }}> Voltar</button>
             </div>
         </>
     );

@@ -25,7 +25,17 @@ export default function TabelaAlunos(props) {
 
     function excluirAluno(aluno) {
         if (window.confirm('Deseja realmente excluir esse aluno?')) {
-            dispatch(removerAluno(aluno));
+            dispatch(removerAluno(aluno)).then((retorno) => {
+                if (retorno.payload.status) {
+                    props.setMensagem('Aluno excluído com sucesso!');
+                    props.setTipoMensagem('success');
+                    props.setMostrarMensagem(true);
+                } else {
+                    props.setMensagem('Aluno não excluído! ' + retorno.payload.mensagem);
+                    props.setTipoMensagem('danger');
+                    props.setMostrarMensagem(true);
+                }
+            });
         }
     }
 
@@ -50,6 +60,7 @@ export default function TabelaAlunos(props) {
 
     useEffect(() => {
         dispatch(buscarAlunos());
+        console.log(alunos);
     }, [dispatch]);
 
     const alunosFiltrados = alunos.filter(aluno =>
