@@ -28,12 +28,12 @@ export default function TelaDefinirRotas(){
 
     const [tela,setTela] = useState(true)
     const [modoEdicao,setModoEdicao] = useState('gravar')
-
+    const [form,setForm] = useState(formVazio)
 
 
     return (
         <Pagina>
-            {tela? <TabelaRotas formVazio={formVazio} modoEdicao={modoEdicao} setModoEdicao={setModoEdicao} setTela={setTela}/>:<FormularioRotas formVazio={formVazio} modoEdicao={modoEdicao} setModoEdicao={setModoEdicao} setTela={setTela}/>}
+            {tela? <TabelaRotas formVazio={formVazio} modoEdicao={modoEdicao} setModoEdicao={setModoEdicao} setTela={setTela} form={form} setForm={setForm}/>:<FormularioRotas form={form} setForm={setForm} formVazio={formVazio} modoEdicao={modoEdicao} setModoEdicao={setModoEdicao} setTela={setTela}/>}
         </Pagina>
     )
 }

@@ -65,10 +65,18 @@ export default function TabelaRotas(props){
                           </svg>
                       </button>
                       <button type="button" className="btn btn-warning" onClick={()=>{
-                          
-
-
-                          props.setModo('edicao')
+                          props.setForm({
+                            nome:rota.nome,
+                            km:rota.km,
+                            periodo:rota.periodo,
+                            ida:rota.tempoInicio,
+                            volta:rota.volta,
+                            veiculo:rota.veiculo[0].vei_codigo,
+                            monitor:rota.monitor[0].mon_codigo,
+                            motoristas:rota.motoristas,
+                            pontos:rota.pontos
+                          })
+                          props.setModoEdicao('edicao')
                           props.setTela(false)
                       }}>    
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">

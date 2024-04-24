@@ -6,6 +6,8 @@ import Select from 'react-select'
 import { useDispatch, useSelector } from 'react-redux';
 import { buscarPontosEmbarque } from '../redux/pontosEmbarqueReducer';
 import { adicionarRotas,buscarRotas } from '../redux/rotaReducer';
+import {buscarMotoristas} from '../redux/motoristaReducer'
+
 import { useEffect } from 'react';
 
 import '../templates/style.css';
@@ -13,12 +15,13 @@ import '../styles/rota.css'
 
 export default function FormularioRotas(props) {
 
-  const [form,setForm] = useState(props.formVazio)
-
+  const [form,setForm] = useState(props.form)
+  
   const {estadoR,mensagemR,rotas} = useSelector(state => state.rota)
   const { estado, mensagem, pontosEmbarque } = useSelector(state => state.pontoEmbarque);
+  const { estadoM, mensagemM, motoristas } = useSelector(state => state.motorista);
   const dispatch =  useDispatch()
-
+  
   
   const [placas,setPlacas] = useState([
     {
@@ -43,40 +46,86 @@ export default function FormularioRotas(props) {
     }
   ])
 
-  const motoristas = [
-    {
-      moto_codigo:1,
-      moto_nome:"Valdemar"
-    },
-    {
-      moto_codigo:2,
-      moto_nome:"Antonio"
-    },
-    {
-      moto_codigo:3,
-      moto_nome:"Joao"
-    },
-    {
-      moto_codigo:4,
-      moto_nome:"Maria"
-    }
-  ]
   
   
-    const [selecionado,setSelecionado] = useState([])
-    const [pesquisa,setPesquisa] = new useState('')
-    const [pesquisaSelecionado,setPesquisaSelecionado] = new useState('')
-    const [pontosDeParada,setPontosDeParada] = useState([])
 
+
+  
+
+  const [selecionadoM, setSelecionadoM] = useState([]);
+
+  useEffect(()=>{
+    
+    const listaSel = form.motoristas.map(motorista => ({
+      value: motorista.id,
+      label: motorista.nome
+    }))
+    setSelecionadoM(listaSel)
+
+
+  },[])
+
+
+  const [motoristasM,setMotoristasM] = useState([])
+
+  useEffect(() => {
+    dispatch(buscarMotoristas());
+  }, [dispatch]);
+  
     useEffect(() => {
-      dispatch(buscarPontosEmbarque());
-    }, [dispatch]);
+      
+      if (motoristas.length > 0) {
+        let listaFiltrada = motoristas.map(moto => ({
+          moto_id: moto.id,
+          moto_nome: moto.nome 
+        }))
+        setMotoristasM(listaFiltrada);
+        const json = {...form}
+        json.motoristas = listaFiltrada
+        setForm(json)
+      }
+    }, [motoristas]);
+
+  
+  
+  const [selecionado, setSelecionado] = useState([]);
+
+  useEffect(() => {
+    const atualizarListaSel = () => {
+      const novaListaSel = form.pontos.map(ponto => ({
+        codigo: ponto.codigo,
+        rua: ponto.rua,
+        numero: ponto.numero,
+        cep: ponto.cep
+      }));
+      setSelecionado(novaListaSel);
+      const json = {...form}
+      json.pontos = novaListaSel
+      setForm(json)
+    };
+
+
+    atualizarListaSel();
+  }, []);
+
+  
+
+  const [pesquisa,setPesquisa] = new useState('')
+  const [pesquisaSelecionado,setPesquisaSelecionado] = new useState('')
+  const [pontosDeParada,setPontosDeParada] = useState([])
+  
+  useEffect(() => {
+    dispatch(buscarPontosEmbarque());
+  }, [dispatch]);
   
     useEffect(() => {
       if (pontosEmbarque.length > 0) {
-        setPontosDeParada(pontosEmbarque);
+        const listaFiltrada = pontosEmbarque.filter(ponto => !selecionado.some(sel => sel.codigo === ponto.codigo));
+        setPontosDeParada(listaFiltrada);
       }
     }, [pontosEmbarque]);
+
+
     
     
     function pesquisarPontos(e){
@@ -126,7 +175,6 @@ export default function FormularioRotas(props) {
 }
 
   function retirarSelecionado(sel){
-    console.log(sel)
     setSelecionado(selecionado.filter(selecionadoF => selecionadoF.codigo!==sel.codigo))
     const lista = pontosDeParada
     lista.push(sel)
@@ -174,11 +222,10 @@ export default function FormularioRotas(props) {
       )
     }
 
-    const [selecionadoM, setSelecionadoM] = useState([]);
 
-    const options = motoristas.map(motorista => ({
+    const options = motoristasM.map(motorista => ({
       label: motorista.moto_nome,
-      value: motorista.moto_codigo
+      value: motorista.moto_id
     }));
 
     const handleChange = selectedOptions => {
@@ -212,7 +259,6 @@ export default function FormularioRotas(props) {
       }
 
       if(selecionadoM.length==0){
-        console.log("passou aqui teste")
         teste = false
         let elem = document.getElementById(nomes[7])
         elem.classList.remove('input-valido')
@@ -237,8 +283,9 @@ export default function FormularioRotas(props) {
       
       
       if(teste){
+        // gravar
         if(props.modoEdicao == 'gravar'){
-          
+          console.log('euuuu')
           const json = {...form}
           //  Passando os vetores de selecionado para os seus respectivos atributos
           let vetorM = []
@@ -252,12 +299,28 @@ export default function FormularioRotas(props) {
           }
           json.pontos = JSON.stringify(vetor)
           setForm(json)
-          console.log(json)
           dispatch(adicionarRotas(json))
+        }
+        // alterar
+        else{
+          const json = {...form}
+          //  Passando os vetores de selecionado para os seus respectivos atributos
+          let vetorM = []
+          for(let i=0;i<selecionadoM.length;i++){
+              vetorM.push(selecionadoM[i].value)
+          }
+          json.motoristas = JSON.stringify(vetorM)
+          let vetor = []
+          for(let i=0;i<selecionado.length;i++){
+            vetor.push(selecionado[i].codigo)
+          }
+          json.pontos = JSON.stringify(vetor)
+          setForm(json)
+
+          console.log(JSON.stringify(json))
         }
       }
     }
-    // console.log(form)
 
     return (
       <>
@@ -266,11 +329,11 @@ export default function FormularioRotas(props) {
                 <Row className='justify-content-center'>
                     <Col md className='text-center'>
                       <h4>Nome da Rota(*):</h4>
-                      <input type="text" id="nome" className="form-control mb-3 mx-auto"  placeholder="Rota Escola A" style={{width:'400px'}} name='nome'  onChange={manipularMudancas}/>
+                      <input type="text" id="nome" className="form-control mb-3 mx-auto"  placeholder="Rota Escola A" style={{width:'400px'}} name='nome' value={form.nome}  onChange={manipularMudancas}/>
                     </Col>
                     <Col md className='text-center'>
                       <h4>Quilometragem da Rota(*):</h4>
-                      <input type="text" id="km" className="form-control mb-3 mx-auto"  placeholder="Escreva a Quilometragem" style={{width:'400px'}} name='km'  onChange={manipularMudancas}/>
+                      <input type="text" id="km" className="form-control mb-3 mx-auto"  placeholder="Escreva a Quilometragem" style={{width:'400px'}} name='km' value={form.km} onChange={manipularMudancas}/>
                     </Col>
                 </Row>
 
@@ -278,7 +341,7 @@ export default function FormularioRotas(props) {
                 <Row>
                   <Col md>
                     <h4 className="mb-3">Placa do Veículo(*):</h4>
-                    <select id="veiculo" className="form-select mb-3" name='veiculo' onChange={manipularMudancas}>
+                    <select id="veiculo" className="form-select mb-3" name='veiculo' value={form.veiculo} onChange={manipularMudancas}>
                         {
                           placas.map(veiculo =>{
                             return(<option key={veiculo.vei_codigo} value={veiculo.vei_codigo}>{veiculo.vei_placa} ({veiculo.vei_modelo})</option>)
@@ -305,7 +368,7 @@ export default function FormularioRotas(props) {
                   <Col md>
                     <h4 className="mb-3">Monitor(*):</h4>
                     <div className="mb-3">
-                        <select id="monitor" className="form-select" name='monitor' onChange={manipularMudancas}>
+                        <select id="monitor" className="form-select" name='monitor' value={form.monitor} onChange={manipularMudancas}>
                             <option value="1">Valdemar</option>
                             <option value="2">Antonio</option>
                             <option value="3">Joao</option>
@@ -323,15 +386,15 @@ export default function FormularioRotas(props) {
                     <h4 className="mb-3">Período:</h4>
                     <div className="mb-3" >
                         <div className="form-check form-check-inline">
-                            <input style={{border:'solid 1px #A6A6A6'}} className="form-check-input" type="radio" name="periodo" id='periodo'  value="M" defaultChecked/>
+                        <input style={{border:'solid 1px #A6A6A6'}} className="form-check-input" type="radio" name="periodo" id='periodo'  value="M" checked={form.periodo==='M' ? true : false} onChange={manipularMudancas}/>
                             <label className="form-check-label" htmlFor="manha">Manhã</label>
                         </div>
                         <div className="form-check form-check-inline">
-                            <input style={{border:'solid 1px #A6A6A6'}} className="form-check-input" type="radio" name="periodo" id='periodo' value="T" />
+                            <input style={{border:'solid 1px #A6A6A6'}} className="form-check-input" type="radio" name="periodo" id='periodo' value="T" checked={form.periodo==='T' ? true : false} onChange={manipularMudancas}/>
                             <label className="form-check-label" htmlFor="tarde">Tarde</label>
                         </div>
                         <div className="form-check form-check-inline">
-                            <input style={{border:'solid 1px #A6A6A6'}} className="form-check-input" type="radio" name="periodo" id='periodo' value="N" />
+                            <input style={{border:'solid 1px #A6A6A6'}} className="form-check-input" type="radio" name="periodo" id='periodo' value="N" checked={form.periodo==='N' ? true : false} onChange={manipularMudancas}/>
                             <label className="form-check-label" htmlFor="noite">Noite</label>
                         </div>
                     </div>
@@ -340,10 +403,10 @@ export default function FormularioRotas(props) {
                   <Col md>
                   <h4 className='mb-3'>Horários(*):</h4>
                       <label htmlFor="inicio">Início:</label>{' '}
-                      <input style={{border:'solid 1px #8a8282a1',width:'80px',textAlign:'center',borderRadius:'3px'}} className='mb-3 mx-auto' type="time" name="ida" id="ida" onChange={manipularMudancas}/>
+                      <input style={{ border: 'solid 1px #8a8282a1', width: '80px', textAlign: 'center', borderRadius: '3px' }} className='mb-3 mx-auto' type="time" name="ida" id="ida" value={form.ida} onChange={manipularMudancas} />
                       {' '}
                       <label htmlFor="volta">Volta:</label>{' '}
-                      <input style={{border:'solid 1px #8a8282a1',width:'80px',textAlign:'center',borderRadius:'3px'}} className='mb-3 mx-auto' type="time" name="volta" id="volta" onChange={manipularMudancas}/>
+                      <input style={{border:'solid 1px #8a8282a1',width:'80px',textAlign:'center',borderRadius:'3px'}} className='mb-3 mx-auto' type="time" name="volta" id="volta" value={form.volta} onChange={manipularMudancas}/>
                       
                   </Col>
                 </Row>
@@ -397,8 +460,10 @@ export default function FormularioRotas(props) {
                 
 
                 <br/><br/><br/>
-                <button type="button" className="btn btn-primary" onClick={()=>{submissao()}}>Cadastrar</button>{' '}
+                {props.modoEdicao === 'gravar'?<button type="button" className="btn btn-primary" onClick={()=>{submissao()}}>Cadastrar</button>:<button type="button" className="btn btn-warning" onClick={()=>{submissao()}}>Alterar</button>}{' '}
                 <button type="button" className="btn btn-danger" onClick={()=>{
+                  props.setForm(props.formVazio)
+                  props.setModoEdicao('gravar')
                   props.setTela(true)
                   }}> Voltar</button>
             </div>
