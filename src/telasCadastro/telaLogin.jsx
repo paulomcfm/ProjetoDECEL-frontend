@@ -13,9 +13,11 @@ export default function TelaLogin() {
 
     async function handleLogin() {
         // Despacha a action para autenticar o usuário
+        console.log("entrou");
         dispatch(autenticarUsuario({ nome: username, cpf }))
             .then((retorno) => {
                 if (retorno.payload.status) {
+                    console.log("passou");
                     setAutenticado(true); // Define autenticado como true se a autenticação for bem-sucedida
                 } else {
                     // Tratamento para autenticação inválida

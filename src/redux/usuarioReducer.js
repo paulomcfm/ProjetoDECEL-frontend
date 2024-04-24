@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import ESTADO from '../recursos/estado';
-const urlBase = 'https://projetodecel-backend.onrender.com/usuario';
+import ESTADO from '../recursos/estado.js';
+const urlBase = 'http://localhost:8080/usuario';
+//'https://projetodecel-backend.onrender.com/usuario';
 
 export const buscarUsuarios = createAsyncThunk('usuario/buscar', async () => {
     try {
@@ -69,7 +70,7 @@ export const adicionarUsuario = createAsyncThunk('usuario/adicionar', async (usu
 
 export const autenticarUsuario = createAsyncThunk('usuario/autenticar', async (credenciais) => {
     const { nome, cpf } = credenciais;
-
+    console.log(credenciais);
     try {
         const resposta = await fetch(`${urlBase}/autenticar`, {
             method: 'POST',

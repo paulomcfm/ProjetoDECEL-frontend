@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Container, Table } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { buscarUsuarios, removerUsuario } from '../../redux/usuarioReducer';
+import { buscarUsuarios, removerUsuario } from '../../redux/usuarioReducer.js';
 
 export default function TabelaUsuarios(props) {
     const [termoBusca, setTermoBusca] = useState('');
