@@ -66,6 +66,7 @@ export default function TabelaRotas(props){
                       </button>
                       <button type="button" className="btn btn-warning" onClick={()=>{
                           props.setForm({
+                            codigo:rota.codigo,
                             nome:rota.nome,
                             km:rota.km,
                             periodo:rota.periodo,

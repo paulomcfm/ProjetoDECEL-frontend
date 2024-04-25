@@ -63,6 +63,7 @@ const resposta = await fetch(urlBase, {
 
 
 export const atualizarRota = createAsyncThunk('rotas/atualizar', async (rota) => {
+    console.log("rota... "+JSON.stringify(rota))
     const resposta = await fetch(urlBase, {
         method: 'PUT',
         headers: {
@@ -163,8 +164,6 @@ const rotaSlice = createSlice({
             state.estado = ESTADO.ERRO;
         }).addCase(atualizarRota.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
-            const indice = state.rotas.findIndex(rota => rota.codigo === action.payload.rota.codigo);
-            state.escolas[indice] = action.payload.rota;
             state.mensagem = action.payload.mensagem;
         }).addCase(atualizarRota.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
@@ -175,7 +174,6 @@ const rotaSlice = createSlice({
         }).addCase(removerRota.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
             state.mensagem = action.payload.mensagem;
-            state.rotas = state.rotas.filter(rota => rota.codigo !== action.payload.rota.codigo);
         }).addCase(removerRota.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
             state.mensagem = "Removendo rota...";
