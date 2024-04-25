@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import Pagina from '../templates/Pagina';
 
-export default function MapaPagina(){
+export default function MapaPagina(props){
 
 
+
+    
     const [direcoes, setDirecoes] = useState(null);
     const [origem, setOrigem] = useState({ lat: -22.095368, lng:-51.418462});
     const [destino, setDestino] = useState({ lat: -22.105930,lng:-51.443321});
@@ -40,14 +42,28 @@ export default function MapaPagina(){
     const address = 'jose medina rodrigues 648';
     
 
-    async function resgatarCoordenadas(addres){
-        fetch(getApiUrl(addres),{method:'GET'}).then((response)=>{
-            return response.json()
-        }).then((res)=>{
-            console.log(res.results[0].geometry.location)
-        }).catch((error)=>{
-            console.log(error)
+    async function resgatarCoordenadas(endereco){
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(endereco)}&key=${API_KEY}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'OK') {
+                const resultado = data.results[0];
+                const coordenadas = resultado.geometry.location;
+                const latitude = coordenadas.lat;
+                const longitude = coordenadas.lng;
+                console.log("Coordenadas:", latitude, longitude);
+            } else {
+                console.error("Não foi possível obter as coordenadas.");
+            }
         })
+        .catch(error => console.error("Erro ao obter coordenadas:", error));
+    }
+
+    for(const uso of props.enderecos){
+        const address = 'José alexandre, 72 - Jardim Pichione, Álvares Machado'
+        resgatarCoordenadas(address)
     }
     
 
@@ -65,7 +81,7 @@ export default function MapaPagina(){
     
     
     return (
-            <Pagina>
+            <>
                 <div className='map'>
                     {
                         isLoaded ? 
@@ -94,7 +110,7 @@ export default function MapaPagina(){
 
                     </div>
                 </div>
-            </Pagina>
+            </>
         )
 
 }

@@ -449,7 +449,7 @@ export default function FormularioRotas(props) {
                 <button type="button" className="btn btn-danger" onClick={()=>{
                   props.setForm(props.formVazio)
                   props.setModoEdicao('gravar')
-                  props.setTela(true)
+                  props.setTela(1)
                   }}> Voltar</button>
             </div>
         </>
