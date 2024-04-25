@@ -9,6 +9,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { format } from 'date-fns';
 import TelaMensagem from '../telasCadastro/TelaMensagem';
 import { buscarRotas } from '../redux/rotaReducer';
+import { buscarEscolaPorPonto } from '../redux/escolaReducer';
 
 
 export default function TelaAlocarAluno(props) {
@@ -21,32 +22,38 @@ export default function TelaAlocarAluno(props) {
     const [novaRotaSelecionada, setNovaRotaSelecionada] = useState(null);
     const { estadoInsc, mensagemIsnc, inscricoes } = useSelector(state => state.inscricao);
     const { estadoRota, mensagemRota, rotas } = useSelector(state => state.rota);
+    const { estadoEsc, mensagemEsc, escolas } = useSelector(state => state.escola);
     const [mostrarMensagem, setMostrarMensagem] = useState(false);
     const [mensagem, setMensagem] = useState("");
     const [tipoMensagem, setTipoMensagem] = useState("");
+    const [escolasRota, setEscolasRota] = useState(null);
+    const [inscricoesFora, setInscricoesFora] = useState([]);
 
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch(buscarInscricoes());
         dispatch(buscarRotas());
-        console.log(rotas);
-        console.log(inscricoes);
     }, [dispatch]);
 
     useEffect(() => {
         if (termoBusca.trim() === '') {
             setInscricoesFiltradas([]);
         } else {
+            const inscricoesFora = inscricoes.filter(inscricao =>
+                !rotaSelecionada.pontos.some(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)
+            );
             const inscricoesNaoAlocadas = inscricoes.filter(inscricao =>
                 inscricao.aluno.nome.toLowerCase().includes(termoBusca.toLowerCase()) &&
+                escolasRota.some(escola => escola.codigo === inscricao.escola.codigo) &&
                 !inscricoesSelecionadas.find(a => a.aluno.nome === inscricao.aluno.nome)
             );
             setInscricoesFiltradas(inscricoesNaoAlocadas);
+            setInscricoesFora(inscricoesFora);
         }
     }, [termoBusca, inscricoes, inscricoesSelecionadas]);
 
-    const handleSelecionarRota = (rota) => {
+    const handleSelecionarRota = async (rota) => {
         if (rota) {
             if (rotaSelecionada && novaRotaSelecionada !== rota) {
                 setNovaRotaSelecionada(rota);
@@ -57,8 +64,15 @@ export default function TelaAlocarAluno(props) {
                 setInscricoesSelecionadas(rota.inscricoes || []);
                 setTermoBusca('');
             }
+            let escolasRota = [];
+            for (const ponto of rota.pontos) {
+                const action = await dispatch(buscarEscolaPorPonto(ponto.codigo));
+                escolasRota = [...escolasRota, ...action.payload.listaEscolas];
+            }
+            setEscolasRota(escolasRota);
         }
     };
+
 
     const confirmarTrocaRota = () => {
         setRotaSelecionada(novaRotaSelecionada);
@@ -131,7 +145,7 @@ export default function TelaAlocarAluno(props) {
                 setNovaRotaSelecionada(null);
             });
         });
-    };    
+    };
 
     if (mostrarMensagem) {
         return (
@@ -146,7 +160,7 @@ export default function TelaAlocarAluno(props) {
                     <Form.Group className="mb-3" controlId="selecionarRota">
                         <Form.Label>Selecione a rota:</Form.Label>
                         <Form.Select onChange={(e) => handleSelecionarRota(rotas.find(rota => rota.nome === e.target.value))}>
-                            <option value="">Selecione...</option>
+                            <option value="">Selecione um rota...</option>
                             {rotas.map((rota, index) => (
                                 <option key={index} value={rota.nome}>
                                     {rota.nome} - {rota.veiculo[0].vei_placa} - {rota.motoristas.map((motorista) => motorista.nome).join('- ')}
@@ -206,76 +220,96 @@ export default function TelaAlocarAluno(props) {
                                     )}
                                 </tbody>
                             </Table>
-
-                            {inscricoesSelecionadas.map((inscricao, index) => (
-                                <div key={index} className="d-flex justify-content-center align-items-center">
-                                    <OverlayTrigger
-                                        trigger="click"
-                                        key="bottom"
-                                        placement="bottom"
-                                        overlay={
-                                            <Popover id="popover-positioned-bottom">
-                                                <Popover.Header as="h3">{inscricao.aluno.nome}</Popover.Header>
-                                                <Popover.Body>
-                                                    <p>RG: {inscricao.aluno.rg}</p>
-                                                    <p>Data de Nascimento: {format(new Date(inscricao.aluno.dataNasc), 'dd/MM/yyyy')}</p>
-                                                    <p>Celular: {inscricao.aluno.celular}</p>
-                                                    <p>Observações: {inscricao.aluno.observacoes}</p>
-                                                </Popover.Body>
-                                            </Popover>
-                                        }
-                                    >
-                                        <Button variant="light" className="me-2 mb-2 mt-4 w-50">
-                                            <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
-                                        </Button>
-                                    </OverlayTrigger>
-                                    <Button variant="danger" className="mb-2 mt-4" onClick={() => handleRemoverInscricao(index)}>
-                                        Remover
-                                    </Button>
-                                </div>
-                            ))}
-
-                            <Form.Label className="mt-4">Alunos:</Form.Label>
+                            <>
+                                <h4>Alunos da Rota</h4>
+                                {inscricoesSelecionadas.length === 0 ? (
+                                    <p>Não há alunos alocados na rota</p>
+                                ) : (
+                                    inscricoesSelecionadas.map((inscricao, index) => {
+                                        const possuiPontoFora = inscricoesFora.some(fora => fora.codigo === inscricao.codigo);
+                                
+                                        return (
+                                            <div key={index} className="d-flex justify-content-center align-items-center">
+                                                <OverlayTrigger
+                                                    trigger="click"
+                                                    key="bottom"
+                                                    placement="bottom"
+                                                    overlay={
+                                                        <Popover id="popover-positioned-bottom">
+                                                            <Popover.Header as="h3">{inscricao.aluno.nome}</Popover.Header>
+                                                            <Popover.Body>
+                                                                <p>RG: {inscricao.aluno.rg}</p>
+                                                                <p>Data de Nascimento: {format(new Date(inscricao.aluno.dataNasc), 'dd/MM/yyyy')}</p>
+                                                                <p>Celular: {inscricao.aluno.celular}</p>
+                                                                <p>Observações: {inscricao.aluno.observacoes}</p>
+                                                            </Popover.Body>
+                                                        </Popover>
+                                                    }
+                                                >
+                                                    <Button variant="light" className="me-2 mb-2 mt-4 w-50">
+                                                        <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
+                                                    </Button>
+                                                </OverlayTrigger>
+                                                <Button variant="danger" className="mb-2 mt-4 me-2" onClick={() => handleRemoverInscricao(index)}>
+                                                    Remover
+                                                </Button>
+                                                {possuiPontoFora && (
+                                                    <p className='mt-4'>Possui ponto de embarque fora da rota.</p>
+                                                )}
+                                            </div>
+                                        );
+                                    })
+                                )}
+                            </>
+                            <Form.Label className="mt-4">Busque alunos:</Form.Label>
                             <div className="d-flex">
                                 <Form.Control
                                     type="text"
-                                    placeholder="Busque um aluno"
+                                    placeholder="Pesquise o nome do aluno..."
                                     value={termoBusca}
                                     onChange={(e) => setTermoBusca(e.target.value)}
                                 />
                             </div>
                             <div className="mt-2">
-                                {inscricoesFiltradas.map((inscricao, index) => (
-                                    <div key={index} className="d-flex justify-content-center align-items-center">
-                                        <OverlayTrigger
-                                            trigger="click"
-                                            key="bottom"
-                                            placement="bottom"
-                                            overlay={
-                                                <Popover id="popover-positioned-bottom">
-                                                    <Popover.Header as="h3">{inscricao.aluno.nome}</Popover.Header>
-                                                    <Popover.Body>
-                                                        <p>RG: {inscricao.aluno.rg}</p>
-                                                        <p>Data de Nascimento: {format(new Date(inscricao.aluno.dataNasc), 'dd/MM/yyyy')}</p>
-                                                        <p>Celular: {inscricao.aluno.celular}</p>
-                                                        <p>Observações: {inscricao.aluno.observacoes}</p>
-                                                    </Popover.Body>
-                                                </Popover>
-                                            }
-                                        >
-                                            <Button variant="light" className="me-2 mb-2 mt-4 w-50">
-                                                <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
+                                {inscricoesFiltradas.map((inscricao, index) => {
+                                    const possuiPontoFora = inscricoesFora.some(fora => fora.codigo === inscricao.codigo);
+
+                                    return (
+                                        <div key={index} className="d-flex justify-content-center align-items-center">
+                                            <OverlayTrigger
+                                                trigger="click"
+                                                key="bottom"
+                                                placement="bottom"
+                                                overlay={
+                                                    <Popover id="popover-positioned-bottom">
+                                                        <Popover.Header as="h3">{inscricao.aluno.nome}</Popover.Header>
+                                                        <Popover.Body>
+                                                            <p>RG: {inscricao.aluno.rg}</p>
+                                                            <p>Data de Nascimento: {format(new Date(inscricao.aluno.dataNasc), 'dd/MM/yyyy')}</p>
+                                                            <p>Celular: {inscricao.aluno.celular}</p>
+                                                            <p>Observações: {inscricao.aluno.observacoes}</p>
+                                                        </Popover.Body>
+                                                    </Popover>
+                                                }
+                                            >
+                                                <Button variant="light" className="me-2 mb-2 mt-4 w-50">
+                                                    <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
+                                                </Button>
+                                            </OverlayTrigger>
+                                            <Button
+                                                variant="primary"
+                                                className="mb-2 mt-4 me-2"
+                                                onClick={() => handleAdicionarInscricao(index)}
+                                            >
+                                                Adicionar
                                             </Button>
-                                        </OverlayTrigger>
-                                        <Button
-                                            variant="primary"
-                                            className="mb-2 mt-4"
-                                            onClick={() => handleAdicionarInscricao(index)}
-                                        >
-                                            Adicionar
-                                        </Button>
-                                    </div>
-                                ))}
+                                            {possuiPontoFora && (
+                                                <p className='mt-4'>Possui ponto de embarque fora da rota.</p>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+
                             </div>
                             <Button
                                 variant="primary"
