@@ -22,7 +22,7 @@ export default function MapaPagina(props){
 
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
-        googleMapsApiKey: "AIzaSyCKNlqqhmlCYU7bLjeku8uWsDfxOxDM5R8"
+        googleMapsApiKey: ""
     })
 
     const position={
@@ -31,7 +31,7 @@ export default function MapaPagina(props){
     }
 
     const API_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
-    const API_KEY = 'AIzaSyCKNlqqhmlCYU7bLjeku8uWsDfxOxDM5R8';
+    const API_KEY = '';
 
     const getApiUrl = (address) => {
         return `${API_URL}?key=${API_KEY}&address=${encodeURI(address)}`;
