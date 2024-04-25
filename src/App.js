@@ -6,7 +6,7 @@ import TelaCadastroPontoEmbarque from './telasCadastro/telaCadastroPontoEmbarque
 import TelaMotorista from './telasCadastro/telaMotorista.jsx';
 import Tela404 from './telasCadastro/Tela404.jsx';
 import TelaCadastroInscricao from './telasFuncoes/telaCadastroInscricao.jsx';
-import TelaDefinirRotas from './telasCadastro/TelaDefinirRotas.jsx';
+import TelaDefinirRotas from './telasFuncoes/TelaDefinirRotas.jsx';
 import TelaAlocarAluno from './telasFuncoes/TelaAlocarAluno.jsx';
 import TelaRegistrarManutencao from './telasFuncoes/TelaRegistrarManutencao.jsx';
 import MapaPagina from './telasSaida/MapaPagina.jsx'
