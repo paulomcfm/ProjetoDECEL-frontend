@@ -101,7 +101,12 @@ export default function TelaAlocarAluno(props) {
             dataAlocacao: format(dataAtual, 'yyyy-MM-dd'),
             rota: rotaSelecionada.codigo
         }));
-
+        if (inscricoesSelecionadas.length === 0) {
+            inscricoesAtualizadas.push({
+                rota: rotaSelecionada.codigo,
+                aluno:{codigo:0}
+            });
+        }
         dispatch(atualizarInscricoes(inscricoesAtualizadas)).then((retorno) => {
             if (retorno.payload.status) {
                 setMensagem('Inscricão alterada com sucesso!');
@@ -113,6 +118,8 @@ export default function TelaAlocarAluno(props) {
                 setMostrarMensagem(true);
             }
         })
+        dispatch(buscarRotas());
+        dispatch(buscarInscricoes());
         setRotaSelecionada(null);
         setInscricoesSelecionadas([]);
     };
@@ -199,18 +206,18 @@ export default function TelaAlocarAluno(props) {
                                         placement="bottom"
                                         overlay={
                                             <Popover id="popover-positioned-bottom">
-                                                <Popover.Header as="h3">{inscricao.aluno.aluno_nome}</Popover.Header>
+                                                <Popover.Header as="h3">{inscricao.aluno.nome}</Popover.Header>
                                                 <Popover.Body>
-                                                    <p>RG: {inscricao.aluno.aluno_rg}</p>
-                                                    <p>Data de Nascimento: {format(new Date(inscricao.aluno.aluno_datanasc), 'dd/MM/yyyy')}</p>
-                                                    <p>Celular: {inscricao.aluno.aluno_celular}</p>
-                                                    <p>Observações: {inscricao.aluno.aluno_observacoes}</p>
+                                                    <p>RG: {inscricao.aluno.rg}</p>
+                                                    <p>Data de Nascimento: {format(new Date(inscricao.aluno.dataNasc), 'dd/MM/yyyy')}</p>
+                                                    <p>Celular: {inscricao.aluno.celular}</p>
+                                                    <p>Observações: {inscricao.aluno.observacoes}</p>
                                                 </Popover.Body>
                                             </Popover>
                                         }
                                     >
                                         <Button variant="light" className="me-2 mb-2 mt-4 w-50">
-                                            <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.aluno.aluno_nome} - RG: ${inscricao.aluno.aluno_rg}`}
+                                            <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
                                         </Button>
                                     </OverlayTrigger>
                                     <Button variant="danger" className="mb-2 mt-4" onClick={() => handleRemoverInscricao(index)}>

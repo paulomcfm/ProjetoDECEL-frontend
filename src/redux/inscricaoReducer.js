@@ -112,9 +112,10 @@ export const atualizarInscricoes = createAsyncThunk('inscricao-aluno/atualizar-i
         }
     }
     else {
+        const dados = await resposta.json();
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao atualizar a inscrição.',
+            mensagem: dados.mensagem,
             inscricoes
         }
     }
