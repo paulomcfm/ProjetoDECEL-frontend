@@ -68,18 +68,10 @@ export const adicionarUsuario = createAsyncThunk('usuario/adicionar', async (usu
     }
 });
 
-export const autenticarUsuario = createAsyncThunk('usuario/autenticar', async (credenciais) => {
-    const { nome, cpf } = credenciais;
+export const autenticar = createAsyncThunk('usuario/autenticar', async (credenciais) => {
     console.log(credenciais);
     try {
-        const resposta = await fetch(`${urlBase}/autenticar`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: credenciais
-        });
-
+        const resposta = await fetch(urlBase, { method: 'GET' });
         const dados = await resposta.json();
         return dados;
     } catch (erro) {

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
-import { autenticarUsuario } from '../redux/usuarioReducer'; // Importa a função de autenticação
+import { autenticar } from '../redux/usuarioReducer'; // Importa a função de autenticação
 
 export default function TelaLogin() {
     const [username, setUsername] = useState('');
@@ -14,12 +14,19 @@ export default function TelaLogin() {
     async function handleLogin() {
         // Despacha a action para autenticar o usuário
         console.log("entrou");
-        dispatch(autenticarUsuario({ nome: username, cpf }))
+        dispatch(autenticar({ nome: username, cpf }))
             .then((retorno) => {
                 if (retorno.payload.status) {
                     console.log("passou");
+                    console.log(retorno);
+                    console.log(retorno.payload);
+                    console.log(retorno.payload.status);
                     setAutenticado(true); // Define autenticado como true se a autenticação for bem-sucedida
                 } else {
+                    console.log("nao passou");
+                    console.log(retorno);
+                    console.log(retorno.payload);
+                    console.log(retorno.payload.status);
                     // Tratamento para autenticação inválida
                     alert('Usuário ou CPF inválidos.');
                 }
@@ -79,7 +86,7 @@ export default function TelaLogin() {
                             <Form.Label>CPF</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="CPF"
+                                placeholder="999.999.999-99"
                                 id="cpf"
                                 name="cpf"
                                 value={cpf}
