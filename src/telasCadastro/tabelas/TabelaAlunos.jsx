@@ -60,7 +60,6 @@ export default function TabelaAlunos(props) {
 
     useEffect(() => {
         dispatch(buscarAlunos());
-        console.log(alunos);
     }, [dispatch]);
 
     const alunosFiltrados = alunos.filter(aluno =>

@@ -32,39 +32,6 @@ export default function FormCadAlunos(props) {
 
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        if (termoBusca.trim() !== '') {
-            dispatch(buscarResponsaveis());
-        }
-    }, [dispatch, termoBusca]);
-
-    useEffect(() => {
-        dispatch(buscarResponsaveis());
-    }, []);
-
-    useEffect(() => {
-        if (props.alunoParaEdicao.responsaveis.length > 0) {
-            const responsaveisSelecionados = props.alunoParaEdicao.responsaveis.map(responsavel => {
-                const responsavelCompleto = responsaveis.find(r => r.codigo === responsavel.codigoResponsavel);
-                if (responsavelCompleto) {
-                    return {
-                        ...responsavelCompleto,
-                        parentesco: responsavel.parentesco
-                    };
-                }
-                return null;
-            }).filter(responsavel => responsavel !== null);
-
-            setResponsaveisSelecionados(responsaveisSelecionados);
-            setResponsaveisAntes(responsaveisSelecionados);
-        }
-
-    }, [responsaveis]);
-
-    const responsaveisFiltrados = responsaveis.filter(responsavel =>
-        responsavel.nome.toLowerCase().includes(termoBusca.toLowerCase())
-    );
-
     function formatDate(s) {
         var b = s.split(/\D/);
         return `${b[0]}-${(b[1].length === 1 ? '0' : '') + b[1]}-${(b[2].length === 1 ? '0' : '') + b[2]}`;
@@ -78,18 +45,6 @@ export default function FormCadAlunos(props) {
             valor = formatarCelular(valor);
         }
         setAluno({ ...aluno, [componente.name]: componente.value });
-    }
-
-    function addResponsavel(responsavel) {
-        if (!responsaveisSelecionados.find(r => r.codigo === responsavel.codigo)) {
-            setResponsaveisSelecionados([...responsaveisSelecionados, responsavel]);
-        }
-    }
-
-    function removerResponsavel(index) {
-        const novosResponsaveis = [...responsaveisSelecionados];
-        novosResponsaveis.splice(index, 1);
-        setResponsaveisSelecionados(novosResponsaveis);
     }
 
     const formatarCelular = (celular) => {
@@ -167,11 +122,53 @@ export default function FormCadAlunos(props) {
         e.preventDefault();
     }
 
+    useEffect(() => {
+        if (termoBusca.trim() === '') {
+            dispatch(buscarResponsaveis());
+        }
+    }, [dispatch, termoBusca]);
 
+    useEffect(() => {
+        dispatch(buscarResponsaveis());
+    }, []);
+
+    useEffect(() => {
+        if (props.alunoParaEdicao.responsaveis.length > 0 && responsaveisSelecionados.length === 0) {
+            const responsaveisSelecionados = props.alunoParaEdicao.responsaveis.map(responsavel => {
+                const responsavelCompleto = responsaveis.find(r => r.codigo === responsavel.codigoResponsavel);
+                if (responsavelCompleto) {
+                    return {
+                        ...responsavelCompleto,
+                        parentesco: responsavel.parentesco
+                    };
+                }
+                return null;
+            }).filter(responsavel => responsavel !== null);
+
+            setResponsaveisSelecionados(responsaveisSelecionados);
+            setResponsaveisAntes(responsaveisSelecionados);
+        }
+    }, [responsaveis]);
+
+    const responsaveisFiltrados = responsaveis.filter(responsavel =>
+        responsavel.nome.toLowerCase().includes(termoBusca.toLowerCase())
+    );
+
+    function removerResponsavel(index) {
+        const novosResponsaveis = [...responsaveisSelecionados];
+        novosResponsaveis.splice(index, 1);
+        setResponsaveisSelecionados(novosResponsaveis);
+    }
+
+    function addResponsavel(responsavel) {
+        if (!responsaveisSelecionados.find(r => r.codigo === responsavel.codigo)) {
+            setResponsaveisSelecionados([...responsaveisSelecionados, responsavel]);
+        }
+    }
+ 
     return (
         <>
             <h2 className="text-center">Cadastrar Aluno</h2>
-
             <Form noValidate validated={formValidado} onSubmit={manipularSubmissao} id='formAluno'>
                 <Form.Group className="mb-3">
                     <Form.Label>Nome completo(*):</Form.Label>
