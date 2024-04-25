@@ -30,6 +30,8 @@ export default function TelaAlocarAluno(props) {
     useEffect(() => {
         dispatch(buscarInscricoes());
         dispatch(buscarRotas());
+        console.log(rotas);
+        console.log(inscricoes);
     }, [dispatch]);
 
     useEffect(() => {
@@ -104,7 +106,7 @@ export default function TelaAlocarAluno(props) {
         if (inscricoesSelecionadas.length === 0) {
             inscricoesAtualizadas.push({
                 rota: rotaSelecionada.codigo,
-                aluno:{codigo:0}
+                aluno: { codigo: 0 }
             });
         }
         dispatch(atualizarInscricoes(inscricoesAtualizadas)).then((retorno) => {
@@ -117,12 +119,19 @@ export default function TelaAlocarAluno(props) {
                 setTipoMensagem('danger');
                 setMostrarMensagem(true);
             }
-        })
-        dispatch(buscarRotas());
-        dispatch(buscarInscricoes());
-        setRotaSelecionada(null);
-        setInscricoesSelecionadas([]);
-    };
+        });
+        dispatch(buscarRotas()).then(() => {
+            dispatch(buscarInscricoes()).then(() => {
+                setRotaSelecionada(null);
+                setRotaEstaSelecionada(false);
+                setInscricoesSelecionadas([]);
+                setTermoBusca('');
+                setInscricoesFiltradas([]);
+                setMostrarModalConfirmacao(false);
+                setNovaRotaSelecionada(null);
+            });
+        });
+    };    
 
     if (mostrarMensagem) {
         return (
