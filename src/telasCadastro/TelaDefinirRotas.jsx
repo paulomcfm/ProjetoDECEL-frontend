@@ -8,6 +8,7 @@ import { buscarRotas } from "../redux/rotaReducer";
 export default function TelaDefinirRotas(){
 
     const formVazio = {
+        codigo:0,
         nome:'',
         km:0,
         periodo:'M',

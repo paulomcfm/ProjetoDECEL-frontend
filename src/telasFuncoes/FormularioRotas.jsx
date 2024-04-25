@@ -5,7 +5,7 @@ import Pagina from '../templates/Pagina';
 import Select from 'react-select'
 import { useDispatch, useSelector } from 'react-redux';
 import { buscarPontosEmbarque } from '../redux/pontosEmbarqueReducer';
-import { adicionarRotas,buscarRotas } from '../redux/rotaReducer';
+import { adicionarRotas,atualizarRota } from '../redux/rotaReducer';
 import {buscarMotoristas} from '../redux/motoristaReducer'
 
 import { useEffect } from 'react';
@@ -243,8 +243,8 @@ export default function FormularioRotas(props) {
     async function submissao(){
       const nomes = Object.keys(form)
       let teste = true
-      for(let i=0;i<nomes.length-2;i++){
-        if(i!=2){
+      for(let i=1;i<nomes.length-2;i++){
+        if(nomes[i]!='periodo'){
           const valor = form[nomes[i]]
           let elem = document.getElementById(nomes[i])
           if(valor != ''){
@@ -260,11 +260,11 @@ export default function FormularioRotas(props) {
 
       if(selecionadoM.length==0){
         teste = false
-        let elem = document.getElementById(nomes[7])
+        let elem = document.getElementById(nomes[8])
         elem.classList.remove('input-valido')
         elem.classList.add('input-invalido')
       }else{
-        let elem = document.getElementById(nomes[7])
+        let elem = document.getElementById(nomes[8])
         elem.classList.remove('input-invalido')
         elem.classList.add('input-valido')
       }
@@ -283,41 +283,26 @@ export default function FormularioRotas(props) {
       
       
       if(teste){
+        const json = {...form}
+        //  Passando os vetores de selecionado para os seus respectivos atributos
+        let vetorM = []
+        for(let i=0;i<selecionadoM.length;i++){
+            vetorM.push(selecionadoM[i].value)
+        }
+        json.motoristas = JSON.stringify(vetorM)
+        let vetor = []
+        for(let i=0;i<selecionado.length;i++){
+          vetor.push(selecionado[i].codigo)
+        }
+        json.pontos = JSON.stringify(vetor)
+        setForm(json)
         // gravar
         if(props.modoEdicao == 'gravar'){
-          console.log('euuuu')
-          const json = {...form}
-          //  Passando os vetores de selecionado para os seus respectivos atributos
-          let vetorM = []
-          for(let i=0;i<selecionadoM.length;i++){
-              vetorM.push(selecionadoM[i].value)
-          }
-          json.motoristas = JSON.stringify(vetorM)
-          let vetor = []
-          for(let i=0;i<selecionado.length;i++){
-            vetor.push(selecionado[i].codigo)
-          }
-          json.pontos = JSON.stringify(vetor)
-          setForm(json)
           dispatch(adicionarRotas(json))
         }
         // alterar
         else{
-          const json = {...form}
-          //  Passando os vetores de selecionado para os seus respectivos atributos
-          let vetorM = []
-          for(let i=0;i<selecionadoM.length;i++){
-              vetorM.push(selecionadoM[i].value)
-          }
-          json.motoristas = JSON.stringify(vetorM)
-          let vetor = []
-          for(let i=0;i<selecionado.length;i++){
-            vetor.push(selecionado[i].codigo)
-          }
-          json.pontos = JSON.stringify(vetor)
-          setForm(json)
-
-          console.log(JSON.stringify(json))
+          dispatch(atualizarRota(json))
         }
       }
     }
