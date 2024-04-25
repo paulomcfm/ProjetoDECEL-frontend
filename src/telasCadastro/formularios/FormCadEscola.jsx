@@ -112,8 +112,6 @@ export default function FormCadEscolas(props) {
             setTermoBusca(`${escola.pontoEmbarque?.rua}, ${escola.pontoEmbarque.numero}, ${escola.pontoEmbarque.bairro} - ${escola.pontoEmbarque?.cep}`);
             setPontoEmbarqueSelecionado(true);
         }
-        else
-            setPontoEmbarqueSelecionado(false);
     }, [props.modoEdicao, escola]);
 
     return (
@@ -164,7 +162,7 @@ export default function FormCadEscolas(props) {
                                 placeholder="Email"
                                 id="email"
                                 name="email"
-                                value={(escola.email)}
+                                value={escola.email}
                                 onChange={manipularMudancas}
                                 required />
                             <Form.Control.Feedback type="invalid">
