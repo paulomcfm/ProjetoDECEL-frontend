@@ -82,6 +82,7 @@ export default function FormCadPontosEmbarque(props) {
                     props.setModoEdicao(false);
                     props.setPontoEmbarqueParaEdicao(pontosEmbarqueVazio);
                 }
+                props.exibirFormulario(false)
                 setPontoEmbarque(pontosEmbarqueVazio);
                 setCepRaw('');
                 setFormValidado(false);
