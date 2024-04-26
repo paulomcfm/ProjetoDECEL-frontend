@@ -1,18 +1,28 @@
 import { useState,useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarRotas } from "../../redux/rotaReducer";
-import { Row, Col, Container, Table } from "react-bootstrap";
+import { Row, Col, Container, Table,Modal,Button } from "react-bootstrap";
 
 export default function TabelaRotas(props){
     const dispatch = useDispatch();
     useEffect(() => {
-      dispatch(buscarRotas());
+        dispatch(buscarRotas());
     }, [dispatch]);
-
-    const { estado, mensagem, rotas } = useSelector(state => state.rota);
-
     
+    const { estado, mensagem, rotas } = useSelector(state => state.rota);
     const [pesquisar, setPesquisar] = useState(''); 
+    const [mostrarConfirmacao,setMostrarConfirmacao] = useState(false)
+    const [esconder,setEsconder] = useState(true)
+    
+    
+    
+    function alerta(valor){
+        setEsconder(true)
+        setMostrarConfirmacao(false)
+        if(valor === true){
+            console.log('foi')
+        }
+    }
 
     function manipularMudancas(evento){
         const input = evento.target;
@@ -38,16 +48,77 @@ export default function TabelaRotas(props){
             if(i+1<vetor.length)
                 texto+=','
         }
-
+        
         return texto
     }
-
+    
     function remover(rota){
-
+        setMostrarConfirmacao(true)
+        setEsconder(false)
     }
 
-    function listaPontos(rota){
-        return rota.pontos
+    const API_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
+    const API_KEY = '';
+
+    async function resgatarCoordenadas(endereco) {
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(endereco)}&key=${API_KEY}`;
+    
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+    
+            if (data.status === 'OK') {
+                const resultado = data.results[0];
+                const coordenadas = resultado.geometry.location;
+                const latitude = coordenadas.lat;
+                const longitude = coordenadas.lng;
+    
+                return  {
+                            location:{
+                                lat: latitude,
+                                lng: longitude
+                            }
+                        };
+            } else {
+                return null;
+            }
+        } catch (error) {
+            return null;
+        }
+    }
+
+    async function listaPontos(rota){
+        const enderecos = rota.pontos
+        const origem = []
+        const destino = []
+        const listaIntermed = []
+        const lista = []
+        for(let i=0;i<enderecos.length;i++){
+            
+            const address = enderecos[i].rua +" "+ enderecos[i].numero + " " + enderecos[i].bairro
+            const retorno = await resgatarCoordenadas(address) 
+            if(retorno != null){
+                lista.push(retorno)
+                console.log("lista:" +lista)
+            }
+        }
+        
+        
+        if(lista.length>0){
+            origem.push(lista[0])
+            destino.push(lista[lista.length-1])
+            for(let i=1;i<lista.length-1;i++){
+                listaIntermed.push(lista[i])
+            }
+        }
+
+        console.log("origem "+JSON.stringify(origem)," destino "+JSON.stringify(destino)," pontosIntermediarios"+JSON.stringify(listaIntermed))
+        
+        return {
+            origem:origem,
+            destino: destino,
+            listaIntermed:listaIntermed
+        }
     }
 
     function listarRotas(rota){
@@ -89,8 +160,8 @@ export default function TabelaRotas(props){
                               <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
                           </svg>
                       </button>
-                      <button type="button" style={{border:'none',backgroundColor:'#C7C8CC',borderRadius:'4px',width:'43px'}} onClick={()=>{
-                        props.setEnderecos(listaPontos(rota))
+                      <button type="button" style={{border:'none',backgroundColor:'#C7C8CC',borderRadius:'4px',width:'43px'}} onClick={async ()=>{
+                        props.setEnderecos(await listaPontos(rota))
                         props.setTela(3)
                       }}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fillRule="currentColor" className="bi bi-map" viewBox="0 0 16 16">
@@ -102,11 +173,31 @@ export default function TabelaRotas(props){
         )
     }
 
+
+
     return (
         <Container className="d-flex justify-content-center flex-column align-items-center" style={{marginTop:'40px'}}>
+            <Modal show={mostrarConfirmacao} onHide={esconder}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Confirmar Exclusão</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>Deseja realmente excluir a rota?</Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={()=>{
+                                    alerta(false)
+                                }}>
+                                    Cancelar
+                                </Button>
+                                <Button variant="primary" onClick={()=>{
+                                    alerta(true)
+                                }}>
+                                    Confirmar
+                                </Button>
+                            </Modal.Footer>
+            </Modal>
             <Row>
                 <Col>
-                    <button type="button" className="btn btn-primary" onClick={()=>{props.setTela(false)}}>Cadastrar Rota</button>{' '}
+                    <button type="button" className="btn btn-primary" onClick={()=>{props.setTela(2)}}>Cadastrar Rota</button>{' '}
                 </Col>
             </Row>
             <br />
