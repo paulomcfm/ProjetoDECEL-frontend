@@ -5,12 +5,12 @@ import { buscarUsuarios, removerUsuario } from '../../redux/usuarioReducer.js';
 
 export default function TabelaUsuarios(props) {
     const [termoBusca, setTermoBusca] = useState('');
-    const { usuarios, mensagem } = useSelector(state => state.usuario); // Removendo 'estado' da desestruturação
+    const { usuarios, mensagem } = useSelector(state => state.usuario);
     const dispatch = useDispatch();
 
     const usuarioVazio = {
         nome: '',
-        rg: '',
+        senha:'',
         cpf: '',
         email: '',
         celular: ''
@@ -32,9 +32,9 @@ export default function TabelaUsuarios(props) {
         dispatch(buscarUsuarios());
     }, [dispatch]);
 
-    const usuariosFiltrados = usuarios.filter(usuario =>
+    const usuariosFiltrados = usuarios ? usuarios.filter(usuario =>
         usuario.nome.toLowerCase().includes(termoBusca.toLowerCase())
-    );
+    ) : [];
 
     return (
         <Container>
@@ -71,6 +71,7 @@ export default function TabelaUsuarios(props) {
                 <thead>
                     <tr>
                         <th>Nome</th>
+                        <th>Senha</th>
                         <th>CPF</th>
                         <th>Email</th>
                         <th>Celular</th>
@@ -81,6 +82,7 @@ export default function TabelaUsuarios(props) {
                     {usuariosFiltrados.map(usuario => (
                         <tr key={usuario.nome}>
                             <td>{usuario.nome}</td>
+                            <td>{usuario.senha}</td>
                             <td>{usuario.cpf}</td>
                             <td>{usuario.email}</td>
                             <td>{usuario.celular}</td>

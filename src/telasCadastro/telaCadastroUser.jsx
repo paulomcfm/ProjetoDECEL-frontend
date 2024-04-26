@@ -12,7 +12,7 @@ export default function TelaCadastroUser(props) {
     const [tipoMensagem, setTipoMensagem] = useState("");
     const [usuarioParaEdicao, setUsuarioParaEdicao] = useState({
         nome: '',
-        rg: '',
+        senha:'',
         cpf: '',
         email:'',
         celular: ''
