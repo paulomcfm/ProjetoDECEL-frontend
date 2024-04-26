@@ -4,12 +4,13 @@ import { Container, Form, Table, OverlayTrigger, Popover, Modal, Button } from '
 import '../templates/style.css';
 import Pagina from "../templates/Pagina";
 import { GrContactInfo } from "react-icons/gr";
-import { buscarInscricoes, atualizarInscricoes } from '../redux/inscricaoReducer';
+import { buscarInscricoes } from '../redux/inscricaoReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import { format } from 'date-fns';
 import TelaMensagem from '../telasCadastro/TelaMensagem';
 import { buscarRotas } from '../redux/rotaReducer';
 import { buscarEscolaPorPonto } from '../redux/escolaReducer';
+import { atualizarInscricoes } from '../redux/alocarReducer';
 
 
 export default function TelaAlocarAluno(props) {
@@ -22,7 +23,6 @@ export default function TelaAlocarAluno(props) {
     const [novaRotaSelecionada, setNovaRotaSelecionada] = useState(null);
     const { estadoInsc, mensagemIsnc, inscricoes } = useSelector(state => state.inscricao);
     const { estadoRota, mensagemRota, rotas } = useSelector(state => state.rota);
-    const { estadoEsc, mensagemEsc, escolas } = useSelector(state => state.escola);
     const [mostrarMensagem, setMostrarMensagem] = useState(false);
     const [mensagem, setMensagem] = useState("");
     const [tipoMensagem, setTipoMensagem] = useState("");
@@ -156,7 +156,7 @@ export default function TelaAlocarAluno(props) {
         return (
             <Pagina>
                 <Container className="mt-4 mb-4 text-center">
-                    <h2>Alocar Aluno</h2>
+                    <h2>Alocar Alunos</h2>
                     <Form.Group className="mb-3" controlId="selecionarRota">
                         <Form.Label>Selecione a rota:</Form.Label>
                         <Form.Select onChange={(e) => handleSelecionarRota(rotas.find(rota => rota.nome === e.target.value))}>
