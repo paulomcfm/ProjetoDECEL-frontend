@@ -198,7 +198,10 @@ export default function FormCadEscolas(props) {
                             type="text"
                             placeholder="Buscar por rua ou CEP"
                             value={termoBusca}
-                            onChange={(e) => setTermoBusca(e.target.value)}
+                            onChange={(e) => {
+                                setTermoBusca(e.target.value);
+                                setPontoEmbarqueSelecionado(false);
+                            }}
                             isInvalid={formValidado && !pontoEmbarqueSelecionado}
                             required
                         />

@@ -295,7 +295,7 @@ function FormCadInscricao(props) {
                             ))}
                         </tbody>
                     </Table>
-                )} {console.log(inscricao)}
+                )}
                 {((alunoSelecionado && escolaSelecionada && pontoEmbarqueSelecionado) || props.modoEdicao) && (
                     <>
                         <Row>

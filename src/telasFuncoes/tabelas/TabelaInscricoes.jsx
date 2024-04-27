@@ -70,8 +70,6 @@ export default function TabelaInscricoes(props) {
         }
     }
 
-    console.log(inscricoes)
-
     function editarInscricao(inscricao) {
         props.setInscricaoParaEdicao(inscricao);
         props.setModoEdicao(true);
@@ -132,8 +130,8 @@ export default function TabelaInscricoes(props) {
                 <tbody>
                     {inscricoesFiltradas.map(inscricao => (
                         <tr key={`${inscricao.aluno.codigo}-${inscricao.ano}`}>
-                            <td>{alunos ? alunos.find(alu => alu.codigo === inscricao.aluno.codigo)?.nome : 'Carregando...'}</td>{console.log(alunos) }
-                            <td>{alunos ? alunos.find(alu => alu.codigo === inscricao.aluno.codigo)?.rg : 'Carregando...'}</td>{console.log(alunos) }
+                            <td>{alunos ? alunos.find(alu => alu.codigo === inscricao.aluno.codigo)?.nome : 'Carregando...'}</td>
+                            <td>{alunos ? alunos.find(alu => alu.codigo === inscricao.aluno.codigo)?.rg : 'Carregando...'}</td>
                             <td>{inscricao.rua}, {inscricao.numero}, {inscricao.bairro}, {inscricao.cep.replace(/^(\d{5})(\d{3})$/, '$1-$2')}</td>
                             <td>{pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.rua : 'Carregando...'}, {pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.numero : 'Carregando...'}, {pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.bairro : 'Carregando...'}, {pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.cep.replace(/^(\d{5})(\d{3})$/, '$1-$2') : 'Carregando...'}</td>
                             <td>{escolas ? escolas.find(esc => esc.codigo === inscricao.escola.codigo)?.nome : 'Carregando...'}</td>
@@ -188,7 +186,7 @@ export default function TabelaInscricoes(props) {
                                         : ''}
                             </td>
                             <td>{inscricao.ano}</td>
-                            <td>
+                            <td style={{width: '106px', alignItems: 'center', justifyContent: 'center'}}>
                                 <Button variant="danger" onClick={() => {
                                     excluirInscricao(inscricao);
                                 }}>

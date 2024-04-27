@@ -8,6 +8,10 @@
     text-align: center;
 }
 
+.custom-container {
+    background-color: #fff;
+}
+
 .navbar-nav .nav-link {
     display: inline-block;
     position: relative;
@@ -34,6 +38,14 @@
 
 .custom-navbar {
     background-color: #3b4b5a94;
+}
+
+.background-image {
+    background-image: url('/src/recursos/fundo.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 95vh;
 }
 
 .ml-auto {
@@ -69,3 +81,40 @@ body, div {
     transform: scale(1.1);
     transition: transform 0.3s ease;
 }
+
+.TfiWrite {
+    transform: scale(1.1);
+    transition: transform 0.3s ease;
+}
+
+.imagem-botao {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    border-radius: 10px; 
+    cursor: pointer; 
+    transition: transform 0.3s; 
+    border: 3px solid transparent; 
+}
+
+.imagem-botao:hover {
+    transform: scale(1.05);
+    border-color: rgba(8, 8, 87, 0.886); 
+}
+
+.imagem-botao a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: inherit; 
+    z-index: 1;
+}
+
+
+
+
+
+
