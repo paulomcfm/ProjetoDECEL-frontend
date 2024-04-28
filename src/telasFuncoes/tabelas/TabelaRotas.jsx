@@ -2,6 +2,7 @@ import { useState,useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarRotas } from "../../redux/rotaReducer";
 import { Row, Col, Container, Table,Modal,Button } from "react-bootstrap";
+import { removerRota } from "../../redux/rotaReducer";
 
 export default function TabelaRotas(props){
     const dispatch = useDispatch();
@@ -13,14 +14,25 @@ export default function TabelaRotas(props){
     const [pesquisar, setPesquisar] = useState(''); 
     const [mostrarConfirmacao,setMostrarConfirmacao] = useState(false)
     const [esconder,setEsconder] = useState(true)
+    const [rotaE,setRotaE] = useState(0)
+    const [mensagemF,setMensagemF] = useState('')
+    const [exibirM,setExibirM] = useState(0)
     
-    
-    
-    function alerta(valor){
+    async function alerta(valor){
         setEsconder(true)
         setMostrarConfirmacao(false)
         if(valor === true){
-            console.log('foi')
+            const resposta  = await dispatch(removerRota(rotaE))
+            if(resposta.payload.status){
+                setMensagemF(resposta.payload.mensagem)
+                setExibirM(1)
+            }else{
+                setExibirM(2)
+                setMensagemF(resposta.payload.mensagem)
+            }
+            setTimeout(()=>{
+                setExibirM(0)
+            },3000)
         }
     }
 
@@ -53,12 +65,13 @@ export default function TabelaRotas(props){
     }
     
     function remover(rota){
+        setRotaE(rota)
         setMostrarConfirmacao(true)
         setEsconder(false)
     }
 
     const API_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
-    const API_KEY = '';
+    const API_KEY = 'AIzaSyCKNlqqhmlCYU7bLjeku8uWsDfxOxDM5R8';
 
     async function resgatarCoordenadas(endereco) {
         const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(endereco)}&key=${API_KEY}`;
@@ -134,7 +147,7 @@ export default function TabelaRotas(props){
                 <td>{rota.monitor[0].mon_nome}</td>
                 <td>{motoristasNomes(rota.motoristas)}</td>
                 <td style={{ display: 'flex', gap: '5px' }}>
-                      <button type="button" className="btn btn-danger" onClick={()=>{remover()}}>
+                      <button type="button" className="btn btn-danger" onClick={()=>{remover(rota.codigo)}}>
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-trash-fill" viewBox="0 0 16 16">
                               <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
                           </svg>
@@ -177,6 +190,19 @@ export default function TabelaRotas(props){
 
     return (
         <Container className="d-flex justify-content-center flex-column align-items-center" style={{marginTop:'40px'}}>
+            { 
+                exibirM===1?
+                <div class="alert alert-success" role="alert">
+                    {mensagemF}
+                </div>
+                :
+                exibirM==2?
+                <div class="alert alert-danger" role="alert">
+                    {mensagemF}
+                </div>
+                :
+                null
+              }
             <Modal show={mostrarConfirmacao} onHide={esconder}>
                             <Modal.Header closeButton>
                                 <Modal.Title>Confirmar Exclusão</Modal.Title>

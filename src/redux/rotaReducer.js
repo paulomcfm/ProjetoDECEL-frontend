@@ -95,16 +95,16 @@ export const atualizarRota = createAsyncThunk('rotas/atualizar', async (rota) =>
 
 
 export const removerRota = createAsyncThunk('rotas/remover', async (rota) => {
-    const resposta = await fetch(urlBase, {
+    const urlB = urlBase+'/'+rota
+    const resposta = await fetch(urlB, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(rota)
     }).catch(erro => {
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao remover a rota:' + erro.message,
+            mensagem: 'Ocorreu um erro ao remover a rota:' + erro,
             rota
         }
     });
@@ -119,7 +119,7 @@ export const removerRota = createAsyncThunk('rotas/remover', async (rota) => {
     else {
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao remover a rota.',
+            mensagem: 'Não é possível deletar está rota',
             rota
         }
     }
@@ -173,6 +173,10 @@ const rotaSlice = createSlice({
             state.estado = ESTADO.ERRO;
         }).addCase(removerRota.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
+            if(action.payload.status === true)
+                state.rotas = state.rotas.filter(rota => rota.codigo!=action.payload.rota)
+            else
+                state.estado = ESTADO.ERRO
             state.mensagem = action.payload.mensagem;
         }).addCase(removerRota.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;

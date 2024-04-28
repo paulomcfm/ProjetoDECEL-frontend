@@ -25,13 +25,13 @@ export default function MapaPagina(props){
     
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
-        googleMapsApiKey: ""
+        googleMapsApiKey: "AIzaSyCKNlqqhmlCYU7bLjeku8uWsDfxOxDM5R8"
     })
     
     
 
     const API_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
-    const API_KEY = '';
+    const API_KEY = 'AIzaSyCKNlqqhmlCYU7bLjeku8uWsDfxOxDM5R8';
 
     const getApiUrl = (address) => {
         return `${API_URL}?key=${API_KEY}&address=${encodeURI(address)}`;
