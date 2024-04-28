@@ -15,10 +15,13 @@ import '../styles/rota.css'
 
 export default function FormularioRotas(props) {
 
+
+  const [mensagemF,setMensagemF] = useState('')
+  const [exibirM,setExibirM] = useState(0)
   const [form,setForm] = useState(props.form)
   
-  const {estadoR,mensagemR,rotas} = useSelector(state => state.rota)
-  const { estado, mensagem, pontosEmbarque } = useSelector(state => state.pontoEmbarque);
+  const {estado,mensagem,rotas} = useSelector(state => state.rota)
+  const { estadoP, mensagemP, pontosEmbarque } = useSelector(state => state.pontoEmbarque);
   const { estadoM, mensagemM, motoristas } = useSelector(state => state.motorista);
   const dispatch =  useDispatch()
   
@@ -254,6 +257,18 @@ export default function FormularioRotas(props) {
             teste = false
             elem.classList.remove('input-valido')
             elem.classList.add('input-invalido')
+          }  
+          if((nomes[i]=='ida' || nomes[i]=='volta') && form['ida']!== '' && form['volta']!==''){
+              let partes1 = form['ida'].split(':')
+              let partes2 = form['volta'].split(':')
+              if(partes1[0]>partes2[0] || (partes1[0]==partes2[0] && partes1[1]>partes2[1])){
+                elem = document.getElementById('ida')
+                elem.classList.remove('input-valido')
+                elem.classList.add('input-invalido')
+                elem = document.getElementById('volta')
+                elem.classList.remove('input-valido')
+                elem.classList.add('input-invalido')
+              }
           }
         }
       }
@@ -297,20 +312,62 @@ export default function FormularioRotas(props) {
         json.pontos = JSON.stringify(vetor)
         setForm(json)
         // gravar
+        let resposta
         if(props.modoEdicao == 'gravar'){
-          dispatch(adicionarRotas(json))
+          console.log(mensagem)
+          resposta = await dispatch(adicionarRotas(json))
+          if(resposta.payload.status){
+            setMensagemF('Rota cadastrada com sucesso')
+            setExibirM(1)
+          }else{
+            setMensagemF("Não foi possivel cadastrar essa rota")
+            setExibirM(2)
+          }
+          
         }
         // alterar
         else{
-          dispatch(atualizarRota(json))
+          resposta = await dispatch(atualizarRota(json))
+          if(resposta.payload.status){
+            setMensagemF('Rota atualizada com sucesso')
+            setExibirM(1)
+          }
+          else{
+            setMensagemF("Não foi possivel atualizar essa rota")
+            setExibirM(2)
+          }
         }
+
+        setTimeout(()=>{
+            setExibirM(0)
+            setMensagemF('')
+            if(resposta.payload.status){
+              setForm(props.formVazio)
+              window.location.reload()
+            }
+        },3000)
       }
     }
 
     return (
-      <>
-                <div className="container mt-5" >
-                <div>
+      
+          <div className="container mt-5" >
+              { 
+                exibirM===1?
+                <div class="alert alert-success" role="alert">
+                    {mensagemF}
+                </div>
+                :
+                exibirM==2?
+                <div class="alert alert-danger" role="alert">
+                    {mensagemF}
+                </div>
+                :
+                null
+              }
+            {
+            exibirM===0?
+            <>
                 <Row className='justify-content-center'>
                     <Col md className='text-center'>
                       <h4>Nome da Rota(*):</h4>
@@ -321,8 +378,6 @@ export default function FormularioRotas(props) {
                       <input type="text" id="km" className="form-control mb-3 mx-auto"  placeholder="Escreva a Quilometragem" style={{width:'400px'}} name='km' value={form.km} onChange={manipularMudancas}/>
                     </Col>
                 </Row>
-
-                </div>
                 <Row>
                   <Col md>
                     <h4 className="mb-3">Placa do Veículo(*):</h4>
@@ -451,7 +506,10 @@ export default function FormularioRotas(props) {
                   props.setModoEdicao('gravar')
                   props.setTela(1)
                   }}> Voltar</button>
-            </div>
-        </>
+            </>
+            :
+            null
+            }
+          </div>
     );
 }

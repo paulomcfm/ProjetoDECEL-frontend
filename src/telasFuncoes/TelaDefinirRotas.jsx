@@ -1,4 +1,4 @@
-import TabelaRotas from "../telasCadastro/tabelas/TabelaRotas";
+import TabelaRotas from './tabelas/TabelaRotas'
 import FormularioRotas from "./FormularioRotas";
 import Pagina from "../templates/Pagina";
 import { useState,useEffect } from "react";
