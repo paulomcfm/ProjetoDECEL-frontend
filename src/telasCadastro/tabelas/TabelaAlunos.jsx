@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Container, Table } from 'react-bootstrap';
+import { Button, Container, Table, Modal } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarAlunos, removerAluno } from '../../redux/alunoReducer';
 import { buscarParentescosAluno } from '../../redux/parentescoReducer';
@@ -11,6 +11,9 @@ export default function TabelaAlunos(props) {
     const { estado, mensagem, alunos } = useSelector(state => state.aluno);
     const { estadoPar, mensagemPar, parentescos } = useSelector(state => state.parentesco);
     const { estadoResp, mensagemResp, responsaveis } = useSelector(state => state.responsavel);
+    const [mostrarModal, setMostrarModal] = useState(false);
+    const [alunoSelecionado, setAlunoSelecionado] = useState(null);
+    const [excluir, setExcluir] = useState(false);
     const dispatch = useDispatch();
 
     const alunoVazio = {
@@ -24,20 +27,25 @@ export default function TabelaAlunos(props) {
     };
 
     function excluirAluno(aluno) {
-        if (window.confirm('Deseja realmente excluir esse aluno?')) {
-            dispatch(removerAluno(aluno)).then((retorno) => {
-                if (retorno.payload.status) {
-                    props.setMensagem('Aluno excluído com sucesso!');
-                    props.setTipoMensagem('success');
-                    props.setMostrarMensagem(true);
-                } else {
-                    props.setMensagem('Aluno não excluído! ' + retorno.payload.mensagem);
-                    props.setTipoMensagem('danger');
-                    props.setMostrarMensagem(true);
-                }
-            });
-        }
+        setAlunoSelecionado(aluno);
+        setMostrarModal(true);
     }
+
+    function handleExcluir() {
+        dispatch(removerAluno(alunoSelecionado)).then((retorno) => {
+            if (retorno.payload.status) {
+                props.setMensagem('Aluno excluído com sucesso!');
+                props.setTipoMensagem('success');
+                props.setMostrarMensagem(true);
+            } else {
+                props.setMensagem('Aluno não excluído! ' + retorno.payload.mensagem);
+                props.setTipoMensagem('danger');
+                props.setMostrarMensagem(true);
+            }
+        });
+        setMostrarModal(false);
+    }
+
 
     function editarAluno(aluno) {
         dispatch(buscarParentescosAluno(aluno.codigo)).then((retorno) => {
@@ -149,6 +157,16 @@ export default function TabelaAlunos(props) {
                     ))}
                 </tbody>
             </Table>
+            <Modal show={mostrarModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirmar Exclusão</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Deseja realmente excluir o aluno?</Modal.Body>
+                <Modal.Footer className='d-flex justify-content-center'>
+                    <Button variant="danger" onClick={handleExcluir}>Sim</Button>
+                    <Button variant="secondary" onClick={() => setMostrarModal(false)}>Cancelar</Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 }

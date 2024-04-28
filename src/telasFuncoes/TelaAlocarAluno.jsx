@@ -4,6 +4,7 @@ import { Container, Form, Table, OverlayTrigger, Popover, Modal, Button } from '
 import '../templates/style.css';
 import Pagina from "../templates/Pagina";
 import { GrContactInfo } from "react-icons/gr";
+import { PiWarningBold } from "react-icons/pi";
 import { buscarInscricoes } from '../redux/inscricaoReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import { format } from 'date-fns';
@@ -20,6 +21,7 @@ export default function TelaAlocarAluno(props) {
     const [termoBusca, setTermoBusca] = useState('');
     const [inscricoesFiltradas, setInscricoesFiltradas] = useState([]);
     const [mostrarModalConfirmacao, setMostrarModalConfirmacao] = useState(false);
+    const [mostrarModalCancelar, setMostrarModalCancelar] = useState(false);
     const [novaRotaSelecionada, setNovaRotaSelecionada] = useState(null);
     const { estadoInsc, mensagemIsnc, inscricoes } = useSelector(state => state.inscricao);
     const { estadoRota, mensagemRota, rotas } = useSelector(state => state.rota);
@@ -28,7 +30,7 @@ export default function TelaAlocarAluno(props) {
     const [tipoMensagem, setTipoMensagem] = useState("");
     const [escolasRota, setEscolasRota] = useState(null);
     const [inscricoesFora, setInscricoesFora] = useState([]);
-
+    const [indiceRotaSelecionadaAnterior, setIndiceRotaSelecionadaAnterior] = useState(null);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -40,22 +42,34 @@ export default function TelaAlocarAluno(props) {
         if (termoBusca.trim() === '') {
             setInscricoesFiltradas([]);
         } else {
-            const inscricoesFora = inscricoes.filter(inscricao =>
-                !rotaSelecionada.pontos.some(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)
-            );
             const inscricoesNaoAlocadas = inscricoes.filter(inscricao =>
                 inscricao.aluno.nome.toLowerCase().includes(termoBusca.toLowerCase()) &&
                 escolasRota.some(escola => escola.codigo === inscricao.escola.codigo) &&
                 !inscricoesSelecionadas.find(a => a.aluno.nome === inscricao.aluno.nome)
             );
             setInscricoesFiltradas(inscricoesNaoAlocadas);
-            setInscricoesFora(inscricoesFora);
+            settingInscricoesFora();
         }
     }, [termoBusca, inscricoes, inscricoesSelecionadas]);
+
+
+    useEffect(() => {
+        settingInscricoesFora();
+    }, [rotaSelecionada]);
+
+    const settingInscricoesFora = () => {
+        if (rotaSelecionada) {
+            const inscricoesFora = inscricoes.filter(inscricao =>
+                !rotaSelecionada.pontos.some(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)
+            );
+            setInscricoesFora(inscricoesFora);
+        }
+    };
 
     const handleSelecionarRota = async (rota) => {
         if (rota) {
             if (rotaSelecionada && novaRotaSelecionada !== rota) {
+                setIndiceRotaSelecionadaAnterior(rotas.findIndex(r => r.nome === rotaSelecionada.nome));
                 setNovaRotaSelecionada(rota);
                 setMostrarModalConfirmacao(true);
             } else {
@@ -86,6 +100,10 @@ export default function TelaAlocarAluno(props) {
     const cancelarTrocaRota = () => {
         setMostrarModalConfirmacao(false);
         setNovaRotaSelecionada(null);
+        if (indiceRotaSelecionadaAnterior !== null) {
+            document.getElementById('selecionarRota').selectedIndex = indiceRotaSelecionadaAnterior + 1;
+        }
+        setIndiceRotaSelecionadaAnterior(null);
     };
 
     const handleRemoverInscricao = (index) => {
@@ -147,6 +165,10 @@ export default function TelaAlocarAluno(props) {
         });
     };
 
+    const handleCancelarAlocacao = () => {
+        setMostrarModalCancelar(true);
+    };
+
     if (mostrarMensagem) {
         return (
             <TelaMensagem mensagem={mensagem} tipo={tipoMensagem} setMostrarMensagem={setMostrarMensagem} />
@@ -174,12 +196,12 @@ export default function TelaAlocarAluno(props) {
                                 <Modal.Title>Confirmar Troca de Rota</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>Deseja realmente trocar de rota?</Modal.Body>
-                            <Modal.Footer>
-                                <Button variant="secondary" onClick={cancelarTrocaRota}>
-                                    Cancelar
-                                </Button>
+                            <Modal.Footer className='d-flex justify-content-center'>
                                 <Button variant="primary" onClick={confirmarTrocaRota}>
                                     Confirmar
+                                </Button>
+                                <Button variant="danger" onClick={cancelarTrocaRota}>
+                                    Cancelar
                                 </Button>
                             </Modal.Footer>
                         </Modal>
@@ -226,8 +248,8 @@ export default function TelaAlocarAluno(props) {
                                     <p>Não há alunos alocados na rota</p>
                                 ) : (
                                     inscricoesSelecionadas.map((inscricao, index) => {
-                                        const possuiPontoFora = inscricoesFora.some(fora => fora.codigo === inscricao.codigo);
-                                
+                                        const possuiPontoFora = inscricoesFora.some(fora => fora.aluno.codigo === inscricao.aluno.codigo);
+
                                         return (
                                             <div key={index} className="d-flex justify-content-center align-items-center">
                                                 <OverlayTrigger
@@ -238,6 +260,9 @@ export default function TelaAlocarAluno(props) {
                                                         <Popover id="popover-positioned-bottom">
                                                             <Popover.Header as="h3">{inscricao.aluno.nome}</Popover.Header>
                                                             <Popover.Body>
+                                                                {possuiPontoFora && (
+                                                                    <p><PiWarningBold style={{ marginRight: '2% ', color: 'red' }} />Aluno possui ponto de embarque fora dos pontos de embarque da rota!</p>
+                                                                )}
                                                                 <p>RG: {inscricao.aluno.rg}</p>
                                                                 <p>Data de Nascimento: {format(new Date(inscricao.aluno.dataNasc), 'dd/MM/yyyy')}</p>
                                                                 <p>Celular: {inscricao.aluno.celular}</p>
@@ -247,15 +272,15 @@ export default function TelaAlocarAluno(props) {
                                                     }
                                                 >
                                                     <Button variant="light" className="me-2 mb-2 mt-4 w-50">
-                                                        <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
+                                                        <GrContactInfo style={{ marginRight: '2%' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
+                                                        {possuiPontoFora && (
+                                                            <PiWarningBold style={{ marginLeft: '2%', verticalAlign: 'middle', color: 'red' }} />
+                                                        )}
                                                     </Button>
                                                 </OverlayTrigger>
                                                 <Button variant="danger" className="mb-2 mt-4 me-2" onClick={() => handleRemoverInscricao(index)}>
                                                     Remover
                                                 </Button>
-                                                {possuiPontoFora && (
-                                                    <p className='mt-4'>Possui ponto de embarque fora da rota.</p>
-                                                )}
                                             </div>
                                         );
                                     })
@@ -272,7 +297,7 @@ export default function TelaAlocarAluno(props) {
                             </div>
                             <div className="mt-2">
                                 {inscricoesFiltradas.map((inscricao, index) => {
-                                    const possuiPontoFora = inscricoesFora.some(fora => fora.codigo === inscricao.codigo);
+                                    const possuiPontoFora = inscricoesFora.some(fora => fora.aluno.codigo === inscricao.aluno.codigo);
 
                                     return (
                                         <div key={index} className="d-flex justify-content-center align-items-center">
@@ -284,6 +309,9 @@ export default function TelaAlocarAluno(props) {
                                                     <Popover id="popover-positioned-bottom">
                                                         <Popover.Header as="h3">{inscricao.aluno.nome}</Popover.Header>
                                                         <Popover.Body>
+                                                            {possuiPontoFora && (
+                                                                <p><PiWarningBold style={{ marginRight: '2% ', color: 'red' }} />Aluno possui ponto de embarque fora dos pontos de embarque da rota!</p>
+                                                            )}
                                                             <p>RG: {inscricao.aluno.rg}</p>
                                                             <p>Data de Nascimento: {format(new Date(inscricao.aluno.dataNasc), 'dd/MM/yyyy')}</p>
                                                             <p>Celular: {inscricao.aluno.celular}</p>
@@ -293,7 +321,10 @@ export default function TelaAlocarAluno(props) {
                                                 }
                                             >
                                                 <Button variant="light" className="me-2 mb-2 mt-4 w-50">
-                                                    <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
+                                                    <GrContactInfo style={{ marginRight: '2%' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
+                                                    {possuiPontoFora && (
+                                                        <PiWarningBold style={{ marginLeft: '2%', verticalAlign: 'middle', color: 'red' }} />
+                                                    )}
                                                 </Button>
                                             </OverlayTrigger>
                                             <Button
@@ -303,21 +334,52 @@ export default function TelaAlocarAluno(props) {
                                             >
                                                 Adicionar
                                             </Button>
-                                            {possuiPontoFora && (
-                                                <p className='mt-4'>Possui ponto de embarque fora da rota.</p>
-                                            )}
                                         </div>
                                     );
                                 })}
-
                             </div>
                             <Button
                                 variant="primary"
-                                className="mb-2 mt-4"
+                                className="mb-2 mt-4 me-2"
                                 onClick={() => { handleSubmissao() }}
                             >
                                 Confirmar Alocação
                             </Button>
+                            <Button
+                                variant="danger"
+                                onClick={() => { handleCancelarAlocacao() }}
+                                className="mb-2 mt-4"
+                            >
+                                Cancelar Alocação
+                            </Button>
+                            {mostrarModalCancelar && (
+                                <Modal show={mostrarModalCancelar} onHide={() => setMostrarModalCancelar(false)}>
+                                    <Modal.Header closeButton>
+                                        <Modal.Title>Cancelar Alocação</Modal.Title>
+                                    </Modal.Header>
+                                    <Modal.Body>
+                                        Deseja realmente cancelar a alocação?
+                                    </Modal.Body>
+                                    <Modal.Footer className='d-flex justify-content-center'>
+                                        <Button variant="danger" onClick={() => {
+                                            setRotaSelecionada(null);
+                                            setRotaEstaSelecionada(false);
+                                            setInscricoesSelecionadas([]);
+                                            setTermoBusca('');
+                                            setInscricoesFiltradas([]);
+                                            setMostrarModalConfirmacao(false);
+                                            setNovaRotaSelecionada(null);
+                                            document.getElementById('selecionarRota').selectedIndex = 0;
+                                            setMostrarModalCancelar(false);
+                                        }}>
+                                            Sim
+                                        </Button>
+                                        <Button variant="secondary" onClick={() => setMostrarModalCancelar(false)}>
+                                            Não
+                                        </Button>
+                                    </Modal.Footer>
+                                </Modal>
+                            )}
                         </>
                     )}
                 </Container>

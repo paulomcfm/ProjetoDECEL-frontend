@@ -3,12 +3,9 @@ import { Form, Button, Col, Row } from 'react-bootstrap';
 import { adicionarAluno, atualizarAluno } from '../../redux/alunoReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarResponsaveis } from '../../redux/responsavelReducer';
-import { adicionarParentesco, atualizarParentesco, removerParentesco } from '../../redux/parentescoReducer';
 import { useEffect } from 'react';
 import validarCelular from '../../validacoes/validarCelular';
 import InputMask from 'react-input-mask';
-
-
 
 export default function FormCadAlunos(props) {
 
