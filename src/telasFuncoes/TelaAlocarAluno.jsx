@@ -4,11 +4,14 @@ import { Container, Form, Table, OverlayTrigger, Popover, Modal, Button } from '
 import '../templates/style.css';
 import Pagina from "../templates/Pagina";
 import { GrContactInfo } from "react-icons/gr";
-import { buscarInscricoes, atualizarInscricoes } from '../redux/inscricaoReducer';
+import { PiWarningBold } from "react-icons/pi";
+import { buscarInscricoes } from '../redux/inscricaoReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import { format } from 'date-fns';
 import TelaMensagem from '../telasCadastro/TelaMensagem';
 import { buscarRotas } from '../redux/rotaReducer';
+import { buscarEscolaPorPonto } from '../redux/escolaReducer';
+import { atualizarInscricoes } from '../redux/alocarReducer';
 
 
 export default function TelaAlocarAluno(props) {
@@ -18,13 +21,16 @@ export default function TelaAlocarAluno(props) {
     const [termoBusca, setTermoBusca] = useState('');
     const [inscricoesFiltradas, setInscricoesFiltradas] = useState([]);
     const [mostrarModalConfirmacao, setMostrarModalConfirmacao] = useState(false);
+    const [mostrarModalCancelar, setMostrarModalCancelar] = useState(false);
     const [novaRotaSelecionada, setNovaRotaSelecionada] = useState(null);
     const { estadoInsc, mensagemIsnc, inscricoes } = useSelector(state => state.inscricao);
     const { estadoRota, mensagemRota, rotas } = useSelector(state => state.rota);
     const [mostrarMensagem, setMostrarMensagem] = useState(false);
     const [mensagem, setMensagem] = useState("");
     const [tipoMensagem, setTipoMensagem] = useState("");
-
+    const [escolasRota, setEscolasRota] = useState(null);
+    const [inscricoesFora, setInscricoesFora] = useState([]);
+    const [indiceRotaSelecionadaAnterior, setIndiceRotaSelecionadaAnterior] = useState(null);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -38,15 +44,32 @@ export default function TelaAlocarAluno(props) {
         } else {
             const inscricoesNaoAlocadas = inscricoes.filter(inscricao =>
                 inscricao.aluno.nome.toLowerCase().includes(termoBusca.toLowerCase()) &&
+                escolasRota.some(escola => escola.codigo === inscricao.escola.codigo) &&
                 !inscricoesSelecionadas.find(a => a.aluno.nome === inscricao.aluno.nome)
             );
             setInscricoesFiltradas(inscricoesNaoAlocadas);
+            settingInscricoesFora();
         }
     }, [termoBusca, inscricoes, inscricoesSelecionadas]);
 
-    const handleSelecionarRota = (rota) => {
+
+    useEffect(() => {
+        settingInscricoesFora();
+    }, [rotaSelecionada]);
+
+    const settingInscricoesFora = () => {
+        if (rotaSelecionada) {
+            const inscricoesFora = inscricoes.filter(inscricao =>
+                !rotaSelecionada.pontos.some(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)
+            );
+            setInscricoesFora(inscricoesFora);
+        }
+    };
+
+    const handleSelecionarRota = async (rota) => {
         if (rota) {
             if (rotaSelecionada && novaRotaSelecionada !== rota) {
+                setIndiceRotaSelecionadaAnterior(rotas.findIndex(r => r.nome === rotaSelecionada.nome));
                 setNovaRotaSelecionada(rota);
                 setMostrarModalConfirmacao(true);
             } else {
@@ -55,8 +78,15 @@ export default function TelaAlocarAluno(props) {
                 setInscricoesSelecionadas(rota.inscricoes || []);
                 setTermoBusca('');
             }
+            let escolasRota = [];
+            for (const ponto of rota.pontos) {
+                const action = await dispatch(buscarEscolaPorPonto(ponto.codigo));
+                escolasRota = [...escolasRota, ...action.payload.listaEscolas];
+            }
+            setEscolasRota(escolasRota);
         }
     };
+
 
     const confirmarTrocaRota = () => {
         setRotaSelecionada(novaRotaSelecionada);
@@ -70,6 +100,10 @@ export default function TelaAlocarAluno(props) {
     const cancelarTrocaRota = () => {
         setMostrarModalConfirmacao(false);
         setNovaRotaSelecionada(null);
+        if (indiceRotaSelecionadaAnterior !== null) {
+            document.getElementById('selecionarRota').selectedIndex = indiceRotaSelecionadaAnterior + 1;
+        }
+        setIndiceRotaSelecionadaAnterior(null);
     };
 
     const handleRemoverInscricao = (index) => {
@@ -101,7 +135,12 @@ export default function TelaAlocarAluno(props) {
             dataAlocacao: format(dataAtual, 'yyyy-MM-dd'),
             rota: rotaSelecionada.codigo
         }));
-
+        if (inscricoesSelecionadas.length === 0) {
+            inscricoesAtualizadas.push({
+                rota: rotaSelecionada.codigo,
+                aluno: { codigo: 0 }
+            });
+        }
         dispatch(atualizarInscricoes(inscricoesAtualizadas)).then((retorno) => {
             if (retorno.payload.status) {
                 setMensagem('Inscricão alterada com sucesso!');
@@ -112,9 +151,22 @@ export default function TelaAlocarAluno(props) {
                 setTipoMensagem('danger');
                 setMostrarMensagem(true);
             }
-        })
-        setRotaSelecionada(null);
-        setInscricoesSelecionadas([]);
+        });
+        dispatch(buscarRotas()).then(() => {
+            dispatch(buscarInscricoes()).then(() => {
+                setRotaSelecionada(null);
+                setRotaEstaSelecionada(false);
+                setInscricoesSelecionadas([]);
+                setTermoBusca('');
+                setInscricoesFiltradas([]);
+                setMostrarModalConfirmacao(false);
+                setNovaRotaSelecionada(null);
+            });
+        });
+    };
+
+    const handleCancelarAlocacao = () => {
+        setMostrarModalCancelar(true);
     };
 
     if (mostrarMensagem) {
@@ -126,11 +178,11 @@ export default function TelaAlocarAluno(props) {
         return (
             <Pagina>
                 <Container className="mt-4 mb-4 text-center">
-                    <h2>Alocar Aluno</h2>
+                    <h2>Alocar Alunos</h2>
                     <Form.Group className="mb-3" controlId="selecionarRota">
                         <Form.Label>Selecione a rota:</Form.Label>
                         <Form.Select onChange={(e) => handleSelecionarRota(rotas.find(rota => rota.nome === e.target.value))}>
-                            <option value="">Selecione...</option>
+                            <option value="">Selecione um rota...</option>
                             {rotas.map((rota, index) => (
                                 <option key={index} value={rota.nome}>
                                     {rota.nome} - {rota.veiculo[0].vei_placa} - {rota.motoristas.map((motorista) => motorista.nome).join('- ')}
@@ -144,12 +196,12 @@ export default function TelaAlocarAluno(props) {
                                 <Modal.Title>Confirmar Troca de Rota</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>Deseja realmente trocar de rota?</Modal.Body>
-                            <Modal.Footer>
-                                <Button variant="secondary" onClick={cancelarTrocaRota}>
-                                    Cancelar
-                                </Button>
+                            <Modal.Footer className='d-flex justify-content-center'>
                                 <Button variant="primary" onClick={confirmarTrocaRota}>
                                     Confirmar
+                                </Button>
+                                <Button variant="danger" onClick={cancelarTrocaRota}>
+                                    Cancelar
                                 </Button>
                             </Modal.Footer>
                         </Modal>
@@ -190,84 +242,144 @@ export default function TelaAlocarAluno(props) {
                                     )}
                                 </tbody>
                             </Table>
+                            <>
+                                <h4>Alunos da Rota</h4>
+                                {inscricoesSelecionadas.length === 0 ? (
+                                    <p>Não há alunos alocados na rota</p>
+                                ) : (
+                                    inscricoesSelecionadas.map((inscricao, index) => {
+                                        const possuiPontoFora = inscricoesFora.some(fora => fora.aluno.codigo === inscricao.aluno.codigo);
 
-                            {inscricoesSelecionadas.map((inscricao, index) => (
-                                <div key={index} className="d-flex justify-content-center align-items-center">
-                                    <OverlayTrigger
-                                        trigger="click"
-                                        key="bottom"
-                                        placement="bottom"
-                                        overlay={
-                                            <Popover id="popover-positioned-bottom">
-                                                <Popover.Header as="h3">{inscricao.aluno.aluno_nome}</Popover.Header>
-                                                <Popover.Body>
-                                                    <p>RG: {inscricao.aluno.aluno_rg}</p>
-                                                    <p>Data de Nascimento: {format(new Date(inscricao.aluno.aluno_datanasc), 'dd/MM/yyyy')}</p>
-                                                    <p>Celular: {inscricao.aluno.aluno_celular}</p>
-                                                    <p>Observações: {inscricao.aluno.aluno_observacoes}</p>
-                                                </Popover.Body>
-                                            </Popover>
-                                        }
-                                    >
-                                        <Button variant="light" className="me-2 mb-2 mt-4 w-50">
-                                            <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.aluno.aluno_nome} - RG: ${inscricao.aluno.aluno_rg}`}
-                                        </Button>
-                                    </OverlayTrigger>
-                                    <Button variant="danger" className="mb-2 mt-4" onClick={() => handleRemoverInscricao(index)}>
-                                        Remover
-                                    </Button>
-                                </div>
-                            ))}
-
-                            <Form.Label className="mt-4">Alunos:</Form.Label>
+                                        return (
+                                            <div key={index} className="d-flex justify-content-center align-items-center">
+                                                <OverlayTrigger
+                                                    trigger="click"
+                                                    key="bottom"
+                                                    placement="bottom"
+                                                    overlay={
+                                                        <Popover id="popover-positioned-bottom">
+                                                            <Popover.Header as="h3">{inscricao.aluno.nome}</Popover.Header>
+                                                            <Popover.Body>
+                                                                {possuiPontoFora && (
+                                                                    <p><PiWarningBold style={{ marginRight: '2% ', color: 'red' }} />Aluno possui ponto de embarque fora dos pontos de embarque da rota!</p>
+                                                                )}
+                                                                <p>RG: {inscricao.aluno.rg}</p>
+                                                                <p>Data de Nascimento: {format(new Date(inscricao.aluno.dataNasc), 'dd/MM/yyyy')}</p>
+                                                                <p>Celular: {inscricao.aluno.celular}</p>
+                                                                <p>Observações: {inscricao.aluno.observacoes}</p>
+                                                            </Popover.Body>
+                                                        </Popover>
+                                                    }
+                                                >
+                                                    <Button variant="light" className="me-2 mb-2 mt-4 w-50">
+                                                        <GrContactInfo style={{ marginRight: '2%' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
+                                                        {possuiPontoFora && (
+                                                            <PiWarningBold style={{ marginLeft: '2%', verticalAlign: 'middle', color: 'red' }} />
+                                                        )}
+                                                    </Button>
+                                                </OverlayTrigger>
+                                                <Button variant="danger" className="mb-2 mt-4 me-2" onClick={() => handleRemoverInscricao(index)}>
+                                                    Remover
+                                                </Button>
+                                            </div>
+                                        );
+                                    })
+                                )}
+                            </>
+                            <Form.Label className="mt-4">Busque alunos:</Form.Label>
                             <div className="d-flex">
                                 <Form.Control
                                     type="text"
-                                    placeholder="Busque um aluno"
+                                    placeholder="Pesquise o nome do aluno..."
                                     value={termoBusca}
                                     onChange={(e) => setTermoBusca(e.target.value)}
                                 />
                             </div>
                             <div className="mt-2">
-                                {inscricoesFiltradas.map((inscricao, index) => (
-                                    <div key={index} className="d-flex justify-content-center align-items-center">
-                                        <OverlayTrigger
-                                            trigger="click"
-                                            key="bottom"
-                                            placement="bottom"
-                                            overlay={
-                                                <Popover id="popover-positioned-bottom">
-                                                    <Popover.Header as="h3">{inscricao.aluno.nome}</Popover.Header>
-                                                    <Popover.Body>
-                                                        <p>RG: {inscricao.aluno.rg}</p>
-                                                        <p>Data de Nascimento: {format(new Date(inscricao.aluno.dataNasc), 'dd/MM/yyyy')}</p>
-                                                        <p>Celular: {inscricao.aluno.celular}</p>
-                                                        <p>Observações: {inscricao.aluno.observacoes}</p>
-                                                    </Popover.Body>
-                                                </Popover>
-                                            }
-                                        >
-                                            <Button variant="light" className="me-2 mb-2 mt-4 w-50">
-                                                <GrContactInfo style={{ marginRight: '15px' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
+                                {inscricoesFiltradas.map((inscricao, index) => {
+                                    const possuiPontoFora = inscricoesFora.some(fora => fora.aluno.codigo === inscricao.aluno.codigo);
+
+                                    return (
+                                        <div key={index} className="d-flex justify-content-center align-items-center">
+                                            <OverlayTrigger
+                                                trigger="click"
+                                                key="bottom"
+                                                placement="bottom"
+                                                overlay={
+                                                    <Popover id="popover-positioned-bottom">
+                                                        <Popover.Header as="h3">{inscricao.aluno.nome}</Popover.Header>
+                                                        <Popover.Body>
+                                                            {possuiPontoFora && (
+                                                                <p><PiWarningBold style={{ marginRight: '2% ', color: 'red' }} />Aluno possui ponto de embarque fora dos pontos de embarque da rota!</p>
+                                                            )}
+                                                            <p>RG: {inscricao.aluno.rg}</p>
+                                                            <p>Data de Nascimento: {format(new Date(inscricao.aluno.dataNasc), 'dd/MM/yyyy')}</p>
+                                                            <p>Celular: {inscricao.aluno.celular}</p>
+                                                            <p>Observações: {inscricao.aluno.observacoes}</p>
+                                                        </Popover.Body>
+                                                    </Popover>
+                                                }
+                                            >
+                                                <Button variant="light" className="me-2 mb-2 mt-4 w-50">
+                                                    <GrContactInfo style={{ marginRight: '2%' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
+                                                    {possuiPontoFora && (
+                                                        <PiWarningBold style={{ marginLeft: '2%', verticalAlign: 'middle', color: 'red' }} />
+                                                    )}
+                                                </Button>
+                                            </OverlayTrigger>
+                                            <Button
+                                                variant="primary"
+                                                className="mb-2 mt-4 me-2"
+                                                onClick={() => handleAdicionarInscricao(index)}
+                                            >
+                                                Adicionar
                                             </Button>
-                                        </OverlayTrigger>
-                                        <Button
-                                            variant="primary"
-                                            className="mb-2 mt-4"
-                                            onClick={() => handleAdicionarInscricao(index)}
-                                        >
-                                            Adicionar
-                                        </Button>
-                                    </div>
-                                ))}
+                                        </div>
+                                    );
+                                })}
                             </div>
                             <Button
                                 variant="primary"
-                                className="mb-2 mt-4"
+                                className="mb-2 mt-4 me-2"
                                 onClick={() => { handleSubmissao() }}
                             >
                                 Confirmar Alocação
                             </Button>
+                            <Button
+                                variant="danger"
+                                onClick={() => { handleCancelarAlocacao() }}
+                                className="mb-2 mt-4"
+                            >
+                                Cancelar Alocação
+                            </Button>
+                            {mostrarModalCancelar && (
+                                <Modal show={mostrarModalCancelar} onHide={() => setMostrarModalCancelar(false)}>
+                                    <Modal.Header closeButton>
+                                        <Modal.Title>Cancelar Alocação</Modal.Title>
+                                    </Modal.Header>
+                                    <Modal.Body>
+                                        Deseja realmente cancelar a alocação?
+                                    </Modal.Body>
+                                    <Modal.Footer className='d-flex justify-content-center'>
+                                        <Button variant="danger" onClick={() => {
+                                            setRotaSelecionada(null);
+                                            setRotaEstaSelecionada(false);
+                                            setInscricoesSelecionadas([]);
+                                            setTermoBusca('');
+                                            setInscricoesFiltradas([]);
+                                            setMostrarModalConfirmacao(false);
+                                            setNovaRotaSelecionada(null);
+                                            document.getElementById('selecionarRota').selectedIndex = 0;
+                                            setMostrarModalCancelar(false);
+                                        }}>
+                                            Sim
+                                        </Button>
+                                        <Button variant="secondary" onClick={() => setMostrarModalCancelar(false)}>
+                                            Não
+                                        </Button>
+                                    </Modal.Footer>
+                                </Modal>
+                            )}
                         </>
                     )}
                 </Container>
