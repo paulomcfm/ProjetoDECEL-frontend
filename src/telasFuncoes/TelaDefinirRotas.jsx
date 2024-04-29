@@ -11,7 +11,7 @@ export default function TelaDefinirRotas(){
     const formVazio = {
         codigo:0,
         nome:'',
-        km:0,
+        km:'',
         periodo:'M',
         ida:'',
         volta:'',

@@ -202,7 +202,7 @@ export default function FormularioRotas(props) {
   function listaPontosSelecionados(sel){
     
     return (
-      <div key={sel.codigo}>
+      <div key={sel.codigo} className=''>
           <label style={{height:"30px"}}>
               <button type="button" style={{border:'none',background:'none'}} onClick={()=>{subirPos(sel)}}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fillRule="currentColor" className="bi bi-sort-up" viewBox="0 0 16 16">
@@ -251,28 +251,38 @@ export default function FormularioRotas(props) {
           const valor = form[nomes[i]]
           let elem = document.getElementById(nomes[i])
           if(valor != ''){
-            elem.classList.remove('input-invalido')
-            elem.classList.add('input-valido')
+            elem.classList.remove('is-invalid')
+            elem.classList.add('is-valid')
           }else{
             teste = false
-            elem.classList.remove('input-valido')
-            elem.classList.add('input-invalido')
+            elem.classList.remove('is-valid')
+            elem.classList.add('is-invalid')
           }  
-          if((nomes[i]=='ida' || nomes[i]=='volta') && form['ida']!== '' && form['volta']!==''){
-              let partes1 = form['ida'].split(':')
-              let partes2 = form['volta'].split(':')
-              if(partes1[0]>partes2[0] || (partes1[0]==partes2[0] && partes1[1]>partes2[1])){
+          if(nomes[i]=='ida' || nomes[i]=='volta'){
+            let partes1 = form['ida'].split(':')
+            let partes2 = form['volta'].split(':')
+            if(partes1.length==1 || partes2.length==1 || partes1[0]>partes2[0] || (partes1[0]==partes2[0] && partes1[1]>partes2[1])){
+                teste = false
                 elem = document.getElementById('ida')
                 elem.classList.remove('input-valido')
                 elem.classList.add('input-invalido')
                 elem = document.getElementById('volta')
                 elem.classList.remove('input-valido')
                 elem.classList.add('input-invalido')
-              }
+            }
+            else{
+              elem = document.getElementById('ida')
+              elem.classList.remove('input-invalido')
+              elem.classList.add('input-valido')
+              elem = document.getElementById('volta')
+              elem.classList.remove('input-invalido')
+              elem.classList.add('input-valido')
+            }
           }
         }
       }
 
+      // verifica seleção de motoristas
       if(selecionadoM.length==0){
         teste = false
         let elem = document.getElementById(nomes[8])
@@ -284,6 +294,7 @@ export default function FormularioRotas(props) {
         elem.classList.add('input-valido')
       }
 
+      // verifica seleção de pontos
       if(selecionado.length==0){
         teste = false
         let elem = document.getElementById('selecionados')
@@ -400,6 +411,7 @@ export default function FormularioRotas(props) {
                           value={selecionadoM}
                           onChange={handleChange}
                           id='motoristas'
+                          
                           placeholder="selecionar motorista"
                     />
                     </div>
@@ -443,10 +455,10 @@ export default function FormularioRotas(props) {
                   <Col md>
                   <h4 className='mb-3'>Horários(*):</h4>
                       <label htmlFor="inicio">Início:</label>{' '}
-                      <input style={{ border: 'solid 1px #8a8282a1', width: '80px', textAlign: 'center', borderRadius: '3px' }} className='mb-3 mx-auto' type="time" name="ida" id="ida" value={form.ida} onChange={manipularMudancas} />
+                      <input style={{ border: 'solid 1px #8a8282a1', width: '80px', textAlign: 'center', borderRadius: '3px', outline:'none'}} className='mb-3 mx-auto' type="time" name="ida" id="ida" value={form.ida} onChange={manipularMudancas} />
                       {' '}
                       <label htmlFor="volta">Volta:</label>{' '}
-                      <input style={{border:'solid 1px #8a8282a1',width:'80px',textAlign:'center',borderRadius:'3px'}} className='mb-3 mx-auto' type="time" name="volta" id="volta" value={form.volta} onChange={manipularMudancas}/>
+                      <input style={{border:'solid 1px #8a8282a1',width:'80px',textAlign:'center',borderRadius:'3px',outline:'none'}} className='mb-3 mx-auto' type="time" name="volta" id="volta" value={form.volta} onChange={manipularMudancas}/>
                       
                   </Col>
                 </Row>
