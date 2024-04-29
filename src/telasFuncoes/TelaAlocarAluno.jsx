@@ -22,6 +22,7 @@ export default function TelaAlocarAluno(props) {
     const [inscricoesFiltradas, setInscricoesFiltradas] = useState([]);
     const [mostrarModalConfirmacao, setMostrarModalConfirmacao] = useState(false);
     const [mostrarModalCancelar, setMostrarModalCancelar] = useState(false);
+    const [mostrarModalRemover, setMostrarModalRemover] = useState(false);
     const [novaRotaSelecionada, setNovaRotaSelecionada] = useState(null);
     const { estadoInsc, mensagemIsnc, inscricoes } = useSelector(state => state.inscricao);
     const { estadoRota, mensagemRota, rotas } = useSelector(state => state.rota);
@@ -32,6 +33,7 @@ export default function TelaAlocarAluno(props) {
     const [inscricoesFora, setInscricoesFora] = useState([]);
     const [indiceRotaSelecionadaAnterior, setIndiceRotaSelecionadaAnterior] = useState(null);
     const [rotasCarregadas, setRotasCarregadas] = useState([]);
+    const [indexInscricaoSelecionada, setIndexInscricaoSelecionada] = useState(null);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -124,6 +126,7 @@ export default function TelaAlocarAluno(props) {
         });
         setInscricoesSelecionadas(inscricoesAtualizadas);
     };
+
     const handleAdicionarInscricao = (index) => {
         const inscricao = inscricoesFiltradas[index];
         const inscricoesAtualizadas = [...rotaSelecionada.inscricoes, inscricao];
@@ -287,7 +290,7 @@ export default function TelaAlocarAluno(props) {
                                                         )}
                                                     </Button>
                                                 </OverlayTrigger>
-                                                <Button variant="danger" className="mb-2 mt-4 me-2" onClick={() => handleRemoverInscricao(index)}>
+                                                <Button variant="danger" className="mb-2 mt-4 me-2" onClick={() => setIndexInscricaoSelecionada(index)}>
                                                     Remover
                                                 </Button>
                                             </div>
@@ -384,6 +387,26 @@ export default function TelaAlocarAluno(props) {
                                             Sim
                                         </Button>
                                         <Button variant="secondary" onClick={() => setMostrarModalCancelar(false)}>
+                                            Não
+                                        </Button>
+                                    </Modal.Footer>
+                                </Modal>
+                            )}
+                            {mostrarModalRemover && (
+                                <Modal show={mostrarModalRemover} onHide={() => setMostrarModalRemover(false)}>
+                                    <Modal.Header closeButton onHide={() => setMostrarModalRemover(false)}>
+                                        <Modal.Title>Remover Inscrição</Modal.Title>
+                                    </Modal.Header>
+                                    <Modal.Body>
+                                        Deseja realmente remover essa inscrição?
+                                    </Modal.Body>
+                                    <Modal.Footer className='d-flex justify-content-center'>
+                                        <Button variant="danger" onClick={() => {
+                                            handleRemoverInscricao(indexInscricaoSelecionada);
+                                        }}>
+                                            Sim
+                                        </Button>
+                                        <Button variant="secondary" onClick={() => setMostrarModalRemover(false)}>
                                             Não
                                         </Button>
                                     </Modal.Footer>
