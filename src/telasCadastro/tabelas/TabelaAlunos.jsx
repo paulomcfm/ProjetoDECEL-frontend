@@ -51,7 +51,7 @@ export default function TabelaAlunos(props) {
     useEffect(() => {
         dispatch(buscarAlunos());
     }, [dispatch]);
-
+    
     const alunosFiltrados = alunos.filter(aluno =>
         aluno.nome.toLowerCase().includes(termoBusca.toLowerCase())
     );

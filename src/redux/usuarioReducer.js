@@ -6,7 +6,9 @@ const urlBase = 'http://localhost:8080/usuario';
 export const buscarUsuarios = createAsyncThunk('usuario/buscar', async () => {
     try {
         const resposta = await fetch(urlBase, { method: 'GET' });
+        console.log(resposta);
         const dados = await resposta.json();
+        console.log(dados);
         if (dados.status) {
             return {
                 status: true,

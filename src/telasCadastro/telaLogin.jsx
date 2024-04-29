@@ -13,22 +13,13 @@ export default function TelaLogin() {
 
     async function handleLogin() {
         // Despacha a action para autenticar o usuário
-        console.log("entrou");
-        dispatch(autenticar({ nome: username, cpf }))
+        dispatch(autenticar({ nome: username, cpf, senha: password }))
             .then((retorno) => {
                 if (retorno.payload.status) {
-                    console.log("passou");
-                    console.log(retorno);
-                    console.log(retorno.payload);
-                    console.log(retorno.payload.status);
                     setAutenticado(true); // Define autenticado como true se a autenticação for bem-sucedida
                 } else {
-                    console.log("nao passou");
-                    console.log(retorno);
-                    console.log(retorno.payload);
-                    console.log(retorno.payload.status);
                     // Tratamento para autenticação inválida
-                    alert('Usuário ou CPF inválidos.');
+                    alert('Usuário, CPF ou senha inválidos.');
                 }
             })
             .catch((error) => {

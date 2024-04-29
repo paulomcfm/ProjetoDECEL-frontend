@@ -5,7 +5,7 @@ import { buscarUsuarios, removerUsuario } from '../../redux/usuarioReducer.js';
 
 export default function TabelaUsuarios(props) {
     const [termoBusca, setTermoBusca] = useState('');
-    const { usuarios, mensagem } = useSelector(state => state.usuario);
+    const { mensagem, usuarios } = useSelector(state => state.usuario);
     const dispatch = useDispatch();
 
     const usuarioVazio = {
@@ -31,10 +31,10 @@ export default function TabelaUsuarios(props) {
     useEffect(() => {
         dispatch(buscarUsuarios());
     }, [dispatch]);
-
-    const usuariosFiltrados = usuarios ? usuarios.filter(usuario =>
+    
+    const usuariosFiltrados = usuarios.filter(usuario =>
         usuario.nome.toLowerCase().includes(termoBusca.toLowerCase())
-    ) : [];
+    );
 
     return (
         <Container>

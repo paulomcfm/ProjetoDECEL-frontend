@@ -19,9 +19,9 @@ export default function FormCadUsuario(props) {
     const [usuario, setUsuario] = useState(estadoInicialUsuario);
     const [formValidado, setFormValidado] = useState(false);
     const [erro, setErro] = useState(false);
-    const { estadoUsu, mensagemUsu, usuarios } = useSelector((state) => state.usuario);
+    const { estadoUsu, mensagemUsu, usuarios} = useSelector((state) => state.usuario);
     const dispatch = useDispatch();
-    const usuarioExistente = null;
+    let usuarioExistente;
 
     useEffect(() => {
         dispatch(buscarUsuarios());
@@ -47,7 +47,7 @@ export default function FormCadUsuario(props) {
         if (form.checkValidity() && validarCelular(usuario.celular) && validarCPF(usuario.cpf)) {
             usuarioExistente = usuarios.find(u => u.nome === usuario.nome || u.cpf === usuario.cpf || u.email === usuario.email || 
                 u.celular === usuario.celular);
-            if (usuarioExistente) {
+            if (usuarioExistente && !props.modoEdicao) {
                 setErro(true);
             }
             else {
@@ -139,7 +139,7 @@ export default function FormCadUsuario(props) {
                         required
                     />
                 </Form.Group>
-                <p>Pode conter letras minúsculas e maiúsculas, números e símbolos</p>
+                <p>A senha pode conter letras minúsculas e maiúsculas, números e símbolos</p>
                 <Form.Group className="mb-3">
                     <Form.Label>CPF(*):</Form.Label>
                     <InputMask
