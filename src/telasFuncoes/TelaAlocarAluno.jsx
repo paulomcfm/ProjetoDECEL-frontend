@@ -31,12 +31,17 @@ export default function TelaAlocarAluno(props) {
     const [escolasRota, setEscolasRota] = useState(null);
     const [inscricoesFora, setInscricoesFora] = useState([]);
     const [indiceRotaSelecionadaAnterior, setIndiceRotaSelecionadaAnterior] = useState(null);
+    const [rotasCarregadas, setRotasCarregadas] = useState([]);
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch(buscarInscricoes());
         dispatch(buscarRotas());
     }, [dispatch]);
+
+    useEffect(() => {
+        setRotasCarregadas(rotas);
+    }, [rotas]);
 
     useEffect(() => {
         if (termoBusca.trim() === '') {
@@ -56,6 +61,10 @@ export default function TelaAlocarAluno(props) {
     useEffect(() => {
         settingInscricoesFora();
     }, [rotaSelecionada]);
+
+    useEffect(() => {
+        setInscricoesSelecionadas(inscricoesSelecionadas);
+    }, [inscricoesSelecionadas]);
 
     const settingInscricoesFora = () => {
         if (rotaSelecionada) {
@@ -128,7 +137,7 @@ export default function TelaAlocarAluno(props) {
         setInscricoesFiltradas(novaListaFiltrada);
     };
 
-    const handleSubmissao = () => {
+    const handleSubmissao = async () => {
         const dataAtual = new Date();
         const inscricoesAtualizadas = inscricoesSelecionadas.map((inscricao) => ({
             ...inscricao,
@@ -152,7 +161,7 @@ export default function TelaAlocarAluno(props) {
                 setMostrarMensagem(true);
             }
         });
-        dispatch(buscarRotas()).then(() => {
+        await dispatch(buscarRotas()).then(() => {
             dispatch(buscarInscricoes()).then(() => {
                 setRotaSelecionada(null);
                 setRotaEstaSelecionada(false);
@@ -181,9 +190,9 @@ export default function TelaAlocarAluno(props) {
                     <h2>Alocar Alunos</h2>
                     <Form.Group className="mb-3" controlId="selecionarRota">
                         <Form.Label>Selecione a rota:</Form.Label>
-                        <Form.Select onChange={(e) => handleSelecionarRota(rotas.find(rota => rota.nome === e.target.value))}>
+                        <Form.Select onChange={(e) => handleSelecionarRota(rotasCarregadas.find(rota => rota.nome === e.target.value))}>
                             <option value="">Selecione um rota...</option>
-                            {rotas.map((rota, index) => (
+                            {rotasCarregadas.map((rota, index) => (
                                 <option key={index} value={rota.nome}>
                                     {rota.nome} - {rota.veiculo[0].vei_placa} - {rota.motoristas.map((motorista) => motorista.nome).join('- ')}
                                 </option>
@@ -192,7 +201,7 @@ export default function TelaAlocarAluno(props) {
                     </Form.Group>
                     {mostrarModalConfirmacao && (
                         <Modal show={mostrarModalConfirmacao} onHide={cancelarTrocaRota}>
-                            <Modal.Header closeButton>
+                            <Modal.Header closeButton onHide={() => setMostrarModalCancelar(false)}>
                                 <Modal.Title>Confirmar Troca de Rota</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>Deseja realmente trocar de rota?</Modal.Body>
@@ -354,7 +363,7 @@ export default function TelaAlocarAluno(props) {
                             </Button>
                             {mostrarModalCancelar && (
                                 <Modal show={mostrarModalCancelar} onHide={() => setMostrarModalCancelar(false)}>
-                                    <Modal.Header closeButton>
+                                    <Modal.Header closeButton onHide={() => setMostrarModalCancelar(false)}>
                                         <Modal.Title>Cancelar Alocação</Modal.Title>
                                     </Modal.Header>
                                     <Modal.Body>
