@@ -46,7 +46,6 @@ export default function TabelaAlunos(props) {
         setMostrarModal(false);
     }
 
-
     function editarAluno(aluno) {
         dispatch(buscarParentescosAluno(aluno.codigo)).then((retorno) => {
             if (retorno.payload.status) {
@@ -157,7 +156,7 @@ export default function TabelaAlunos(props) {
                     ))}
                 </tbody>
             </Table>
-            <Modal show={mostrarModal}>
+            <Modal show={mostrarModal} onHide={() => setMostrarModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirmar Exclusão</Modal.Title>
                 </Modal.Header>

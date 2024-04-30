@@ -22,6 +22,7 @@ export default function TelaAlocarAluno(props) {
     const [inscricoesFiltradas, setInscricoesFiltradas] = useState([]);
     const [mostrarModalConfirmacao, setMostrarModalConfirmacao] = useState(false);
     const [mostrarModalCancelar, setMostrarModalCancelar] = useState(false);
+    const [mostrarModalRemover, setMostrarModalRemover] = useState(false);
     const [novaRotaSelecionada, setNovaRotaSelecionada] = useState(null);
     const { estadoInsc, mensagemIsnc, inscricoes } = useSelector(state => state.inscricao);
     const { estadoRota, mensagemRota, rotas } = useSelector(state => state.rota);
@@ -31,12 +32,18 @@ export default function TelaAlocarAluno(props) {
     const [escolasRota, setEscolasRota] = useState(null);
     const [inscricoesFora, setInscricoesFora] = useState([]);
     const [indiceRotaSelecionadaAnterior, setIndiceRotaSelecionadaAnterior] = useState(null);
+    const [rotasCarregadas, setRotasCarregadas] = useState([]);
+    const [indexInscricaoSelecionada, setIndexInscricaoSelecionada] = useState(null);
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch(buscarInscricoes());
         dispatch(buscarRotas());
     }, [dispatch]);
+
+    useEffect(() => {
+        setRotasCarregadas(rotas);
+    }, [rotas]);
 
     useEffect(() => {
         if (termoBusca.trim() === '') {
@@ -56,6 +63,10 @@ export default function TelaAlocarAluno(props) {
     useEffect(() => {
         settingInscricoesFora();
     }, [rotaSelecionada]);
+
+    useEffect(() => {
+        setInscricoesSelecionadas(inscricoesSelecionadas);
+    }, [inscricoesSelecionadas]);
 
     const settingInscricoesFora = () => {
         if (rotaSelecionada) {
@@ -114,7 +125,9 @@ export default function TelaAlocarAluno(props) {
             inscricoes: inscricoesAtualizadas
         });
         setInscricoesSelecionadas(inscricoesAtualizadas);
+        setMostrarModalRemover(false);
     };
+
     const handleAdicionarInscricao = (index) => {
         const inscricao = inscricoesFiltradas[index];
         const inscricoesAtualizadas = [...rotaSelecionada.inscricoes, inscricao];
@@ -128,7 +141,7 @@ export default function TelaAlocarAluno(props) {
         setInscricoesFiltradas(novaListaFiltrada);
     };
 
-    const handleSubmissao = () => {
+    const handleSubmissao = async () => {
         const dataAtual = new Date();
         const inscricoesAtualizadas = inscricoesSelecionadas.map((inscricao) => ({
             ...inscricao,
@@ -152,7 +165,7 @@ export default function TelaAlocarAluno(props) {
                 setMostrarMensagem(true);
             }
         });
-        dispatch(buscarRotas()).then(() => {
+        await dispatch(buscarRotas()).then(() => {
             dispatch(buscarInscricoes()).then(() => {
                 setRotaSelecionada(null);
                 setRotaEstaSelecionada(false);
@@ -181,9 +194,9 @@ export default function TelaAlocarAluno(props) {
                     <h2>Alocar Alunos</h2>
                     <Form.Group className="mb-3" controlId="selecionarRota">
                         <Form.Label>Selecione a rota:</Form.Label>
-                        <Form.Select onChange={(e) => handleSelecionarRota(rotas.find(rota => rota.nome === e.target.value))}>
+                        <Form.Select onChange={(e) => handleSelecionarRota(rotasCarregadas.find(rota => rota.nome === e.target.value))}>
                             <option value="">Selecione um rota...</option>
-                            {rotas.map((rota, index) => (
+                            {rotasCarregadas.map((rota, index) => (
                                 <option key={index} value={rota.nome}>
                                     {rota.nome} - {rota.veiculo[0].vei_placa} - {rota.motoristas.map((motorista) => motorista.nome).join('- ')}
                                 </option>
@@ -192,7 +205,7 @@ export default function TelaAlocarAluno(props) {
                     </Form.Group>
                     {mostrarModalConfirmacao && (
                         <Modal show={mostrarModalConfirmacao} onHide={cancelarTrocaRota}>
-                            <Modal.Header closeButton>
+                            <Modal.Header closeButton onHide={() => setMostrarModalCancelar(false)}>
                                 <Modal.Title>Confirmar Troca de Rota</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>Deseja realmente trocar de rota?</Modal.Body>
@@ -278,7 +291,7 @@ export default function TelaAlocarAluno(props) {
                                                         )}
                                                     </Button>
                                                 </OverlayTrigger>
-                                                <Button variant="danger" className="mb-2 mt-4 me-2" onClick={() => handleRemoverInscricao(index)}>
+                                                <Button variant="danger" className="mb-2 mt-4 me-2" onClick={() => {setMostrarModalRemover(true); setIndexInscricaoSelecionada(index)}}>
                                                     Remover
                                                 </Button>
                                             </div>
@@ -354,7 +367,7 @@ export default function TelaAlocarAluno(props) {
                             </Button>
                             {mostrarModalCancelar && (
                                 <Modal show={mostrarModalCancelar} onHide={() => setMostrarModalCancelar(false)}>
-                                    <Modal.Header closeButton>
+                                    <Modal.Header closeButton onHide={() => setMostrarModalCancelar(false)}>
                                         <Modal.Title>Cancelar Alocação</Modal.Title>
                                     </Modal.Header>
                                     <Modal.Body>
@@ -375,6 +388,26 @@ export default function TelaAlocarAluno(props) {
                                             Sim
                                         </Button>
                                         <Button variant="secondary" onClick={() => setMostrarModalCancelar(false)}>
+                                            Não
+                                        </Button>
+                                    </Modal.Footer>
+                                </Modal>
+                            )}
+                            {mostrarModalRemover && (
+                                <Modal show={mostrarModalRemover} onHide={() => setMostrarModalRemover(false)}>
+                                    <Modal.Header closeButton onHide={() => setMostrarModalRemover(false)}>
+                                        <Modal.Title>Remover Inscrição</Modal.Title>
+                                    </Modal.Header>
+                                    <Modal.Body>
+                                        Deseja realmente remover essa inscrição?
+                                    </Modal.Body>
+                                    <Modal.Footer className='d-flex justify-content-center'>
+                                        <Button variant="danger" onClick={() => {
+                                            handleRemoverInscricao(indexInscricaoSelecionada);
+                                        }}>
+                                            Sim
+                                        </Button>
+                                        <Button variant="secondary" onClick={() => setMostrarModalRemover(false)}>
                                             Não
                                         </Button>
                                     </Modal.Footer>
