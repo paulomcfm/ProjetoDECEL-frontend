@@ -107,7 +107,6 @@ export default function TabelaRotas(props){
         const listaIntermed = []
         const lista = []
         for(let i=0;i<enderecos.length;i++){
-            
             const address = enderecos[i].rua +" "+ enderecos[i].numero + " " + enderecos[i].bairro
             const retorno = await resgatarCoordenadas(address) 
             if(retorno != null){
@@ -221,7 +220,7 @@ export default function TabelaRotas(props){
                                 </Button>
                             </Modal.Footer>
             </Modal>
-            <Row>
+            <Row style={{marginBottom:'40px'}}>
                 <Col>
                     <button type="button" className="btn btn-primary" onClick={()=>{props.setTela(2)}}>Cadastrar Rota</button>{' '}
                 </Col>

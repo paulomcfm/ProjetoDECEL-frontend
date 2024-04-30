@@ -48,7 +48,6 @@ export default function validarCNH(PVRegCnh) {
 
     // Verificar se os dígitos verificadores correspondem aos últimos dois dígitos da CNH
     const Dig_Enc = Digito1.toString() + Digito2.toString();
-    console.log("fim")
     if (Dig_Forn === Dig_Enc) {
         return true;
     } else {

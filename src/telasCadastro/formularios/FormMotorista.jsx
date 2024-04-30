@@ -19,7 +19,6 @@ export default function FormMotorista(props) {
 
           function manipularMudancas(e){
             const input = e.target
-            console.log(input.value)
             setMotorista({...motorista,[input.name]:input.value})
           }
 
