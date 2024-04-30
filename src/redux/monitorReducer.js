@@ -1,10 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ESTADO from "../recursos/estado";
-const urlBase = 'http://localhost:8080/motorista';
-// const urlBase = 'https://projetodecel-backend.onrender.com/motorista';
+const urlBase = 'http://localhost:8080/monitor';
+// const urlBase = 'https://projetodecel-backend.onrender.com/monitor';
 
 
-export const buscarMotoristas = createAsyncThunk('motoristas/buscar', async (filtro) => {
+export const buscarMonitores = createAsyncThunk('monitores/buscar', async (filtro) => {
     try {
         let resposta;
         if(filtro === undefined){
@@ -21,70 +21,67 @@ export const buscarMotoristas = createAsyncThunk('motoristas/buscar', async (fil
         if (dados.status) {
             return {
                 status: true,
-                listaMotoristas: dados.listaMotoristas,
+                listaMonitores: dados.listaMonitores,
                 mensagem: ''
             }
         }
         else {
             return {
                 status: false,
-                listaMotoristas: [],
-                mensagem: 'Ocorreu um erro ao recuperar motoristas da base de dados.'
+                listaMonitores: [],
+                mensagem: 'Ocorreu um erro ao recuperar monitores da base de dados.'
             }
         }
     } catch (erro) {
         return {
             status: false,
-            listaMotoristas: [],
-            mensagem: 'Ocorreu um erro ao recuperar motoristas da base de dados:' + erro.message
+            listaMonitores: [],
+            mensagem: 'Ocorreu um erro ao recuperar monitores da base de dados:' + erro.message
         }
     }
 });
 
-export const adicionarMotorista = createAsyncThunk('motorista/adicionar', async (motorista) => {
+export const adicionarMonitor = createAsyncThunk('monitor/adicionar', async (monitor) => {
     const resposta = await fetch(urlBase, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(motorista)
+        body: JSON.stringify(monitor)
     }).catch(erro => {
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao adicionar motorista:' + erro.message
+            mensagem: 'Ocorreu um erro ao adicionar monitor:' + erro.message
         }
     });
-
-    const dados = await resposta.json();
-    console.log(dados)
     if (resposta.ok) {
-        console.log(dados)
+        const dados = await resposta.json();
         return {
             status: dados.status,
             mensagem: dados.mensagem,
-            motorista
+            monitor
         }
     }
     else {
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao adicionar motorista.',
-            motorista
+            mensagem: 'Ocorreu um erro ao adicionar monitor.',
+            monitor
         }
     }
 });
 
-export const atualizarMotorista = createAsyncThunk('motorista/atualizar', async (motorista) => {
+export const atualizarMonitor = createAsyncThunk('monitor/atualizar', async (monitor) => {
     const resposta = await fetch(urlBase, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(motorista)
+        body: JSON.stringify(monitor)
     }).catch(erro => {
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao atualizar motorista:' + erro.message
+            mensagem: 'Ocorreu um erro ao atualizar monitor:' + erro.message
         }
     });
     if (resposta.ok) {
@@ -92,30 +89,30 @@ export const atualizarMotorista = createAsyncThunk('motorista/atualizar', async 
         return {
             status: dados.status,
             mensagem: dados.mensagem,
-            motorista
+            monitor
         }
     }
     else {
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao atualizar motorista.',
-            motorista
+            mensagem: 'Ocorreu um erro ao atualizar monitor.',
+            monitor
         }
     }
 });
 
-export const removerMotorista = createAsyncThunk('motorista/remover', async (motoristaId) => {
+export const removerMonitor = createAsyncThunk('monitor/remover', async (monitorId) => {
     const resposta = await fetch(urlBase, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ "id": motoristaId })
+        body: JSON.stringify({ "id": monitorId })
     }).catch(erro => {
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao remover motorista:' + erro.message,
-            motoristaId
+            mensagem: 'Ocorreu um erro ao remover monitor:' + erro.message,
+            monitorId
         }
     });
     if (resposta.ok) {
@@ -123,14 +120,14 @@ export const removerMotorista = createAsyncThunk('motorista/remover', async (mot
         return {
             status: dados.status,
             mensagem: dados.mensagem,
-            motoristaId
+            monitorId
         }
     }
     else {
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao remover motorista.',
-            motoristaId
+            mensagem: 'Ocorreu um erro ao remover monitor.',
+            monitorId
         }
     }
 });
@@ -138,63 +135,63 @@ export const removerMotorista = createAsyncThunk('motorista/remover', async (mot
 const initialState = {
     estado: ESTADO.OCIOSO,
     mensagem: "",
-    motoristas: []
+    monitores: []
 };
 
-const motoristaSlice = createSlice({
-    name: 'motoristas',
+const monitorSlice = createSlice({
+    name: 'monitores',
     initialState,
     reducers: {
     },
     extraReducers: (builder) => {
-        builder.addCase(buscarMotoristas.pending, (state, action) => {
+        builder.addCase(buscarMonitores.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
             state.mensagem = "Buscando clientes...";
-        }).addCase(buscarMotoristas.fulfilled, (state, action) => {
+        }).addCase(buscarMonitores.fulfilled, (state, action) => {
             if (action.payload.status) {
                 state.estado = ESTADO.OCIOSO;
                 state.mensagem = action.payload.mensagem;
-                state.motoristas = action.payload.listaMotoristas;
+                state.monitores = action.payload.listaMonitores;
             } else {
                 state.estado = ESTADO.ERRO;
                 state.mensagem = action.payload.mensagem;
             }
-        }).addCase(buscarMotoristas.rejected, (state, action) => {
+        }).addCase(buscarMonitores.rejected, (state, action) => {
             state.estado = ESTADO.ERRO;
             state.mensagem = action.error.message;
-        }).addCase(adicionarMotorista.fulfilled, (state, action) => {
+        }).addCase(adicionarMonitor.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
-            state.motoristas.push(action.payload.motorista);
+            state.monitores.push(action.payload.motorista);
             state.mensagem = action.payload.mensagem;
-        }).addCase(adicionarMotorista.pending, (state, action) => {
+        }).addCase(adicionarMonitor.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
             state.mensagem = "Adicionando motorista...";
-        }).addCase(adicionarMotorista.rejected, (state, action) => {
+        }).addCase(adicionarMonitor.rejected, (state, action) => {
             state.mensagem = "Erro ao adicionar motorista: " + action.error.message;
             state.estado = ESTADO.ERRO;
-        }).addCase(atualizarMotorista.fulfilled, (state, action) => {
+        }).addCase(atualizarMonitor.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
-            const indice = state.motoristas.findIndex(motorista => motorista.cnh === action.payload.motorista.cnh);
-            state.motoristas[indice] = action.payload.motorista;
+            const indice = state.monitores.findIndex(motorista => motorista.cnh === action.payload.motorista.cnh);
+            state.monitores[indice] = action.payload.motorista;
             state.mensagem = action.payload.mensagem;
-        }).addCase(atualizarMotorista.pending, (state, action) => {
+        }).addCase(atualizarMonitor.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
             state.mensagem = "Atualizando motorista...";
-        }).addCase(atualizarMotorista.rejected, (state, action) => {
+        }).addCase(atualizarMonitor.rejected, (state, action) => {
             state.mensagem = "Erro ao atualizar motorista: " + action.error.message;
             state.estado = ESTADO.ERRO;
-        }).addCase(removerMotorista.fulfilled, (state, action) => {
+        }).addCase(removerMonitor.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
             state.mensagem = action.payload.mensagem;
-            state.motoristas = state.motoristas.filter(motorista => motorista.id !== action.payload.motoristaId);
-        }).addCase(removerMotorista.pending, (state, action) => {
+            state.monitores = state.monitores.filter(motorista => motorista.id !== action.payload.motoristaId);
+        }).addCase(removerMonitor.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
             state.mensagem = "Removendo motorista...";
-        }).addCase(removerMotorista.rejected, (state, action) => {
+        }).addCase(removerMonitor.rejected, (state, action) => {
             state.mensagem = "Erro ao remover motorista: " + action.error.message;
             state.estado = ESTADO.ERRO;
         })
     }
 });
 
-export default motoristaSlice.reducer;
+export default monitorSlice.reducer;
