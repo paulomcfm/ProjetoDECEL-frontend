@@ -55,8 +55,7 @@ export const adicionarUsuario = createAsyncThunk('usuario/adicionar', async (usu
                 senha: usuario.senha,
                 cpf: usuario.cpf,
                 email: usuario.email,
-                celular: usuario.celular,
-                categoria: usuario.categoria
+                celular: usuario.celular
             }
         }
     }
@@ -82,7 +81,7 @@ export const autenticar = createAsyncThunk('usuario/autenticar', async (credenci
 
 export const atualizarUsuario = createAsyncThunk('usuario/atualizar', async (usuario) => {
     const resposta = await fetch(urlBase, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
             'Content-Type': 'application/json'
         },
@@ -95,6 +94,7 @@ export const atualizarUsuario = createAsyncThunk('usuario/atualizar', async (usu
     });
     if (resposta.ok) {
         const dados = await resposta.json();
+        console.log(dados);
         return {
             status: dados.status,
             mensagem: dados.mensagem,
@@ -103,8 +103,7 @@ export const atualizarUsuario = createAsyncThunk('usuario/atualizar', async (usu
                 senha: usuario.senha,
                 cpf: usuario.cpf,
                 email: usuario.email,
-                celular: usuario.celular,
-                categoria: usuario.categoria
+                celular: usuario.celular
             }
         }
     }
