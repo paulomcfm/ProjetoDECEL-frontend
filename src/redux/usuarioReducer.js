@@ -51,7 +51,6 @@ export const adicionarUsuario = createAsyncThunk('usuario/adicionar', async (usu
             status: dados.status,
             mensagem: dados.mensagem,
             usuario: {
-                codigoGerado: dados.codigoGerado,
                 nome: usuario.nome,
                 senha: usuario.senha,
                 cpf: usuario.cpf,
@@ -100,7 +99,6 @@ export const atualizarUsuario = createAsyncThunk('usuario/atualizar', async (usu
             status: dados.status,
             mensagem: dados.mensagem,
             usuario: {
-                codigoGerado: dados.codigoGerado,
                 nome: usuario.nome,
                 senha: usuario.senha,
                 cpf: usuario.cpf,
