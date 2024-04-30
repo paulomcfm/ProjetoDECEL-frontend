@@ -125,6 +125,7 @@ export default function TelaAlocarAluno(props) {
             inscricoes: inscricoesAtualizadas
         });
         setInscricoesSelecionadas(inscricoesAtualizadas);
+        setMostrarModalRemover(false);
     };
 
     const handleAdicionarInscricao = (index) => {
@@ -290,7 +291,7 @@ export default function TelaAlocarAluno(props) {
                                                         )}
                                                     </Button>
                                                 </OverlayTrigger>
-                                                <Button variant="danger" className="mb-2 mt-4 me-2" onClick={() => setIndexInscricaoSelecionada(index)}>
+                                                <Button variant="danger" className="mb-2 mt-4 me-2" onClick={() => {setMostrarModalRemover(true); setIndexInscricaoSelecionada(index)}}>
                                                     Remover
                                                 </Button>
                                             </div>
