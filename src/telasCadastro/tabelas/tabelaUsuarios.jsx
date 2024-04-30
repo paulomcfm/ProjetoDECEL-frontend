@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Container, Table } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { buscarUsuarios, removerUsuario } from '../../redux/usuarioReducer';
+import { buscarUsuarios, removerUsuario } from '../../redux/usuarioReducer.js';
 
 export default function TabelaUsuarios(props) {
     const [termoBusca, setTermoBusca] = useState('');
-    const { usuarios, mensagem } = useSelector(state => state.usuario); // Removendo 'estado' da desestruturação
+    const { mensagem, usuarios } = useSelector(state => state.usuario);
     const dispatch = useDispatch();
 
     const usuarioVazio = {
-        codigo: '0',
         nome: '',
-        senha: '',
+        senha:'',
         cpf: '',
         email: '',
         celular: ''
@@ -32,7 +31,7 @@ export default function TabelaUsuarios(props) {
     useEffect(() => {
         dispatch(buscarUsuarios());
     }, [dispatch]);
-
+    
     const usuariosFiltrados = usuarios.filter(usuario =>
         usuario.nome.toLowerCase().includes(termoBusca.toLowerCase())
     );
@@ -72,6 +71,7 @@ export default function TabelaUsuarios(props) {
                 <thead>
                     <tr>
                         <th>Nome</th>
+                        <th>Senha</th>
                         <th>CPF</th>
                         <th>Email</th>
                         <th>Celular</th>
@@ -80,8 +80,9 @@ export default function TabelaUsuarios(props) {
                 </thead>
                 <tbody>
                     {usuariosFiltrados.map(usuario => (
-                        <tr key={usuario.codigo}>
+                        <tr key={usuario.cpf}>
                             <td>{usuario.nome}</td>
+                            <td>{usuario.senha}</td>
                             <td>{usuario.cpf}</td>
                             <td>{usuario.email}</td>
                             <td>{usuario.celular}</td>
