@@ -26,6 +26,7 @@ export default function Esqueci() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
+                                pattern="\S+@\S+\.\S+"
                             />
                         </Form.Group>
                         <br />

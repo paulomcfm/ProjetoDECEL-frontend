@@ -1,0 +1,15 @@
+.input-invalido {
+    border:1px solid red!important; /* Vermelho */
+    outline: 2px red;
+    border-radius: 5px;
+}
+
+
+
+.input-valido {
+    border:1px solid green !important; /* Verde claro */
+    outline: 2px green;
+    border-radius: 5px;
+}
+
+

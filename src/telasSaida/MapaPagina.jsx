@@ -1,54 +1,42 @@
+
+
 import { GoogleMap, useJsApiLoader,DirectionsService,DirectionsRenderer  } from '@react-google-maps/api';
 import "./mapaPagina.css"
 import { useState } from 'react';
 import { useEffect } from 'react';
 import Pagina from '../templates/Pagina';
 
-export default function MapaPagina(){
-
-
+export default function MapaPagina(props){
+    
+    console.log(props.enderecos)
     const [direcoes, setDirecoes] = useState(null);
-    const [origem, setOrigem] = useState({ lat: -22.095368, lng:-51.418462});
-    const [destino, setDestino] = useState({ lat: -22.105930,lng:-51.443321});
-    const [pontosIntermediarios, setPontosIntermediarios] = useState([
-        { location: { lat: -22.098633, lng: -51.416408 } },
-        { location: { lat: -22.106080, lng: -51.419507 } },
-    ]);
+    const [origem, setOrigem] = useState({lat:props.enderecos.origem[0].location.lat,lng:props.enderecos.origem[0].location.lng});
+    const [destino, setDestino] = useState({lat:props.enderecos.destino[0].location.lat,lng:props.enderecos.destino[0].location.lng});
+    const [pontosIntermediarios, setPontosIntermediarios] = useState(props.enderecos.listaIntermed);
+    console.log(pontosIntermediarios)
+    const lista = []
+    
+    
 
+    
+    
     const [carregado,setCarregado] = useState(1)
-
-
+    
+    
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
-        googleMapsApiKey: ""
+        googleMapsApiKey: "AIzaSyCKNlqqhmlCYU7bLjeku8uWsDfxOxDM5R8"
     })
-
-    const position={
-        lat: -22.079105, 
-        lng: -51.472569
-    }
+    
+    
 
     const API_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
-    const API_KEY = '';
+    const API_KEY = 'AIzaSyCKNlqqhmlCYU7bLjeku8uWsDfxOxDM5R8';
 
     const getApiUrl = (address) => {
         return `${API_URL}?key=${API_KEY}&address=${encodeURI(address)}`;
     }
 
-    
-
-    const address = 'jose medina rodrigues 648';
-    
-
-    async function resgatarCoordenadas(addres){
-        fetch(getApiUrl(addres),{method:'GET'}).then((response)=>{
-            return response.json()
-        }).then((res)=>{
-            console.log(res.results[0].geometry.location)
-        }).catch((error)=>{
-            console.log(error)
-        })
-    }
     
 
     const callbackDirecoes = (resposta) => {
@@ -65,7 +53,7 @@ export default function MapaPagina(){
     
     
     return (
-            <Pagina>
+            <>
                 <div className='map'>
                     {
                         isLoaded ? 
@@ -94,7 +82,7 @@ export default function MapaPagina(){
 
                     </div>
                 </div>
-            </Pagina>
+            </>
         )
 
 }

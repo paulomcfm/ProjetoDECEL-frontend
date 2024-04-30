@@ -5,9 +5,9 @@ import { buscarPontosEmbarque } from '../../redux/pontosEmbarqueReducer';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function FormCadEscolas(props) {
-    const { estado, mensagem, escolas } = useSelector(state => state.escola);
     const estadoInicialEscola = props.escolaParaEdicao;
     const [escola, setEscola] = useState(estadoInicialEscola);
+    const [pontoEmbarqueSelecionado, setPontoEmbarqueSelecionado] = useState(false);
 
     const escolaVazia = {
         codigo: 0,
@@ -26,7 +26,7 @@ export default function FormCadEscolas(props) {
 
     const [termoBusca, setTermoBusca] = useState('');
     const [formValidado, setFormValidado] = useState(false);
-    const { estadoPdE, mensagemPdE, pontosEmbarque } = useSelector(state => state.pontoEmbarque);
+    const { pontosEmbarque } = useSelector(state => state.pontoEmbarque);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -39,8 +39,9 @@ export default function FormCadEscolas(props) {
     );
 
     const handleSelecionarPontoEmbarque = (pontoEmbarque) => {
-        setTermoBusca(`${pontoEmbarque.rua}, ${pontoEmbarque.numero}, ${pontoEmbarque.bairro}, ${pontoEmbarque.cep}`);
+        setTermoBusca(`${pontoEmbarque.rua}, ${pontoEmbarque.numero}, ${pontoEmbarque.bairro}, ${pontoEmbarque.cep.replace(/^(\d{5})(\d{3})$/, '$1-$2')}`);
         setEscola({ ...escola, pontoEmbarque: pontoEmbarque });
+        setPontoEmbarqueSelecionado(true);
     };
 
     function manipularMudancas(e) {
@@ -75,7 +76,7 @@ export default function FormCadEscolas(props) {
 
     function manipularSubmissao(e) {
         const form = e.currentTarget;
-        if (escola.pontoEmbarque != null) {
+        if (pontoEmbarqueSelecionado) {
             if (form.checkValidity()) {
                 if (!props.modoEdicao) {
                     dispatch(adicionarEscola(escola));
@@ -91,6 +92,7 @@ export default function FormCadEscolas(props) {
                     props.setModoEdicao(false);
                     props.setEscolaParaEdicao(escolaVazia);
                 }
+                props.exibirFormulario(false);
                 setEscola(escolaVazia);
                 setFormValidado(false);
             }
@@ -98,13 +100,20 @@ export default function FormCadEscolas(props) {
                 setFormValidado(true);
             }
         }
-        else
-            console.log('Selecione um ponto de embarque')
-
+        else {
+            setFormValidado(true);
+        }
         e.stopPropagation();
         e.preventDefault();
     }
-    
+
+    useEffect(() => {
+        if (props.modoEdicao) {
+            setTermoBusca(`${escola.pontoEmbarque?.rua}, ${escola.pontoEmbarque.numero}, ${escola.pontoEmbarque.bairro} - ${escola.pontoEmbarque?.cep}`);
+            setPontoEmbarqueSelecionado(true);
+        }
+    }, [props.modoEdicao, escola]);
+
     return (
         <>
             <h2 className="text-center">Cadastrar Escola</h2>
@@ -122,6 +131,9 @@ export default function FormCadEscolas(props) {
                                 value={escola.nome}
                                 onChange={manipularMudancas}
                                 required />
+                            <Form.Control.Feedback type="invalid">
+                                Por favor, informe o nome da escola.
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
                     <Col md={3}>
@@ -136,6 +148,9 @@ export default function FormCadEscolas(props) {
                                 onChange={manipularMudancas}
                                 maxLength="16"
                                 required />
+                            <Form.Control.Feedback type="invalid">
+                                Por favor, informe o telefone.
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
 
@@ -147,9 +162,12 @@ export default function FormCadEscolas(props) {
                                 placeholder="Email"
                                 id="email"
                                 name="email"
-                                value={(escola.email)}
+                                value={escola.email}
                                 onChange={manipularMudancas}
                                 required />
+                            <Form.Control.Feedback type="invalid">
+                                Por favor, informe o email.
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
                     <Col>
@@ -162,10 +180,14 @@ export default function FormCadEscolas(props) {
                                 value={escola.tipo}
                                 required>
                                 <option value="">Selecione...</option>
-                                <option value='i'>Educação Infantil</option>
-                                <option value='f'>Ensino Fundamental</option>
-                                <option value='a'>Ambos</option>
+                                <option value='I'>Educação Infantil</option>
+                                <option value='F'>Ensino Fundamental</option>
+                                <option value='A'>Educação Infantil e Ensino Fundamental</option>
+                                <option value='M'>Ensino Médio</option>
                             </Form.Select>
+                            <Form.Control.Feedback type="invalid">
+                                Por favor, selecione o tipo de escola.
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
                 </Row>
@@ -176,10 +198,18 @@ export default function FormCadEscolas(props) {
                             type="text"
                             placeholder="Buscar por rua ou CEP"
                             value={termoBusca}
-                            onChange={(e) => setTermoBusca(e.target.value)}
+                            onChange={(e) => {
+                                setTermoBusca(e.target.value);
+                                setPontoEmbarqueSelecionado(false);
+                            }}
+                            isInvalid={formValidado && !pontoEmbarqueSelecionado}
+                            required
                         />
+                        <Form.Control.Feedback type="invalid">
+                            Por favor, selecione um ponto de embarque.
+                        </Form.Control.Feedback>
                     </Form.Group>
-                    {termoBusca.length > 0 && (
+                    {(termoBusca.length > 0 && !pontoEmbarqueSelecionado) && (
                         <Table striped bordered hover className="table-white" variant="white">
                             <tbody>
                                 {pontoEmbarqueFiltrados.map(pontoEmbarque => (
@@ -197,10 +227,14 @@ export default function FormCadEscolas(props) {
                         <Button type="submit" variant="primary">
                             {props.modoEdicao ? "Alterar" : "Cadastrar"}
                         </Button>
-                        <Button type="submit" variant="danger" className="ms-2" onClick={() => props.exibirFormulario(false)}>
+                        <Button type="submit" variant="danger" className="ms-2" onClick={() => {
+                            props.exibirFormulario(false);
+                            props.setModoEdicao(false);
+                        }}>
                             Voltar
                         </Button>
                     </div>
+
                 </Row>
             </Form>
         </>

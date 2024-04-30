@@ -8,7 +8,7 @@ export default function TelaMotorista(){
     const motoLimpo = {
         nome:"",
         cnh:"",
-        telefone:""
+        celular:""
     }
     const [motorista,setMotorista] = useState(motoLimpo)
     return(

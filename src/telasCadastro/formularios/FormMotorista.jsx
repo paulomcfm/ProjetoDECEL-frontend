@@ -7,7 +7,7 @@ import InputMask from 'react-input-mask';
 import { adicionarMotorista,atualizarMotorista } from '../../redux/motoristaReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import validarCNH from '../../validacoes/validarCnh';
-import validarTelefone from '../../validacoes/validarTelefone';
+
 
 export default function FormMotorista(props) {
           const [motorista,setMotorista] = useState(props.motorista)
@@ -29,8 +29,7 @@ export default function FormMotorista(props) {
 
           async function manipularEnvio(e){
               const form = e.target
-              console.log(validarCNH(motorista.cnh),validarCelular(motorista.telefone))
-              if(validarCelular(motorista.telefone) && validarCNH(motorista.cnh)){
+              if(validarCelular(motorista.celular) && validarCNH(motorista.cnh)){
                 
                 if(props.modo === 'gravar'){
                   dispatch(adicionarMotorista(motorista))
@@ -85,15 +84,15 @@ export default function FormMotorista(props) {
               <Row className="justify-content-center">
                 <Col xs={12} md={6}>
                   {/* Input do Telefone */}
-                  <label htmlFor="telefone">Telefone</label>
+                  <label htmlFor="celular">Telefone</label>
                   <InputMask
                     style={{width:'300px'}}
                     className="form-control"
                     mask="(99) 99999-9999"
                     maskChar="_"
                     placeholder="(99) 99999-9999"
-                    name="telefone"
-                    value={motorista.telefone}
+                    name="celular"
+                    value={motorista.celular}
                     onChange={manipularMudancas}
                     required
                   />

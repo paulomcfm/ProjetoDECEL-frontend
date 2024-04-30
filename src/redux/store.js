@@ -6,6 +6,8 @@ import parentescoSlice from './parentescoReducer.js';
 import pontosEmbarqueReducer from './pontosEmbarqueReducer.js';
 import motoristaSlice from './motoristaReducer.js'
 import usuarioSlice from './usuarioReducer.js'
+import rotaSlice from './rotaReducer.js'
+import inscricaoSlice from './inscricaoReducer.js'
 
 const store = configureStore({
     reducer: {
@@ -14,8 +16,10 @@ const store = configureStore({
         aluno: alunoSlice,
         parentesco: parentescoSlice,
         pontoEmbarque: pontosEmbarqueReducer,
-        motorista:motoristaSlice,
-        usuario:usuarioSlice
+        motorista: motoristaSlice,
+        usuario: usuarioSlice,
+        inscricao: inscricaoSlice,
+        rota: rotaSlice,
     }
 });
 

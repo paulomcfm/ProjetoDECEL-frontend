@@ -29,6 +29,33 @@ export const buscarEscolas = createAsyncThunk('escola/buscar', async () => {
     }
 });
 
+export const buscarEscolaPorPonto  = createAsyncThunk('escola/buscar', async (ponto) => {
+    try {
+        const resposta = await fetch(urlBase+"/buscar-por-ponto/"+ponto, { method: 'GET' });
+        const dados = await resposta.json();
+        if (dados.status) {
+            return {
+                status: true,
+                listaEscolas: dados.listaEscolas,
+                mensagem: ''
+            }
+        }
+        else {
+            return {
+                status: false,
+                listaEscolas: [],
+                mensagem: 'Ocorreu um erro ao recuperar as escolas da base de dados.'
+            }
+        }
+    } catch (erro) {
+        return {
+            status: false,
+            listaEscolas: [],
+            mensagem: 'Ocorreu um erro ao recuperar as escolas da base de dados:' + erro.message
+        }
+    }
+});
+
 export const adicionarEscola = createAsyncThunk('escola/adicionar', async (escola) => {
     const resposta = await fetch(urlBase, {
         method: 'POST',
