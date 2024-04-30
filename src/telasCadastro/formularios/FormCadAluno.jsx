@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Form, Button, Col, Row } from 'react-bootstrap';
+import { Form, Button, Col, Row, OverlayTrigger, Popover } from 'react-bootstrap';
 import { adicionarAluno, atualizarAluno } from '../../redux/alunoReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarResponsaveis } from '../../redux/responsavelReducer';
@@ -162,7 +162,7 @@ export default function FormCadAlunos(props) {
             setResponsaveisSelecionados([...responsaveisSelecionados, responsavel]);
         }
     }
- 
+
     return (
         <>
             <h2 className="text-center">Cadastrar Aluno</h2>
@@ -239,13 +239,31 @@ export default function FormCadAlunos(props) {
                     <Form.Group>
                         {responsaveisSelecionados.map((responsavel, index) => (
                             <div key={index} className="d-flex align-items-center">
-                                <Button
-                                    variant="secondary"
-                                    className="me-2 mb-2 mt-3 w-75"
-                                    onClick={() => addResponsavel(responsavel)}
+                                <OverlayTrigger
+                                    trigger="hover"
+                                    key="bottom"
+                                    placement="bottom"
+                                    overlay={
+                                        <Popover id="popover-positioned-bottom">
+                                            <Popover.Header as="h3">{responsavel.nome}</Popover.Header>
+                                            <Popover.Body>
+                                                <p>RG: {responsavel.rg}</p>
+                                                <p>CPF: {responsavel.cpf}</p>
+                                                <p>E-mail: {responsavel.email}</p>
+                                                <p>Celular: {responsavel.celular}</p>
+                                                <p>Telefone: {responsavel.telefone}</p>
+                                            </Popover.Body>
+                                        </Popover>
+                                    }
                                 >
-                                    {`${responsavel.nome} - RG: ${responsavel.rg}`}
-                                </Button>
+                                    <Button
+                                        variant="secondary"
+                                        className="me-2 mb-2 mt-3 w-75"
+                                        onClick={() => addResponsavel(responsavel)}
+                                    >
+                                        {`${responsavel.nome} - RG: ${responsavel.rg}`}
+                                    </Button>
+                                </OverlayTrigger>
                                 <Form.Select
                                     className="mb-2 mt-3"
                                     value={responsavel.parentesco}
@@ -296,7 +314,7 @@ export default function FormCadAlunos(props) {
                         <Form.Control.Feedback type="invalid">
                             O celular deve estar no formato (99) 99999-9999.
                         </Form.Control.Feedback>
-                        {aluno.celular.length==15 && !validarCelular(aluno.celular) && (
+                        {aluno.celular.length == 15 && !validarCelular(aluno.celular) && (
                             <Form.Text className="text-danger">
                                 Celular inválido.
                             </Form.Text>

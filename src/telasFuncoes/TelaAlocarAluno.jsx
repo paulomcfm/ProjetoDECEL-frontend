@@ -154,6 +154,7 @@ export default function TelaAlocarAluno(props) {
                 aluno: { codigo: 0 }
             });
         }
+        console.log(inscricoesAtualizadas);
         dispatch(atualizarInscricoes(inscricoesAtualizadas)).then((retorno) => {
             if (retorno.payload.status) {
                 setMensagem('Inscricão alterada com sucesso!');
@@ -266,7 +267,7 @@ export default function TelaAlocarAluno(props) {
                                         return (
                                             <div key={index} className="d-flex justify-content-center align-items-center">
                                                 <OverlayTrigger
-                                                    trigger="click"
+                                                    trigger="hover"
                                                     key="bottom"
                                                     placement="bottom"
                                                     overlay={
@@ -315,7 +316,7 @@ export default function TelaAlocarAluno(props) {
                                     return (
                                         <div key={index} className="d-flex justify-content-center align-items-center">
                                             <OverlayTrigger
-                                                trigger="click"
+                                                trigger="hover"
                                                 key="bottom"
                                                 placement="bottom"
                                                 overlay={
