@@ -16,7 +16,6 @@ export default function FormCadUsuario(props) {
     };
 
     const estadoInicialUsuario = props.usuarioParaEdicao;
-    const { estado, mensagem, usuarios } = useSelector(state => state.usuario);
     const [usuario, setUsuario] = useState(estadoInicialUsuario);
     const [formValidado, setFormValidado] = useState(false);
     const [erro, setErro] = useState(false);
@@ -246,7 +245,7 @@ export default function FormCadUsuario(props) {
                         </Button>
                     </Col>
                 </Row>
-               {erro && <div>
+               {!erro ? "" : <div>
                     <Form.Label>
                         <p> O campo {usuarioExistente.nome === usuario.nome ? 'Nome' : usuarioExistente.rg === usuario.rg ? 'RG' : usuarioExistente.cpf === usuario.cpf ? 'CPF' : 
                     usuarioExistente.email === usuario.email ? 'E-mail' : 'Celular'} já está/estão em uso. </p>

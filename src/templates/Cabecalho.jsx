@@ -41,7 +41,7 @@ export default function Cabecalho(props) {
 
                 <Dropdown.Menu>
                     <Dropdown.Item href="#/action-1">Editar Usuário</Dropdown.Item>
-                    <Dropdown.Item href="#/action-2">Sair</Dropdown.Item>
+                    <NavLink to="/" className="dropdown-item nav-link" style={{ textAlign: 'center' }}>Sair</NavLink>
                 </Dropdown.Menu>
             </Dropdown>
         </Navbar>
