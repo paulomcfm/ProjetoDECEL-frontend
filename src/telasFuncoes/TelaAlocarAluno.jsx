@@ -52,7 +52,8 @@ export default function TelaAlocarAluno(props) {
             const inscricoesNaoAlocadas = inscricoes.filter(inscricao =>
                 inscricao.aluno.nome.toLowerCase().includes(termoBusca.toLowerCase()) &&
                 escolasRota.some(escola => escola.codigo === inscricao.escola.codigo) &&
-                !inscricoesSelecionadas.find(a => a.aluno.nome === inscricao.aluno.nome)
+                !inscricoesSelecionadas.find(a => a.aluno.nome === inscricao.aluno.nome) &&
+                inscricao.ano === new Date().getFullYear()
             );
             setInscricoesFiltradas(inscricoesNaoAlocadas);
             settingInscricoesFora();
