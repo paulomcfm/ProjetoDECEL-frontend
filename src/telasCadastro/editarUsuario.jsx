@@ -14,6 +14,7 @@ export default function EditarUsuario(){
         email:'',
         celular: ''
     });
+    let usuarioExistente;
 
     useEffect(() => {
         dispatch(buscarUsuarios());
@@ -28,6 +29,16 @@ export default function EditarUsuario(){
             celular: usuarioLogado.celular
         });
     }, [usuarioLogado]);
+
+
+    function manipularMudancas(e) {
+        const componente = e.currentTarget;
+        let valor = componente.value;
+        if (componente.name === 'celular') {
+            valor = formatarCelular(valor);
+        }
+        setUsuario({ ...usuario, [componente.name]: componente.value });
+    }
 
     async function handleInputChange(event) {
         const { name, value } = event.target;
@@ -53,6 +64,8 @@ export default function EditarUsuario(){
 
     function handleSubmit(e){
         e.preventDefault();
+        e.stopPropagation();
+        const form = e.currentTarget;
         // Chamar a ação redux para atualizar o usuário com os novos dados
         dispatch(atualizarUsuario(usuario));
     };
