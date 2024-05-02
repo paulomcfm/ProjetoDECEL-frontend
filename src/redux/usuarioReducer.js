@@ -1,11 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import ESTADO from '../recursos/estado';
+import ESTADO from '../recursos/estado.js';
 const urlBase = 'http://localhost:8080/usuario';
 
 export const buscarUsuarios = createAsyncThunk('usuario/buscar', async () => {
     try {
         const resposta = await fetch(urlBase, { method: 'GET' });
+        console.log(resposta);
         const dados = await resposta.json();
+        console.log(dados);
         if (dados.status) {
             return {
                 status: true,
@@ -65,18 +67,10 @@ export const adicionarUsuario = createAsyncThunk('usuario/adicionar', async (usu
     }
 });
 
-export const autenticarUsuario = createAsyncThunk('usuario/autenticar', async (credenciais) => {
-    const { nome, cpf } = credenciais;
+export const autenticar = createAsyncThunk('usuario/autenticar', async (credenciais) => {
     console.log(credenciais);
     try {
-        const resposta = await fetch(urlBase, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: credenciais
-        });
-
+        const resposta = await fetch(urlBase, { method: 'GET' });
         const dados = await resposta.json();
         return dados;
     } catch (erro) {
@@ -86,7 +80,7 @@ export const autenticarUsuario = createAsyncThunk('usuario/autenticar', async (c
 
 export const atualizarUsuario = createAsyncThunk('usuario/atualizar', async (usuario) => {
     const resposta = await fetch(urlBase, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
             'Content-Type': 'application/json'
         },
@@ -99,6 +93,7 @@ export const atualizarUsuario = createAsyncThunk('usuario/atualizar', async (usu
     });
     if (resposta.ok) {
         const dados = await resposta.json();
+        console.log(dados);
         return {
             status: dados.status,
             mensagem: dados.mensagem,
