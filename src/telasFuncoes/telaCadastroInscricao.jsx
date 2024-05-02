@@ -77,6 +77,9 @@ export default function TelaCadastroInscricao(props) {
                                     setInscricaoParaEdicao={setInscricaoParaEdicao}
                                     modoEdicao={modoEdicao}
                                     setModoEdicao={setModoEdicao}
+                                    setMostrarMensagem={setMostrarMensagem}
+                                    setMensagem={setMensagem}
+                                    setTipoMensagem={setTipoMensagem}
                                 />
                         }
                     </Row>

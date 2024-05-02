@@ -139,9 +139,10 @@ export const removerEscola = createAsyncThunk('escola/remover', async (escola) =
         }
     }
     else {
+        const erro = await resposta.json();
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao remover a escola.',
+            mensagem: erro.mensagem,
             escola
         }
     }

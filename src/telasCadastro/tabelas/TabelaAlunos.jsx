@@ -78,7 +78,7 @@ export default function TabelaAlunos(props) {
         <Container>
             <Button
                 type="button"
-                className="d-flex align-items-center mb-4 mt-2 mx-auto"
+                className="d-flex align-items-center mb-4 mt-2 mx-auto justify-content-center"
                 style={{ width: '142px' }}
                 onClick={() => {
                     props.setAlunoParaEdicao(alunoVazio);
