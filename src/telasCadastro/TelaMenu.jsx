@@ -52,8 +52,8 @@ export default function Menu(props) {
                     </Row>
                     <div style={{ justifyContent: 'center', display: 'flex' }}>
                         <NavLink to="/registrar-manutencao" className="nav-link" style={{ width: '40%', alignItems: 'center', justifyContent: 'center' }}>
-                            <div className="imagem-botao w-100 hover-scale rounded shadow" style={{ backgroundColor: 'rgba(8, 8, 87, 0.886)', color: 'white', justifyContent: 'center' }}>
-                                <p style={{ fontSize: '30px' }}>Relatórios</p>
+                            <div className="imagem-botao w-100 hover-scale rounded shadow" style={{ backgroundColor: 'rgba(8, 8, 87, 0.886)', color: 'white', justifyContent: 'center', display: 'flex', alignItems: 'center', height: '130%' }}>
+                                <p style={{ fontSize: '30px', margin: 'auto' }}>Relatórios</p>
                             </div>
                         </NavLink>
                     </div>
