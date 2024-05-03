@@ -2,7 +2,7 @@ import { useState,useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarRotas } from "../../redux/rotaReducer";
 import { Row, Col, Container, Table,Modal,Button } from "react-bootstrap";
-import { removerRota } from "../../redux/rotaReducer";
+import { removerRota,buscarRotasInscricoes } from "../../redux/rotaReducer";
 
 export default function TabelaRotas(props){
     const dispatch = useDispatch();

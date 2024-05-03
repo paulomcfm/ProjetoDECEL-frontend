@@ -1,5 +1,3 @@
-
-
 import { GoogleMap, useJsApiLoader,DirectionsService,DirectionsRenderer  } from '@react-google-maps/api';
 import "./mapaPagina.css"
 import { useState } from 'react';
