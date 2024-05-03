@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Form, Button, Col, Row, InputGroup } from 'react-bootstrap';
+import { Form, Button, Col, Row, } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { adicionarUsuario, atualizarUsuario, buscarUsuarios } from '../../redux/usuarioReducer';
-import InputMask from 'react-input-mask';
 import validarCelular from '../../validacoes/validarCelular';
 import validarCPF from '../../validacoes/validarCpf';
 
@@ -21,8 +20,7 @@ export default function FormCadUsuario(props) {
     const [erro, setErro] = useState(false);
     const { estadoUsu, mensagemUsu, usuarios} = useSelector((state) => state.usuario);
     const dispatch = useDispatch();
-    let usuarioExistente;
-
+    let usuarioExistente = null;
     useEffect(() => {
         dispatch(buscarUsuarios());
     }, [dispatch]);
@@ -79,52 +77,54 @@ export default function FormCadUsuario(props) {
         return celular;
     }
 
-    function manipularSubmissao(e) {
+    async function manipularSubmissao(e) {
         e.preventDefault();
         e.stopPropagation();
-
         const form = e.currentTarget;
-
-        if (form.checkValidity() && validarCelular(usuario.celular) && validarCPF(usuario.cpf)) {
-            usuarioExistente = usuarios.find(u => u.nome === usuario.nome || u.cpf === usuario.cpf || u.email === usuario.email || 
-                u.celular === usuario.celular);
-            if (usuarioExistente && !props.modoEdicao) {
-                setErro(true);
-            }
-            else {
-                if (!props.modoEdicao) {
-                    dispatch(adicionarUsuario(usuario)).then((retorno) => {
-                        if (retorno.payload.status) {
-                            props.setMensagem('Usuário incluído com sucesso');
-                            props.setTipoMensagem('success');
-                            props.setMostrarMensagem(true);
-                        } else {
-                            props.setMensagem('Usuário não incluído!');
-                            props.setTipoMensagem('danger');
-                            props.setMostrarMensagem(true);
-                        }
-                    });
-                } else {
-                    dispatch(atualizarUsuario(usuario)).then((retorno) => {
-                        if (retorno.payload.status) {
-                            props.setMensagem('Usuário alterado com sucesso');
-                            props.setTipoMensagem('success');
-                            props.setMostrarMensagem(true);
-                            props.setModoEdicao(false);
-                            props.setUsuarioParaEdicao(usuarioVazio);
-                        } else {
-                            props.setMensagem('Usuário não alterado!');
-                            props.setTipoMensagem('danger');
-                            props.setMostrarMensagem(true);
-                        }
-                    });
-                }
-            }
-            setUsuario(usuarioVazio);
-            setFormValidado(false);
-        } else {
-            setFormValidado(true);
+        usuarioExistente = usuarios.find(u => u.nome === usuario.nome || u.cpf === usuario.cpf || u.email === usuario.email || u.celular === usuario.celular);
+        console.log(usuarioExistente);
+        if(usuarioExistente)
+        {
+            setErro(true);
         }
+        else
+            if (form.checkValidity() && validarCelular(usuario.celular) && validarCPF(usuario.cpf)) {
+                    if (!props.modoEdicao) {
+                        dispatch(adicionarUsuario(usuario)).then((retorno) => {
+                            if (retorno.payload.status) {
+                                props.setMensagem('Usuário incluído com sucesso');
+                                props.setTipoMensagem('success');
+                                props.setMostrarMensagem(true);
+                            } else {
+                                props.setMensagem('Usuário não incluído!');
+                                props.setTipoMensagem('danger');
+                                props.setMostrarMensagem(true);
+                            }
+                        });
+                    } else {
+                        dispatch(atualizarUsuario(usuario)).then((retorno) => {
+                            if (retorno.payload.status) {
+                                props.setMensagem('Usuário alterado com sucesso');
+                                props.setTipoMensagem('success');
+                                props.setMostrarMensagem(true);
+                                props.setModoEdicao(false);
+                                props.setUsuarioParaEdicao(usuarioVazio);
+                            } else {
+                                props.setMensagem('Usuário não alterado!');
+                                props.setTipoMensagem('danger');
+                                props.setMostrarMensagem(true);
+                            }
+                        });
+                    }
+                setUsuario(usuarioVazio);
+                setFormValidado(false);
+            }
+            else if(!validarCelular(usuario.celular) || !validarCPF(usuario.cpf))
+            {
+                alert("Celular ou CPF inválidos");
+            } else {
+                setFormValidado(true);
+            }
     }
     
     function formatarCelular(celular) {
@@ -223,7 +223,7 @@ export default function FormCadUsuario(props) {
                         name="celular"
                         value={usuario.celular}
                         onChange={handleInputChange}
-                        maxLength="16"
+                        maxLength="15"
                         required 
                     />
                     <Form.Control.Feedback type="invalid">
@@ -246,10 +246,10 @@ export default function FormCadUsuario(props) {
                     </Col>
                 </Row>
                {!erro ? "" : <div>
-                    <Form.Label>
-                        <p> O campo {usuarioExistente.nome === usuario.nome ? 'Nome' : usuarioExistente.rg === usuario.rg ? 'RG' : usuarioExistente.cpf === usuario.cpf ? 'CPF' : 
-                    usuarioExistente.email === usuario.email ? 'E-mail' : 'Celular'} já está/estão em uso. </p>
-                    </Form.Label>
+                <Form.Label>
+                <p> O campo {usuarioExistente && usuarioExistente.nome === usuario.nome ? 'Nome' : usuarioExistente && usuarioExistente.cpf === usuario.cpf ? 'CPF' :
+                    usuarioExistente && usuarioExistente.email === usuario.email ? 'E-mail' : usuarioExistente && usuarioExistente.celular === usuario.celular ? 'Celular' : ''} já está/estão em uso. </p>
+                </Form.Label>
                 </div>}
             </Form>
         </>

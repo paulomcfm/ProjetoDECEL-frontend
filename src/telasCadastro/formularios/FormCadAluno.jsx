@@ -17,7 +17,6 @@ export default function FormCadAlunos(props) {
         celular: '',
         responsaveis: []
     }
-
     const estadoInicialAluno = props.alunoParaEdicao;
     const [aluno, setAluno] = useState(estadoInicialAluno);
     const [formValidado, setFormValidado] = useState(false);
