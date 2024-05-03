@@ -27,7 +27,7 @@
 
       return (
           <Container className="d-flex justify-content-center flex-column align-items-center" style={{marginTop:'40px'}}>
-            <button type="button" className="btn btn-primary mb-3" style={{ width: '172px' }} onClick={() => { props.setModo('gravar'); props.setTela(false); props.setMotorista(props.motoLimpo) }}>Cadastrar Motorista</button>
+            <button type="button" className="btn btn-primary mb-3 justify-content-center" style={{ width: '172px' }} onClick={() => { props.setModo('gravar'); props.setTela(false); props.setMotorista(props.motoLimpo) }}>Cadastrar Motorista</button>
             
             <FormControl style={{
                         borderRadius: '8px',

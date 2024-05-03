@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
-import { autenticarUsuario } from '../redux/usuarioReducer'; // Importa a função de autenticação
+import { autenticar } from '../redux/usuarioReducer'; // Importa a função de autenticação
 
 export default function TelaLogin() {
     const [username, setUsername] = useState('');
@@ -13,17 +13,13 @@ export default function TelaLogin() {
 
     async function handleLogin() {
         // Despacha a action para autenticar o usuário
-        dispatch(autenticarUsuario({ nome: username, cpf }))
+        dispatch(autenticar({ nome: username, cpf, senha: password }))
             .then((retorno) => {
-                console.log(retorno);
-                console.log(retorno.payload);
-                console.log(retorno.payload.status);
                 if (retorno.payload.status) {
                     setAutenticado(true); // Define autenticado como true se a autenticação for bem-sucedida
                 } else {
-                    console.log(retorno);
                     // Tratamento para autenticação inválida
-                    alert('Usuário ou CPF inválidos.');
+                    alert('Usuário, CPF ou senha inválidos.');
                 }
             })
             .catch((error) => {

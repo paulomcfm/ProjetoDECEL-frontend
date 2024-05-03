@@ -1,15 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Container, Table } from 'react-bootstrap';
+import { Button, Container, Table, Modal, Form, ModalFooter } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarEscolas } from '../../redux/escolaReducer';
 import { buscarPontosEmbarque } from '../../redux/pontosEmbarqueReducer';
 import { buscarInscricoes, removerInscricao } from '../../redux/inscricaoReducer';
 import { buscarAlunos } from '../../redux/alunoReducer';
+import { MdFilterListAlt } from "react-icons/md";
+import ModalExcluir from '../../templates/ModalExcluir';
 
 export default function TabelaInscricoes(props) {
     const [termoBusca, setTermoBusca] = useState('');
     const { inscricoes } = useSelector(state => state.inscricao);
+    const [mostrarModal, setMostrarModal] = useState(false);
+    const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false);
+    const [anosSelecionados, setAnosSelecionados] = useState([]);
+    const [inscricaoSelecionada, setInscricaoSelecionada] = useState(null);
+    const [inscricoesFiltradas, setInscricoesFiltradas] = useState([]);
     const dispatch = useDispatch();
+
+    function obterAnosInscricoes(inscricoes) {
+        const anos = inscricoes.map(inscricao => inscricao.ano);
+        return [...new Set(anos)];
+    }
+
+    const anosDisponiveis = obterAnosInscricoes(inscricoes);
 
     const inscricaoVazia = {
         codigo: '0',
@@ -60,15 +74,46 @@ export default function TabelaInscricoes(props) {
         dispatch(buscarAlunos());
     }, [dispatch]);
 
+    useEffect(() => {
+        if (inscricoes.length > 0) {
+            const anos = obterAnosInscricoes(inscricoes);
+            anos.sort((a, b) => b - a);
+            if (anos.length > 0) {
+                setAnosSelecionados([anos[0]]);
+            }
+        }
+    }, [inscricoes]);
+
+    useEffect(() => {
+        const inscricoesFiltradasPorAno = inscricoes.filter(inscricao =>
+            anosSelecionados.includes(inscricao.ano)
+        );
+        setInscricoesFiltradas(inscricoesFiltradasPorAno);
+    }, [inscricoes, anosSelecionados]);
+
+    useEffect(() => {
+        const termoBuscaLowerCase = termoBusca.toLowerCase().trim();
+
+        let inscricoesFiltradasPelosAnos = inscricoes.filter(inscricao =>
+            anosSelecionados.includes(inscricao.ano)
+        );
+
+        let inscricoesFiltradasPeloTermo = inscricoesFiltradasPelosAnos;
+
+        if (termoBuscaLowerCase !== '') {
+            inscricoesFiltradasPeloTermo = inscricoesFiltradasPelosAnos.filter(inscricao =>
+                inscricao.aluno.nome.toLowerCase().includes(termoBuscaLowerCase)
+            );
+        }
+
+        setInscricoesFiltradas(inscricoesFiltradasPeloTermo);
+    }, [inscricoes, termoBusca, anosSelecionados]);
+
+
+
     const { pontosEmbarque } = useSelector(state => state.pontoEmbarque);
     const { escolas } = useSelector(state => state.escola);
     const { alunos } = useSelector(state => state.aluno);
-
-    function excluirInscricao(inscricao) {
-        if (window.confirm('Deseja realmente excluir essa inscrição?')) {
-            dispatch(removerInscricao(inscricao));
-        }
-    }
 
     function editarInscricao(inscricao) {
         props.setInscricaoParaEdicao(inscricao);
@@ -76,16 +121,31 @@ export default function TabelaInscricoes(props) {
         props.exibirFormulario(true);
     }
 
-    const inscricoesFiltradas = inscricoes ? inscricoes.filter(inscricao =>
-        inscricao.aluno.nome.toLowerCase().includes(termoBusca.toLowerCase())
-    ) : [];
+    function excluirInscricao(inscricao) {
+        setInscricaoSelecionada(inscricao);
+        setMostrarModalExcluir(true);
+    }
 
+    function confirmarExclusao() {
+        dispatch(removerInscricao(inscricaoSelecionada)).then((retorno) => {
+            if (retorno.payload.status) {
+                props.setMensagem('Inscrição excluída com sucesso!');
+                props.setTipoMensagem('success');
+                props.setMostrarMensagem(true);
+            } else {
+                props.setMensagem('Inscrição não excluída! ' + retorno.payload.mensagem);
+                props.setTipoMensagem('danger');
+                props.setMostrarMensagem(true);
+            }
+        });
+        setMostrarModalExcluir(false); 
+    }
 
     return (
         <Container>
             <Button
                 type="button"
-                className="d-flex align-items-center mb-4 mt-2 mx-auto"
+                className="d-flex align-items-center mb-4 mt-2 mx-auto justify-content-center"
                 style={{ width: '142px' }}
                 onClick={() => {
                     props.setInscricaoParaEdicao(inscricaoVazia);
@@ -95,22 +155,37 @@ export default function TabelaInscricoes(props) {
             >
                 Inscrever Aluno
             </Button>
-            <div className="mb-5 d-flex justify-content-center align-items-center">
-                <input
-                    type="text"
-                    className="form-control"
-                    style={{
-                        borderRadius: '8px',
-                        padding: '12px 16px',
-                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                        border: '1px solid #ced4da',
-                        transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
-                        width: '750px',
-                    }}
-                    placeholder="Buscar inscrições..."
-                    value={termoBusca}
-                    onChange={e => setTermoBusca(e.target.value)}
-                />
+            <div className="mb-5 d-flex align-items-center justify-content-center">
+                <div className="input-group" style={{ width: '750px' }}>
+                    <input
+                        type="text"
+                        className="form-control"
+                        style={{
+                            borderRadius: '10px 0 0 10px',
+                            padding: '12px 16px',
+                            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                            border: '1px solid #ced4da',
+                            transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
+                        }}
+                        placeholder="Buscar inscrições pelo nome do aluno..."
+                        value={termoBusca}
+                        onChange={e => setTermoBusca(e.target.value)}
+                    />
+                    <div className="input-group-append">
+                        <Button
+                            onClick={() => setMostrarModal(true)}
+                            style={{
+                                borderRadius: '0 8px 8px 0',
+                                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                                border: '1px solid #ced4da',
+                                height: '100%',
+                                width: '100%'
+                            }}
+                        >
+                            <MdFilterListAlt />
+                        </Button>
+                    </div>
+                </div>
             </div>
             <Table striped bordered hover>
                 <thead>
@@ -167,7 +242,7 @@ export default function TabelaInscricoes(props) {
                                     : inscricao.etapa === 'M'
                                         ? 'Ensino Médio'
                                         : ''} {inscricao.etapa === 'F' ?
-                                                (inscricao.anoLetivo.includes('1') ||
+                                            (inscricao.anoLetivo.includes('1') ||
                                                 inscricao.anoLetivo.includes('2') ||
                                                 inscricao.anoLetivo.includes('3') ||
                                                 inscricao.anoLetivo.includes('4') ||
@@ -186,7 +261,7 @@ export default function TabelaInscricoes(props) {
                                         : ''}
                             </td>
                             <td>{inscricao.ano}</td>
-                            <td style={{width: '106px', alignItems: 'center', justifyContent: 'center'}}>
+                            <td style={{ width: '106px', alignItems: 'center', justifyContent: 'center' }}>
                                 <Button variant="danger" onClick={() => {
                                     excluirInscricao(inscricao);
                                 }}>
@@ -219,6 +294,49 @@ export default function TabelaInscricoes(props) {
                         </tr>
                     ))}
                 </tbody>
+                <Modal show={mostrarModal} onHide={() => setMostrarModal(false)}>
+                    <Modal.Header closeButton>
+                        Selecione o(s) ano(s) para filtrar a busca:
+                    </Modal.Header>
+                    <Modal.Body>
+                        {anosDisponiveis.map(ano => (
+                            <Form.Check
+                                key={ano}
+                                inline
+                                label={ano}
+                                checked={anosSelecionados.includes(ano)}
+                                onChange={(e) => {
+                                    if (e.target.checked) {
+                                        setAnosSelecionados([...anosSelecionados, ano]);
+                                    } else {
+                                        setAnosSelecionados(anosSelecionados.filter(item => item !== ano));
+                                    }
+                                }}
+                            />
+                        ))}
+                        <Form.Check
+                            inline
+                            label="Selecionar todos os anos"
+                            checked={anosSelecionados.length === anosDisponiveis.length}
+                            onChange={(e) => {
+                                if (e.target.checked) {
+                                    setAnosSelecionados(anosDisponiveis);
+                                } else {
+                                    setAnosSelecionados([]);
+                                }
+                            }}
+                        />
+                    </Modal.Body>
+                    <ModalFooter className="justify-content-center">
+                        <Button onClick={() => setMostrarModal(false)} variant="primary">Ok</Button>
+                    </ModalFooter>
+                </Modal>
+                <ModalExcluir
+                    mostrarModalExcluir={mostrarModalExcluir}
+                    mensagemExcluir="Deseja realmente excluir esta inscrição?"
+                    onConfirmar={confirmarExclusao}
+                    onCancelar={() => setMostrarModalExcluir(false)}
+                />
             </Table>
         </Container>
     );

@@ -33,7 +33,6 @@ export default function TelaDefinirRotas(){
     const [form,setForm] = useState(formVazio)
     const [enderecos,setEnderecos] = useState([])
 
-
     return (
         <Pagina>
             {tela === 1? <TabelaRotas setEnderecos={setEnderecos} formVazio={formVazio} modoEdicao={modoEdicao} setModoEdicao={setModoEdicao} setTela={setTela} form={form} setForm={setForm}/>:tela === 2?<FormularioRotas form={form} setForm={setForm} formVazio={formVazio} modoEdicao={modoEdicao} setModoEdicao={setModoEdicao} setTela={setTela}/>:<MapaPagina enderecos={enderecos}/>}

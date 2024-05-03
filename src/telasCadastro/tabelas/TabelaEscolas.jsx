@@ -3,10 +3,13 @@ import { Button, Container, Table } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarEscolas, removerEscola } from '../../redux/escolaReducer';
 import { buscarPontosEmbarque } from '../../redux/pontosEmbarqueReducer';
+import ModalExcluir from '../../templates/ModalExcluir';
 
 export default function TabelaEscolas(props) {
     const [termoBusca, setTermoBusca] = useState('');
     const { escolas } = useSelector(state => state.escola);
+    const [escolaSelecionada, setEscolaSelecionada] = useState(null); 
+    const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false);
     const dispatch = useDispatch();
 
     const escolaVazia = {
@@ -32,9 +35,23 @@ export default function TabelaEscolas(props) {
     const { pontosEmbarque } = useSelector(state => state.pontoEmbarque);
 
     function excluirEscola(escola) {
-        if (window.confirm('Deseja realmente excluir essa escola?')) {
-            dispatch(removerEscola(escola));
-        }
+        setEscolaSelecionada(escola);
+        setMostrarModalExcluir(true);
+    }
+
+    function confirmarExclusao() {
+        dispatch(removerEscola(escolaSelecionada)).then((retorno) => {
+            if (retorno.payload.status) {
+                props.setMensagem('Escola excluída com sucesso!');
+                props.setTipoMensagem('success');
+                props.setMostrarMensagem(true);
+            } else {
+                props.setMensagem('Escola não excluída! ' + retorno.payload.mensagem);
+                props.setTipoMensagem('danger');
+                props.setMostrarMensagem(true);
+            }
+        });
+        setMostrarModalExcluir(false); 
     }
 
     function editarEscola(escola) {
@@ -51,7 +68,7 @@ export default function TabelaEscolas(props) {
         <Container>
             <Button
                 type="button"
-                className="d-flex align-items-center mb-4 mt-2 mx-auto"
+                className="d-flex align-items-center mb-4 mt-2 mx-auto justify-content-center"
                 style={{ width: '142px' }}
                 onClick={() => {
                     props.setEscolaParaEdicao(escolaVazia);
@@ -145,6 +162,12 @@ export default function TabelaEscolas(props) {
                         </tr>
                     ))}
                 </tbody>
+                <ModalExcluir
+                    mostrarModalExcluir={mostrarModalExcluir}
+                    mensagemExcluir="Deseja realmente excluir esta escola?"
+                    onConfirmar={confirmarExclusao}
+                    onCancelar={() => setMostrarModalExcluir(false)}
+                />
             </Table>
         </Container>
     );

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Form, Button, Col, Row, InputGroup } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { adicionarUsuario, atualizarUsuario, buscarUsuarios } from '../../redux/usuarioReducer';
+import InputMask from 'react-input-mask';
 import validarCelular from '../../validacoes/validarCelular';
 import validarCPF from '../../validacoes/validarCpf';
 
@@ -15,18 +16,26 @@ export default function FormCadUsuario(props) {
     };
 
     const estadoInicialUsuario = props.usuarioParaEdicao;
-    const { estado, mensagem, usuarios } = useSelector(state => state.usuario);
     const [usuario, setUsuario] = useState(estadoInicialUsuario);
     const [formValidado, setFormValidado] = useState(false);
+    const [erro, setErro] = useState(false);
+    const { estadoUsu, mensagemUsu, usuarios} = useSelector((state) => state.usuario);
     const dispatch = useDispatch();
+    let usuarioExistente;
 
     useEffect(() => {
         dispatch(buscarUsuarios());
     }, [dispatch]);
 
     function manipularMudancas(e) {
-        const { name, value } = e.target;
-        setUsuario({ ...usuario, [name]: value });
+        const componente = e.currentTarget;
+        let valor = componente.value;
+        if (componente.name === 'celular') {
+            valor = formatarCelular(valor);
+        } else if(componente.name === 'cpf'){
+            valor = formatarCPF(valor);
+        }
+        setUsuario({ ...usuario, [componente.name]: componente.value });
     }
 
     async function handleInputChange(event) {
@@ -77,41 +86,70 @@ export default function FormCadUsuario(props) {
         const form = e.currentTarget;
 
         if (form.checkValidity() && validarCelular(usuario.celular) && validarCPF(usuario.cpf)) {
-            if (!props.modoEdicao) {
-                dispatch(adicionarUsuario(usuario)).then((retorno) => {
-                    if (retorno.payload.status) {
-                        props.setMensagem('Usuário incluído com sucesso');
-                        props.setTipoMensagem('success');
-                        props.setMostrarMensagem(true);
-                    } else {
-                        props.setMensagem('Usuário não incluído!');
-                        props.setTipoMensagem('danger');
-                        props.setMostrarMensagem(true);
-                    }
-                });
-            } else {
-                dispatch(atualizarUsuario(usuario)).then((retorno) => {
-                    if (retorno.payload.status) {
-                        props.setMensagem('Usuário alterado com sucesso');
-                        props.setTipoMensagem('success');
-                        props.setMostrarMensagem(true);
-                        props.setModoEdicao(false);
-                        props.setUsuarioParaEdicao(usuarioVazio);
-                    } else {
-                        props.setMensagem('Usuário não alterado!');
-                        props.setTipoMensagem('danger');
-                        props.setMostrarMensagem(true);
-                    }
-                });
+            usuarioExistente = usuarios.find(u => u.nome === usuario.nome || u.cpf === usuario.cpf || u.email === usuario.email || 
+                u.celular === usuario.celular);
+            if (usuarioExistente && !props.modoEdicao) {
+                setErro(true);
             }
-
+            else {
+                if (!props.modoEdicao) {
+                    dispatch(adicionarUsuario(usuario)).then((retorno) => {
+                        if (retorno.payload.status) {
+                            props.setMensagem('Usuário incluído com sucesso');
+                            props.setTipoMensagem('success');
+                            props.setMostrarMensagem(true);
+                        } else {
+                            props.setMensagem('Usuário não incluído!');
+                            props.setTipoMensagem('danger');
+                            props.setMostrarMensagem(true);
+                        }
+                    });
+                } else {
+                    dispatch(atualizarUsuario(usuario)).then((retorno) => {
+                        if (retorno.payload.status) {
+                            props.setMensagem('Usuário alterado com sucesso');
+                            props.setTipoMensagem('success');
+                            props.setMostrarMensagem(true);
+                            props.setModoEdicao(false);
+                            props.setUsuarioParaEdicao(usuarioVazio);
+                        } else {
+                            props.setMensagem('Usuário não alterado!');
+                            props.setTipoMensagem('danger');
+                            props.setMostrarMensagem(true);
+                        }
+                    });
+                }
+            }
             setUsuario(usuarioVazio);
             setFormValidado(false);
         } else {
             setFormValidado(true);
         }
     }
-
+    
+    function formatarCelular(celular) {
+        if (!celular) return celular;
+        // Remove todos os caracteres não numéricos
+        celular = celular.replace(/\D/g, '');
+        // Verifica se o celular possui 11 dígitos (incluindo DDD) e aplica a máscara correta
+        if (celular.length === 11) {
+            celular = celular.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+        } else {
+            // Se não possuir 11 dígitos, assume que é um telefone fixo e aplica a máscara para telefone fixo
+            celular = celular.replace(/^(\d{2})(\d{4})(\d{4})$/, '($1) $2-$3');
+        }
+        return celular;
+    }
+    
+    function formatarCPF(cpf) {
+        if (!cpf) return cpf;
+        // Remove todos os caracteres não numéricos
+        cpf = cpf.replace(/\D/g, '');
+        // Aplica a máscara para CPF (xxx.xxx.xxx-xx)
+        cpf = cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+        return cpf;
+    }
+    
     return (
         <>
             <h2 className="text-center">{props.modoEdicao ? 'Alterar Usuário' : 'Cadastrar Usuário'}</h2>
@@ -133,7 +171,7 @@ export default function FormCadUsuario(props) {
                 <Form.Group className="mb-3">
                     <Form.Label>Senha(*):</Form.Label>
                     <Form.Control
-                        type="password"
+                        type="text"
                         placeholder="Senha"
                         id="senha"
                         name="senha"
@@ -142,7 +180,7 @@ export default function FormCadUsuario(props) {
                         required
                     />
                 </Form.Group>
-      
+                <p>A senha pode conter letras minúsculas e maiúsculas, números e símbolos</p>
                 <Form.Group className="mb-3">
                     <Form.Label>CPF(*):</Form.Label>
                     <Form.Control
@@ -207,6 +245,12 @@ export default function FormCadUsuario(props) {
                         </Button>
                     </Col>
                 </Row>
+               {erro && <div>
+                    <Form.Label>
+                        <p> O campo {usuarioExistente.nome === usuario.nome ? 'Nome' : usuarioExistente.rg === usuario.rg ? 'RG' : usuarioExistente.cpf === usuario.cpf ? 'CPF' : 
+                    usuarioExistente.email === usuario.email ? 'E-mail' : 'Celular'} já está/estão em uso. </p>
+                    </Form.Label>
+                </div>}
             </Form>
         </>
     );

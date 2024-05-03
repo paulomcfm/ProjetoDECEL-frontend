@@ -113,9 +113,10 @@ export const removerPontoEmbarque = createAsyncThunk('pontos-embarque/remover', 
         }
     }
     else {
+        const erro = await resposta.json();
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao remover o ponto de embarque.',
+            mensagem: erro.mensagem,
             pontoEmbarque
         }
     }
