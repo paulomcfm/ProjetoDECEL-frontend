@@ -9,7 +9,7 @@ import { buscarInscricoes } from '../redux/inscricaoReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import { format } from 'date-fns';
 import TelaMensagem from '../telasCadastro/TelaMensagem';
-import { buscarRotas } from '../redux/rotaReducer';
+import { buscarRotasInscricoes } from '../redux/rotaReducer';
 import { buscarEscolaPorPonto } from '../redux/escolaReducer';
 import { atualizarInscricoes } from '../redux/alocarReducer';
 
@@ -38,7 +38,7 @@ export default function TelaAlocarAluno(props) {
 
     useEffect(() => {
         dispatch(buscarInscricoes());
-        dispatch(buscarRotas());
+        dispatch(buscarRotasInscricoes());
     }, [dispatch]);
 
     useEffect(() => {
@@ -167,7 +167,7 @@ export default function TelaAlocarAluno(props) {
                 setMostrarMensagem(true);
             }
         });
-        await dispatch(buscarRotas()).then(() => {
+        await dispatch(buscarRotasInscricoes()).then(() => {
             dispatch(buscarInscricoes()).then(() => {
                 setRotaSelecionada(null);
                 setRotaEstaSelecionada(false);

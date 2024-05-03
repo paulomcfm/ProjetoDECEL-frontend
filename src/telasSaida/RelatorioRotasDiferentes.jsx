@@ -1,53 +1,33 @@
-import React, { useState } from 'react';
-import { Button, Container, Table, Modal } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Button, Container, Table } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { useEffect } from 'react';
-import { format } from 'date-fns';
 import Pagina from '../templates/Pagina';
 
 export default function RelatorioRotasDiferentes(props) {
     const [termoBusca, setTermoBusca] = useState('');
-    const { estado, mensagem, alunos } = useSelector(state => state.aluno);
-    const { estadoPar, mensagemPar, parentescos } = useSelector(state => state.parentesco);
-    const { estadoResp, mensagemResp, responsaveis } = useSelector(state => state.responsavel);
-    const [mostrarModal, setMostrarModal] = useState(false);
-    const [alunoSelecionado, setAlunoSelecionado] = useState(null);
-    const [excluir, setExcluir] = useState(false);
+    const { inscricoes } = useSelector(state => state.inscricao);
     const dispatch = useDispatch();
+    const { pontosEmbarque } = useSelector(state => state.pontoEmbarque);
+    const { escolas } = useSelector(state => state.escola);
+    const { alunos } = useSelector(state => state.aluno);
+    
+    const inscricoesFiltradas = inscricoes ? inscricoes.filter(inscricao =>
+        inscricao.aluno.nome.toLowerCase().includes(termoBusca.toLowerCase())
+    ) : [];
 
-    const alunoVazio = {
-        codigo: '0',
-        nome: '',
-        rg: '',
-        observacoes: '',
-        dataNasc: '',
-        celular: '',
-        responsaveis: []
-    };
-
-    function excluirAluno(aluno) {
-        setAlunoSelecionado(aluno);
-        setMostrarModal(true);
-    }
-
-    function handleExcluir() {
-
-    }
-
-    function editarAluno(aluno) {
-
-    }
-
-    useEffect(() => {
-    }, [dispatch]);
-
-    const alunosFiltrados = alunos.filter(aluno =>
-        aluno.nome.toLowerCase().includes(termoBusca.toLowerCase())
-    );
 
     return (
         <Pagina>
-            <Container className='mt-5'>
+            <Container>
+                <Button
+                    type="button"
+                    className="d-flex align-items-center mb-4 mt-2 mx-auto"
+                    style={{ width: '142px' }}
+                    onClick={() => {
+                    }}
+                >
+                    Inscrever Aluno
+                </Button>
                 <div className="mb-5 d-flex justify-content-center align-items-center">
                     <input
                         type="text"
@@ -60,7 +40,7 @@ export default function RelatorioRotasDiferentes(props) {
                             transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
                             width: '750px',
                         }}
-                        placeholder="Buscar alunos..."
+                        placeholder="Buscar inscrições..."
                         value={termoBusca}
                         onChange={e => setTermoBusca(e.target.value)}
                     />
@@ -68,25 +48,80 @@ export default function RelatorioRotasDiferentes(props) {
                 <Table striped bordered hover>
                     <thead>
                         <tr>
-                            <th>Nome</th>
+                            <th>Aluno</th>
                             <th>RG</th>
-                            <th>Data de Nascimento</th>
-                            <th>Celular</th>
-                            <th>Observações</th>
-                            <th>Ações</th>
+                            <th>Endereço</th>
+                            <th>Ponto de Embarque</th>
+                            <th>Escola</th>
+                            <th>Turma</th>
+                            <th>Etapa</th>
+                            <th>Período</th>
+                            <th>Ano</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {alunosFiltrados.map(aluno => (
-                            <tr key={aluno.codigo}>
-                                <td>{aluno.nome}</td>
-                                <td>{aluno.rg}</td>
-                                <td>{format(new Date(aluno.dataNasc), 'dd/MM/yyyy')}</td>
-                                <td>{aluno.celular}</td>
-                                <td>{aluno.observacoes}</td>
+                        {inscricoesFiltradas.map(inscricao => (
+                            <tr key={`${inscricao.aluno.codigo}-${inscricao.ano}`}>
+                                <td>{alunos ? alunos.find(alu => alu.codigo === inscricao.aluno.codigo)?.nome : 'Carregando...'}</td>
+                                <td>{alunos ? alunos.find(alu => alu.codigo === inscricao.aluno.codigo)?.rg : 'Carregando...'}</td>
+                                <td>{inscricao.rua}, {inscricao.numero}, {inscricao.bairro}, {inscricao.cep.replace(/^(\d{5})(\d{3})$/, '$1-$2')}</td>
+                                <td>{pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.rua : 'Carregando...'}, {pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.numero : 'Carregando...'}, {pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.bairro : 'Carregando...'}, {pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.cep.replace(/^(\d{5})(\d{3})$/, '$1-$2') : 'Carregando...'}</td>
+                                <td>{escolas ? escolas.find(esc => esc.codigo === inscricao.escola.codigo)?.nome : 'Carregando...'}</td>
                                 <td>
+                                    {inscricao.anoLetivo === '1I'
+                                        ? 'Pré 1' :
+                                        inscricao.anoLetivo === '2I'
+                                            ? 'Pré 2' :
+                                            inscricao.anoLetivo.includes('1')
+                                                ? '1º Ano' :
+                                                inscricao.anoLetivo.includes('2')
+                                                    ? '2º Ano'
+                                                    : inscricao.anoLetivo.includes('3')
+                                                        ? '3º Ano'
+                                                        : inscricao.anoLetivo.includes('4')
+                                                            ? '4º Ano'
+                                                            : inscricao.anoLetivo.includes('5')
+                                                                ? '5º Ano'
+                                                                : inscricao.anoLetivo.includes('6')
+                                                                    ? '6º Ano'
+                                                                    : inscricao.anoLetivo.includes('7')
+                                                                        ? '7º Ano'
+                                                                        : inscricao.anoLetivo.includes('8')
+                                                                            ? '8º Ano'
+                                                                            : inscricao.anoLetivo.includes('9')
+                                                                                ? '9º Ano'
+                                                                                : ''} {inscricao.turma}
+                                </td>
+                                <td>{inscricao.etapa === 'I'
+                                    ? 'Educação Infantil'
+                                    : inscricao.etapa === 'F'
+                                        ? 'Ensino Fundamental'
+                                        : inscricao.etapa === 'M'
+                                            ? 'Ensino Médio'
+                                            : ''} {inscricao.etapa === 'F' ?
+                                                (inscricao.anoLetivo.includes('1') ||
+                                                    inscricao.anoLetivo.includes('2') ||
+                                                    inscricao.anoLetivo.includes('3') ||
+                                                    inscricao.anoLetivo.includes('4') ||
+                                                    inscricao.anoLetivo.includes('5') ||
+                                                    inscricao.anoLetivo.includes('6'))
+                                                    ? 'I'
+                                                    : 'II'
+                                                : ''}
+                                </td>
+                                <td>{inscricao.periodo === 'M'
+                                    ? 'Matinal'
+                                    : inscricao.periodo === 'V'
+                                        ? 'Vespertino'
+                                        : inscricao.periodo === 'I'
+                                            ? 'Integral'
+                                            : ''}
+                                </td>
+                                <td>{inscricao.ano}</td>
+                                <td style={{ width: '106px', alignItems: 'center', justifyContent: 'center' }}>
                                     <Button variant="danger" onClick={() => {
-                                        excluirAluno(aluno);
+
                                     }}>
                                         <svg xmlns="http://www.w3.org/2000/svg"
                                             width="16"
@@ -99,7 +134,7 @@ export default function RelatorioRotasDiferentes(props) {
                                         </svg>
                                     </Button> {' '}
                                     <Button onClick={() => {
-                                        editarAluno(aluno);
+                                        
                                     }
 
                                     } variant="warning">
@@ -110,7 +145,7 @@ export default function RelatorioRotasDiferentes(props) {
                                             className="bi bi-pencil-square"
                                             viewBox="0 0 16 16">
                                             <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                                            <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
                                         </svg>
                                     </Button>
                                 </td>
@@ -118,16 +153,6 @@ export default function RelatorioRotasDiferentes(props) {
                         ))}
                     </tbody>
                 </Table>
-                <Modal show={mostrarModal} onHide={() => setMostrarModal(false)}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Confirmar Exclusão</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>Deseja realmente excluir o aluno?</Modal.Body>
-                    <Modal.Footer className='d-flex justify-content-center'>
-                        <Button variant="danger" onClick={handleExcluir}>Sim</Button>
-                        <Button variant="secondary" onClick={() => setMostrarModal(false)}>Cancelar</Button>
-                    </Modal.Footer>
-                </Modal>
             </Container>
         </Pagina>
     );
