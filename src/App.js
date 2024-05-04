@@ -18,6 +18,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import TelaMenu from './telasCadastro/TelaMenu.jsx'
 import store from './redux/store.js';
 import { Provider } from 'react-redux';
+import './recursos/App.css';
 
 function App() {
   return (

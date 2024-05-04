@@ -155,10 +155,9 @@ export default function TelaAlocarAluno(props) {
                 aluno: { codigo: 0 }
             });
         }
-        console.log(inscricoesAtualizadas);
-        dispatch(atualizarInscricoes(inscricoesAtualizadas)).then((retorno) => {
+        dispatch(atualizarInscricoes(inscricoesAtualizadas)).then(async (retorno) => {
             if (retorno.payload.status) {
-                setMensagem('Inscricão alterada com sucesso!');
+                setMensagem(retorno.payload.mensagem);
                 setTipoMensagem('success');
                 setMostrarMensagem(true);
             } else {
@@ -166,16 +165,16 @@ export default function TelaAlocarAluno(props) {
                 setTipoMensagem('danger');
                 setMostrarMensagem(true);
             }
-        });
-        await dispatch(buscarRotasInscricoes()).then(() => {
-            dispatch(buscarInscricoes()).then(() => {
-                setRotaSelecionada(null);
-                setRotaEstaSelecionada(false);
-                setInscricoesSelecionadas([]);
-                setTermoBusca('');
-                setInscricoesFiltradas([]);
-                setMostrarModalConfirmacao(false);
-                setNovaRotaSelecionada(null);
+            await dispatch(buscarRotasInscricoes()).then(() => {
+                dispatch(buscarInscricoes()).then(() => {
+                    setRotaSelecionada(null);
+                    setRotaEstaSelecionada(false);
+                    setInscricoesSelecionadas([]);
+                    setTermoBusca('');
+                    setInscricoesFiltradas([]);
+                    setMostrarModalConfirmacao(false);
+                    setNovaRotaSelecionada(null);
+                });
             });
         });
     };

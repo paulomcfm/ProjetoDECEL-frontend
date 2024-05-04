@@ -12,7 +12,7 @@ export const atualizarInscricoes = createAsyncThunk('alocar-alunos/atualizar-ins
     }).catch(erro => {
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao atualizar a inscrição:' + erro.message
+            mensagem: 'Ocorreu um erro ao atualizar as inscrições:' + erro.message
         }
     });
     if (resposta.ok) {
@@ -55,7 +55,7 @@ const alocarSlice = createSlice({
             state.estado = ESTADO.PENDENTE;
             state.mensagem = "Atualizando inscrição...";
         }).addCase(atualizarInscricoes.rejected, (state, action) => {
-            state.mensagem = "Erro ao atualizar a inscrição: " + action.error.message;
+            state.mensagem = "Ocorreu um erro ao atualizar aa inscrições:" + action.error.message;
             state.estado = ESTADO.ERRO;
         })
     }

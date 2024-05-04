@@ -29,9 +29,9 @@ export const buscarInscricoes = createAsyncThunk('inscricao-aluno/buscar', async
     }
 });
 
-export const buscarInscricoesFora = createAsyncThunk('inscricao-aluno/buscar-fora', async () => {
+export const getInscricoesFora = createAsyncThunk('inscricao-aluno/buscar-fora', async (ano) => {
     try {
-        const resposta = await fetch(urlBase+"-fora", { method: 'GET' });
+        const resposta = await fetch(urlBase+"/buscar-fora/"+ ano, { method: 'GET' });
         const dados = await resposta.json();
         if (dados.status) {
             return {
@@ -175,10 +175,10 @@ const inscricaoSlice = createSlice({
         }).addCase(buscarInscricoes.rejected, (state, action) => {
             state.estado = ESTADO.ERRO;
             state.mensagem = action.error.message;
-        }).addCase(buscarInscricoesFora.pending, (state, action) => {
+        }).addCase(getInscricoesFora.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
             state.mensagem = "Buscando inscrições...";
-        }).addCase(buscarInscricoesFora.fulfilled, (state, action) => {
+        }).addCase(getInscricoesFora.fulfilled, (state, action) => {
             if (action.payload.status) {
                 state.estado = ESTADO.OCIOSO;
                 state.mensagem = action.payload.mensagem;
@@ -187,7 +187,7 @@ const inscricaoSlice = createSlice({
                 state.estado = ESTADO.ERRO;
                 state.mensagem = action.payload.mensagem;
             }
-        }).addCase(buscarInscricoesFora.rejected, (state, action) => {
+        }).addCase(getInscricoesFora.rejected, (state, action) => {
             state.estado = ESTADO.ERRO;
             state.mensagem = action.error.message;
         })
