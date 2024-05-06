@@ -101,18 +101,15 @@ export const atualizarMonitor = createAsyncThunk('monitor/atualizar', async (mon
     }
 });
 
-export const removerMonitor = createAsyncThunk('monitor/remover', async (monitorId) => {
-    const resposta = await fetch(urlBase, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ "id": monitorId })
+export const removerMonitor = createAsyncThunk('monitor/remover', async (monitorCodigo) => {
+    const url = urlBase+"/"+monitorCodigo
+    console.log(url)
+    const resposta = await fetch(url, {
+        method: 'DELETE'
     }).catch(erro => {
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao remover monitor:' + erro.message,
-            monitorId
+            mensagem: 'Ocorreu um erro ao remover monitor:' + erro.message
         }
     });
     if (resposta.ok) {
@@ -120,14 +117,13 @@ export const removerMonitor = createAsyncThunk('monitor/remover', async (monitor
         return {
             status: dados.status,
             mensagem: dados.mensagem,
-            monitorId
+            monitorCodigo
         }
     }
     else {
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao remover monitor.',
-            monitorId
+            mensagem: 'Ocorreu um erro ao remover monitor.'
         }
     }
 });
@@ -161,34 +157,31 @@ const monitorSlice = createSlice({
             state.mensagem = action.error.message;
         }).addCase(adicionarMonitor.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
-            state.monitores.push(action.payload.motorista);
             state.mensagem = action.payload.mensagem;
         }).addCase(adicionarMonitor.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
-            state.mensagem = "Adicionando motorista...";
+            state.mensagem = "Adicionando monitor...";
         }).addCase(adicionarMonitor.rejected, (state, action) => {
-            state.mensagem = "Erro ao adicionar motorista: " + action.error.message;
+            state.mensagem = "Erro ao adicionar monitor: " + action.error.message;
             state.estado = ESTADO.ERRO;
         }).addCase(atualizarMonitor.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
-            const indice = state.monitores.findIndex(motorista => motorista.cnh === action.payload.motorista.cnh);
-            state.monitores[indice] = action.payload.motorista;
             state.mensagem = action.payload.mensagem;
         }).addCase(atualizarMonitor.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
-            state.mensagem = "Atualizando motorista...";
+            state.mensagem = "Atualizando monitor...";
         }).addCase(atualizarMonitor.rejected, (state, action) => {
-            state.mensagem = "Erro ao atualizar motorista: " + action.error.message;
+            state.mensagem = "Erro ao atualizar monitor: " + action.error.message;
             state.estado = ESTADO.ERRO;
         }).addCase(removerMonitor.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
+            state.monitores = state.monitores.filter(monitor => monitor.codigo !== action.payload.monitorCodigo);
             state.mensagem = action.payload.mensagem;
-            state.monitores = state.monitores.filter(motorista => motorista.id !== action.payload.motoristaId);
         }).addCase(removerMonitor.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
-            state.mensagem = "Removendo motorista...";
+            state.mensagem = "Removendo monitor...";
         }).addCase(removerMonitor.rejected, (state, action) => {
-            state.mensagem = "Erro ao remover motorista: " + action.error.message;
+            state.mensagem = "Erro ao remover monitor: " + action.error.message;
             state.estado = ESTADO.ERRO;
         })
     }
