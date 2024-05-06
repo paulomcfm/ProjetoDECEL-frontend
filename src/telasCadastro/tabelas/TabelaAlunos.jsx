@@ -5,6 +5,8 @@ import { buscarAlunos, removerAluno } from '../../redux/alunoReducer';
 import { buscarParentescosAluno } from '../../redux/parentescoReducer';
 import { useEffect } from 'react';
 import { format } from 'date-fns';
+import { ToastContainer, toast, Bounce } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function TabelaAlunos(props) {
     const [termoBusca, setTermoBusca] = useState('');
@@ -13,7 +15,6 @@ export default function TabelaAlunos(props) {
     const { estadoResp, mensagemResp, responsaveis } = useSelector(state => state.responsavel);
     const [mostrarModal, setMostrarModal] = useState(false);
     const [alunoSelecionado, setAlunoSelecionado] = useState(null);
-    const [excluir, setExcluir] = useState(false);
     const dispatch = useDispatch();
 
     const alunoVazio = {
@@ -34,13 +35,29 @@ export default function TabelaAlunos(props) {
     function handleExcluir() {
         dispatch(removerAluno(alunoSelecionado)).then((retorno) => {
             if (retorno.payload.status) {
-                props.setMensagem('Aluno excluído com sucesso!');
-                props.setTipoMensagem('success');
-                props.setMostrarMensagem(true);
+                toast.success('Aluno excluído com sucesso!', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                });
             } else {
-                props.setMensagem('Aluno não excluído! ' + retorno.payload.mensagem);
-                props.setTipoMensagem('danger');
-                props.setMostrarMensagem(true);
+                toast.error('Aluno não excluído! ' + retorno.payload.mensagem, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                });
             }
         });
         setMostrarModal(false);
@@ -68,13 +85,14 @@ export default function TabelaAlunos(props) {
     useEffect(() => {
         dispatch(buscarAlunos());
     }, [dispatch]);
-    
+
     const alunosFiltrados = alunos.filter(aluno =>
         aluno.nome.toLowerCase().includes(termoBusca.toLowerCase())
     );
 
     return (
         <Container>
+            <ToastContainer />
             <Button
                 type="button"
                 className="d-flex align-items-center mb-4 mt-2 mx-auto justify-content-center"

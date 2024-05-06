@@ -6,6 +6,8 @@ import { buscarResponsaveis } from '../../redux/responsavelReducer';
 import { useEffect } from 'react';
 import validarCelular from '../../validacoes/validarCelular';
 import InputMask from 'react-input-mask';
+import { ToastContainer, toast, Bounce } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function FormCadAlunos(props) {
 
@@ -81,13 +83,29 @@ export default function FormCadAlunos(props) {
                 aluno.responsaveis = responsaveisSelecionados;
                 dispatch(adicionarAluno(aluno)).then((retorno) => {
                     if (retorno.payload.status) {
-                        props.setMensagem('Aluno incluído com sucesso!');
-                        props.setTipoMensagem('success');
-                        props.setMostrarMensagem(true);
+                        toast.success('Aluno incluído com sucesso!', {
+                            position: "top-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                            transition: Bounce,
+                        });
                     } else {
-                        props.setMensagem('Aluno não incluído! ' + retorno.payload.mensagem);
-                        props.setTipoMensagem('danger');
-                        props.setMostrarMensagem(true);
+                        toast.error('Aluno não incluído! ' + retorno.payload.mensagem, {
+                            position: "top-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                            transition: Bounce,
+                        });
                     }
                 });
             }
@@ -95,15 +113,31 @@ export default function FormCadAlunos(props) {
                 aluno.responsaveis = responsaveisSelecionados;
                 dispatch(atualizarAluno(aluno)).then((retorno) => {
                     if (retorno.payload.status) {
-                        props.setMensagem('Aluno alterado com sucesso');
-                        props.setTipoMensagem('success');
-                        props.setMostrarMensagem(true);
+                        toast.success('Aluno alterado com sucesso!', {
+                            position: "top-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                            transition: Bounce,
+                        });
                         props.setModoEdicao(false);
                         props.setAlunoParaEdicao(alunoVazio);
                     } else {
-                        props.setMensagem('Aluno não alterado! ' + retorno.payload.mensagem);
-                        props.setTipoMensagem('danger');
-                        props.setMostrarMensagem(true);
+                        toast.error('Aluno não alterado! ' + retorno.payload.mensagem, {
+                            position: "top-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                            transition: Bounce,
+                        });
                     }
                 });
             }

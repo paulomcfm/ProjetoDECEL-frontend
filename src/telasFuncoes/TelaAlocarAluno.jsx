@@ -9,9 +9,11 @@ import { buscarInscricoes } from '../redux/inscricaoReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import { format } from 'date-fns';
 import TelaMensagem from '../telasCadastro/TelaMensagem';
-import { buscarRotas } from '../redux/rotaReducer';
+import { buscarRotasInscricoes } from '../redux/rotaReducer';
 import { buscarEscolaPorPonto } from '../redux/escolaReducer';
 import { atualizarInscricoes } from '../redux/alocarReducer';
+import { ToastContainer, toast, Bounce } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 export default function TelaAlocarAluno(props) {
@@ -34,16 +36,61 @@ export default function TelaAlocarAluno(props) {
     const [indiceRotaSelecionadaAnterior, setIndiceRotaSelecionadaAnterior] = useState(null);
     const [rotasCarregadas, setRotasCarregadas] = useState([]);
     const [indexInscricaoSelecionada, setIndexInscricaoSelecionada] = useState(null);
+    const [outdatedRoutes, setOutdatedRoutes] = useState([]);
+    const [toastController, setToastController] = useState(false);
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch(buscarInscricoes());
-        dispatch(buscarRotas());
+        dispatch(buscarRotasInscricoes());
     }, [dispatch]);
 
     useEffect(() => {
         setRotasCarregadas(rotas);
     }, [rotas]);
+
+    useEffect(() => {
+        if (inscricoes.length > 0) {
+            const curYear = new Date().getFullYear();
+            // const curYear = 2025;
+            const outdatedSubscriptions = inscricoes.filter((inscricao) => {
+                if (inscricao.dataAlocacao != null) {
+                    const dataAlocacao = new Date(inscricao.dataAlocacao);
+                    return dataAlocacao.getFullYear() < curYear;
+                }
+            });
+            const outdatedRoutes = [];
+            outdatedSubscriptions.forEach((inscricao) => {
+                if (!outdatedRoutes.includes(inscricao.rota)) {
+                    outdatedRoutes.push(inscricao.rota);
+                }
+            });
+            setOutdatedRoutes(outdatedRoutes);
+        }
+    }, [inscricoes, rotasCarregadas]);
+
+    if (!toastController && outdatedRoutes.length > 0) {
+        let i = 0;
+        outdatedRoutes.forEach((rota) => {
+            const rotaEncontrada = rotasCarregadas.find((r) => r.codigo === rota);
+            if (rotaEncontrada) {
+                toast.warn(`Há alunos com alocações desatualizadas na rota ${rotaEncontrada.nome}`,{
+                    position: "bottom-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    delay: i,
+                    transition: Bounce,
+                });
+                i = i + 3000;
+            }
+        });
+        setToastController(true);
+    }
 
     useEffect(() => {
         if (termoBusca.trim() === '') {
@@ -52,7 +99,8 @@ export default function TelaAlocarAluno(props) {
             const inscricoesNaoAlocadas = inscricoes.filter(inscricao =>
                 inscricao.aluno.nome.toLowerCase().includes(termoBusca.toLowerCase()) &&
                 escolasRota.some(escola => escola.codigo === inscricao.escola.codigo) &&
-                !inscricoesSelecionadas.find(a => a.aluno.nome === inscricao.aluno.nome)
+                !inscricoesSelecionadas.find(a => a.aluno.nome === inscricao.aluno.nome) &&
+                inscricao.ano === new Date().getFullYear()
             );
             setInscricoesFiltradas(inscricoesNaoAlocadas);
             settingInscricoesFora();
@@ -154,10 +202,9 @@ export default function TelaAlocarAluno(props) {
                 aluno: { codigo: 0 }
             });
         }
-        console.log(inscricoesAtualizadas);
-        dispatch(atualizarInscricoes(inscricoesAtualizadas)).then((retorno) => {
+        dispatch(atualizarInscricoes(inscricoesAtualizadas)).then(async (retorno) => {
             if (retorno.payload.status) {
-                setMensagem('Inscricão alterada com sucesso!');
+                setMensagem(retorno.payload.mensagem);
                 setTipoMensagem('success');
                 setMostrarMensagem(true);
             } else {
@@ -165,16 +212,16 @@ export default function TelaAlocarAluno(props) {
                 setTipoMensagem('danger');
                 setMostrarMensagem(true);
             }
-        });
-        await dispatch(buscarRotas()).then(() => {
-            dispatch(buscarInscricoes()).then(() => {
-                setRotaSelecionada(null);
-                setRotaEstaSelecionada(false);
-                setInscricoesSelecionadas([]);
-                setTermoBusca('');
-                setInscricoesFiltradas([]);
-                setMostrarModalConfirmacao(false);
-                setNovaRotaSelecionada(null);
+            await dispatch(buscarRotasInscricoes()).then(() => {
+                dispatch(buscarInscricoes()).then(() => {
+                    setRotaSelecionada(null);
+                    setRotaEstaSelecionada(false);
+                    setInscricoesSelecionadas([]);
+                    setTermoBusca('');
+                    setInscricoesFiltradas([]);
+                    setMostrarModalConfirmacao(false);
+                    setNovaRotaSelecionada(null);
+                });
             });
         });
     };
@@ -292,7 +339,7 @@ export default function TelaAlocarAluno(props) {
                                                         )}
                                                     </Button>
                                                 </OverlayTrigger>
-                                                <Button variant="danger" className="mb-2 mt-4 me-2" onClick={() => {setMostrarModalRemover(true); setIndexInscricaoSelecionada(index)}}>
+                                                <Button variant="danger" className="mb-2 mt-4 me-2" onClick={() => { setMostrarModalRemover(true); setIndexInscricaoSelecionada(index) }}>
                                                     Remover
                                                 </Button>
                                             </div>
@@ -417,6 +464,7 @@ export default function TelaAlocarAluno(props) {
                         </>
                     )}
                 </Container>
+                <ToastContainer />
             </Pagina>
         );
     }

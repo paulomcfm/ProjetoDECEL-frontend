@@ -29,6 +29,33 @@ export const buscarInscricoes = createAsyncThunk('inscricao-aluno/buscar', async
     }
 });
 
+export const getInscricoesFora = createAsyncThunk('inscricao-aluno/buscar-fora', async (ano) => {
+    try {
+        const resposta = await fetch(urlBase+"/buscar-fora/"+ ano, { method: 'GET' });
+        const dados = await resposta.json();
+        if (dados.status) {
+            return {
+                status: true,
+                listaInscricoes: dados.listaInscricoes,
+                mensagem: dados.mensagem
+            }
+        }
+        else {
+            return {
+                status: false,
+                listaInscricoes: [],
+                mensagem: 'Ocorreu um erro ao recuperar as inscrições da base de dados.' + dados.mensagem
+            }
+        }
+    } catch (erro) {
+        return {
+            status: false,
+            listaInscricoes: [],
+            mensagem: 'Ocorreu um erro ao recuperar as inscrições da base de dados:' + erro.message
+        }
+    }
+});
+
 export const adicionarInscricao = createAsyncThunk('inscricao-aluno/adicionar', async (inscricao) => {
     const resposta = await fetch(urlBase, {
         method: 'POST',
@@ -148,7 +175,23 @@ const inscricaoSlice = createSlice({
         }).addCase(buscarInscricoes.rejected, (state, action) => {
             state.estado = ESTADO.ERRO;
             state.mensagem = action.error.message;
-        }).addCase(adicionarInscricao.fulfilled, (state, action) => {
+        }).addCase(getInscricoesFora.pending, (state, action) => {
+            state.estado = ESTADO.PENDENTE;
+            state.mensagem = "Buscando inscrições...";
+        }).addCase(getInscricoesFora.fulfilled, (state, action) => {
+            if (action.payload.status) {
+                state.estado = ESTADO.OCIOSO;
+                state.mensagem = action.payload.mensagem;
+                state.inscricoes = action.payload.listaInscricoes;
+            } else {
+                state.estado = ESTADO.ERRO;
+                state.mensagem = action.payload.mensagem;
+            }
+        }).addCase(getInscricoesFora.rejected, (state, action) => {
+            state.estado = ESTADO.ERRO;
+            state.mensagem = action.error.message;
+        })
+        .addCase(adicionarInscricao.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
             state.inscricoes.push(action.payload.inscricao);
             state.mensagem = action.payload.mensagem;
