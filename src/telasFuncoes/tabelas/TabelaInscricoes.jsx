@@ -16,6 +16,8 @@ export default function TabelaInscricoes(props) {
     const [anosSelecionados, setAnosSelecionados] = useState([]);
     const [inscricaoSelecionada, setInscricaoSelecionada] = useState(null);
     const [inscricoesFiltradas, setInscricoesFiltradas] = useState([]);
+    const [filtroAlunosInscritos, setFiltroAlunosInscritos] = useState(false);
+    const [filtroAlunosAlocados, setFiltroAlunosAlocados] = useState(false);
     const dispatch = useDispatch();
 
     function obterAnosInscricoes(inscricoes) {
@@ -253,7 +255,7 @@ export default function TabelaInscricoes(props) {
                                             : ''}
                             </td>
                             <td>{inscricao.periodo === 'M'
-                                ? 'Matinal'
+                                ? 'Matutino'
                                 : inscricao.periodo === 'V'
                                     ? 'Vespertino'
                                     : inscricao.periodo === 'I'

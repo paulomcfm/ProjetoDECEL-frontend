@@ -4,9 +4,13 @@ import ESTADO from '../recursos/estado';
 const urlBase = 'http://localhost:8080/definir-rota';
 
 
-export const buscarRotas = createAsyncThunk('rotas/buscar', async () => {
+export const buscarRotas = createAsyncThunk('rotas/buscar', async (filtro) => {
     try {
-        const resposta = await fetch(urlBase, { method: 'GET' });
+        let url = urlBase;
+        if(filtro!=undefined) {
+            url = url + '/' + filtro;
+        }
+        const resposta = await fetch(url, { method: 'GET' });
         const dados = await resposta.json();
         if (dados.status) {
             return {
@@ -61,7 +65,7 @@ export const buscarRotasInscricoes = createAsyncThunk('inscricoes-rotas/buscar',
 });
 
 export const adicionarRotas = createAsyncThunk('rotas/adicionar', async (rota) => {
-const resposta = await fetch(urlBase, {
+    const resposta = await fetch(urlBase, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -92,7 +96,7 @@ const resposta = await fetch(urlBase, {
 
 
 export const atualizarRota = createAsyncThunk('rotas/atualizar', async (rota) => {
-    console.log("rota... "+JSON.stringify(rota))
+    console.log("rota... " + JSON.stringify(rota))
     const resposta = await fetch(urlBase, {
         method: 'PUT',
         headers: {
@@ -124,7 +128,7 @@ export const atualizarRota = createAsyncThunk('rotas/atualizar', async (rota) =>
 
 
 export const removerRota = createAsyncThunk('rotas/remover', async (rota) => {
-    const urlB = urlBase+'/'+rota
+    const urlB = urlBase + '/' + rota
     const resposta = await fetch(urlB, {
         method: 'DELETE',
         headers: {
@@ -217,8 +221,8 @@ const rotaSlice = createSlice({
             state.estado = ESTADO.ERRO;
         }).addCase(removerRota.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
-            if(action.payload.status === true)
-                state.rotas = state.rotas.filter(rota => rota.codigo!=action.payload.rota)
+            if (action.payload.status === true)
+                state.rotas = state.rotas.filter(rota => rota.codigo != action.payload.rota)
             else
                 state.estado = ESTADO.ERRO
             state.mensagem = action.payload.mensagem;
