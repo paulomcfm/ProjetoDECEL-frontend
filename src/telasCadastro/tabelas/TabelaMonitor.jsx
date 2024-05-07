@@ -1,4 +1,4 @@
-import { Table, Modal, Button, Row, Col, Container } from 'react-bootstrap'
+import { Table, Modal, Button, Row, Col, Container,FormControl } from 'react-bootstrap'
 import { buscarMonitores, removerMonitor } from '../../redux/monitorReducer.js'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
@@ -44,7 +44,9 @@ export default function TabelaMonitor(props) {
     }, [dispatch]);
 
     function manipularMudancas(evento) {
-        // Implemente aqui a lógica para manipular as mudanças no input de pesquisa
+        const target = evento.target
+        setPesquisar(target.value)
+        console.log(pesquisar)
     }
 
     return (
@@ -75,15 +77,18 @@ export default function TabelaMonitor(props) {
             </Modal>
             <Row style={{ marginBottom: '40px' }}>
                 <Col>
-                    <button type="button" className="btn btn-primary" onClick={() => { props.setTela(2) }}>Cadastrar Rota</button>{' '}
+                    <button type="button" className="btn btn-primary" onClick={() => { props.setTela(false) }}>Cadastrar Monitor</button>{' '}
                 </Col>
             </Row>
             <br />
-            <Row>
-                <Col>
-                    <input type="text" id="nome" className="form-control mb-3 mx-auto" placeholder="Pesquisar Rota..." style={{ width: '400px' }} name='nome' onChange={manipularMudancas} />
-                </Col>
-            </Row>
+            <FormControl style={{
+                        borderRadius: '8px',
+                        padding: '12px 16px',
+                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                        border: '1px solid #ced4da',
+                        transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
+                        width: '750px',
+                    }} type="text" placeholder="Pesquisar" className="mr-sm-2" name='nome' onChange={manipularMudancas}/>
             <Table>
                 <thead>
                     <tr>
@@ -95,6 +100,8 @@ export default function TabelaMonitor(props) {
                 </thead>
                 <tbody>
                     {monitores.map(monitor => (
+                        
+                        pesquisar==='' || monitor.nome.toLowerCase().includes(pesquisar.toLowerCase())?
                         <tr key={monitor.codigo}>
                             <td>{monitor.nome}</td>
                             <td>{monitor.cpf}</td>
@@ -106,13 +113,13 @@ export default function TabelaMonitor(props) {
                                     </svg>
                                 </button>
                                 <button type="button" className="btn btn-warning" onClick={()=>{
-                                    props.setForm({
+                                    props.setMonitor({
                                         codigo:monitor.codigo,
                                         nome:monitor.nome,
                                         cpf:monitor.cpf,
                                         celular:monitor.celular
                                     })
-                                    props.setModoEdicao('edicao')
+                                    props.setModo('edicao')
                                     props.setTela(false)
                                 }}>    
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -122,6 +129,8 @@ export default function TabelaMonitor(props) {
                                 </button>
                             </td>
                         </tr>
+                        :
+                        null
                     ))}
                 </tbody>
             </Table>
