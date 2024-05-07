@@ -80,7 +80,7 @@ export const autenticar = createAsyncThunk('usuario/autenticar', async (credenci
 
 export const atualizarUsuario = createAsyncThunk('usuario/atualizar', async (usuario) => {
     const resposta = await fetch(urlBase, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },

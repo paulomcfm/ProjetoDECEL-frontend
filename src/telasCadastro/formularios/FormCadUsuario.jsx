@@ -20,7 +20,13 @@ export default function FormCadUsuario(props) {
     const [erro, setErro] = useState(false);
     const { estadoUsu, mensagemUsu, usuarios} = useSelector((state) => state.usuario);
     const dispatch = useDispatch();
-    let usuarioExistente = null;
+    const [camposRepetidos, setCamposRepetidos] = useState({
+        nome: false,
+        cpf: false,
+        email: false,
+        celular: false,
+    });
+
     useEffect(() => {
         dispatch(buscarUsuarios());
     }, [dispatch]);
@@ -54,6 +60,19 @@ export default function FormCadUsuario(props) {
             }));
         }
     }
+    async function verificarCamposRepetidos() {
+        const camposRepetidosAtualizados = {
+                nome: !!usuarios.find(u => u.nome === usuario.nome && u.cpf !== usuario.cpf),
+                cpf: !!usuarios.find(u => u.cpf === usuario.cpf),
+                email: !!usuarios.find(u => u.email === usuario.email && u.cpf !== usuario.cpf),
+                celular: !!usuarios.find(u => u.celular === usuario.celular && u.cpf !== usuario.cpf),
+            };
+        setCamposRepetidos(camposRepetidosAtualizados);
+    }
+
+    useEffect(() => {
+        verificarCamposRepetidos();
+    }, [usuario.nome, usuario.cpf, usuario.email, usuario.celular]);
 
     function formatarCPF(cpf) {
         if (!cpf) return cpf;
@@ -81,50 +100,43 @@ export default function FormCadUsuario(props) {
         e.preventDefault();
         e.stopPropagation();
         const form = e.currentTarget;
-        usuarioExistente = usuarios.find(u => u.nome === usuario.nome || u.cpf === usuario.cpf || u.email === usuario.email || u.celular === usuario.celular);
-        console.log(usuarioExistente);
-        if(usuarioExistente)
-        {
-            setErro(true);
+        if (form.checkValidity() && validarCelular(usuario.celular) && validarCPF(usuario.cpf)) {
+                if (!props.modoEdicao) {
+                    dispatch(adicionarUsuario(usuario)).then((retorno) => {
+                        if (retorno.payload.status) {
+                            props.setMensagem('Usuário incluído com sucesso');
+                            props.setTipoMensagem('success');
+                            props.setMostrarMensagem(true);
+                        } else {
+                            props.setMensagem('Usuário não incluído!');
+                            props.setTipoMensagem('danger');
+                            props.setMostrarMensagem(true);
+                        }
+                    });
+                } else {
+                    dispatch(atualizarUsuario(usuario)).then((retorno) => {
+                        if (retorno.payload.status) {
+                            props.setMensagem('Usuário alterado com sucesso');
+                            props.setTipoMensagem('success');
+                            props.setMostrarMensagem(true);
+                            props.setModoEdicao(false);
+                            props.setUsuarioParaEdicao(usuarioVazio);
+                        } else {
+                            props.setMensagem('Usuário não alterado!');
+                            props.setTipoMensagem('danger');
+                            props.setMostrarMensagem(true);
+                        }
+                    });
+                }
+            setUsuario(usuarioVazio);
+            setFormValidado(false);
         }
-        else
-            if (form.checkValidity() && validarCelular(usuario.celular) && validarCPF(usuario.cpf)) {
-                    if (!props.modoEdicao) {
-                        dispatch(adicionarUsuario(usuario)).then((retorno) => {
-                            if (retorno.payload.status) {
-                                props.setMensagem('Usuário incluído com sucesso');
-                                props.setTipoMensagem('success');
-                                props.setMostrarMensagem(true);
-                            } else {
-                                props.setMensagem('Usuário não incluído!');
-                                props.setTipoMensagem('danger');
-                                props.setMostrarMensagem(true);
-                            }
-                        });
-                    } else {
-                        dispatch(atualizarUsuario(usuario)).then((retorno) => {
-                            if (retorno.payload.status) {
-                                props.setMensagem('Usuário alterado com sucesso');
-                                props.setTipoMensagem('success');
-                                props.setMostrarMensagem(true);
-                                props.setModoEdicao(false);
-                                props.setUsuarioParaEdicao(usuarioVazio);
-                            } else {
-                                props.setMensagem('Usuário não alterado!');
-                                props.setTipoMensagem('danger');
-                                props.setMostrarMensagem(true);
-                            }
-                        });
-                    }
-                setUsuario(usuarioVazio);
-                setFormValidado(false);
-            }
-            else if(!validarCelular(usuario.celular) || !validarCPF(usuario.cpf))
-            {
-                alert("Celular ou CPF inválidos");
-            } else {
-                setFormValidado(true);
-            }
+        else if(!validarCelular(usuario.celular) || !validarCPF(usuario.cpf))
+        {
+            alert("Celular ou CPF inválidos");
+        } else {
+            setFormValidado(true);
+        }
     }
     
     function formatarCelular(celular) {
@@ -166,6 +178,7 @@ export default function FormCadUsuario(props) {
                         onChange={manipularMudancas}
                         required
                     />
+                    {camposRepetidos.nome && <Form.Text className="text-danger">Este nome já está em uso.</Form.Text>}
                 </Form.Group>
 
                 <Form.Group className="mb-3">
@@ -191,10 +204,12 @@ export default function FormCadUsuario(props) {
                         value={usuario.cpf}
                         onChange={handleInputChange}
                         maxLength="14"
-                        required />
+                        required 
+                        disabled={props.modoEdicao}/>
                     <Form.Control.Feedback type="invalid">
                         CPF inválido.
                     </Form.Control.Feedback>
+                    {!props.modoEdicao && camposRepetidos.cpf && <Form.Text className="text-danger">Este CPF já está em uso.</Form.Text>}
                 </Form.Group>
 
                 <Form.Group className="mb-3">
@@ -212,6 +227,7 @@ export default function FormCadUsuario(props) {
                     <Form.Control.Feedback type="invalid">
                         E-mail inválido.
                     </Form.Control.Feedback>
+                    {camposRepetidos.email && <Form.Text className="text-danger">Este e-mail já está em uso.</Form.Text>}
                 </Form.Group>
 
                 <Form.Group className="mb-3">
@@ -229,6 +245,7 @@ export default function FormCadUsuario(props) {
                     <Form.Control.Feedback type="invalid">
                         Celular inválido.
                     </Form.Control.Feedback>
+                    {camposRepetidos.celular && <Form.Text className="text-danger">Este celular já está em uso.</Form.Text>}
                 </Form.Group>
 
                 <p>(*) Campos obrigatórios</p>
@@ -245,12 +262,6 @@ export default function FormCadUsuario(props) {
                         </Button>
                     </Col>
                 </Row>
-               {!erro ? "" : <div>
-                <Form.Label>
-                <p> O campo {usuarioExistente && usuarioExistente.nome === usuario.nome ? 'Nome' : usuarioExistente && usuarioExistente.cpf === usuario.cpf ? 'CPF' :
-                    usuarioExistente && usuarioExistente.email === usuario.email ? 'E-mail' : usuarioExistente && usuarioExistente.celular === usuario.celular ? 'Celular' : ''} já está/estão em uso. </p>
-                </Form.Label>
-                </div>}
             </Form>
         </>
     );
