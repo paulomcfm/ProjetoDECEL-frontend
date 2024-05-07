@@ -1,5 +1,5 @@
-
 import TelaCadastroEscola from './telasCadastro/telaCadastroEscola.jsx';
+import TelaCadastroMonitor from './telasCadastro/TelaCadastroMonitor.jsx';
 import TelaCadastroResponsavel from './telasCadastro/telaCadastroResponsavel.jsx';
 import TelaCadastroAluno from './telasCadastro/telaCadastroAluno.jsx';
 import TelaCadastroPontoEmbarque from './telasCadastro/telaCadastroPontoEmbarque.jsx';
@@ -12,12 +12,14 @@ import TelaRegistrarManutencao from './telasFuncoes/TelaRegistrarManutencao.jsx'
 import MapaPagina from './telasSaida/MapaPagina.jsx'
 import TelaLogin from './telasCadastro/telaLogin.jsx';
 import TelaCadastroUser from './telasCadastro/telaCadastroUser.jsx';
+import RelatorioRotasDiferentes from './telasSaida/RelatorioRotasDiferentes.jsx';
 import Esqueci from './telasCadastro/telaEsqueci.jsx';
 import RelatorioAlunos from './telasSaida/RelatorioAlunos.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import TelaMenu from './telasCadastro/TelaMenu.jsx'
 import store from './redux/store.js';
 import { Provider } from 'react-redux';
+import './recursos/App.css';
 
 function App() {
   return (
@@ -40,6 +42,8 @@ function App() {
             <Route path='/registrar-manutencao' element={<TelaRegistrarManutencao />} />
             <Route path='/mapa-rota' element={<MapaPagina />} />
             <Route path='/relatorios/alunos' element={<RelatorioAlunos />} />
+            <Route path='/monitor' element={< TelaCadastroMonitor/>} />
+            <Route path='/relatorios/rotas-diferentes' element={<RelatorioRotasDiferentes />} />
             <Route path='*' element={<Tela404 />} />
           </Routes>
         </BrowserRouter>

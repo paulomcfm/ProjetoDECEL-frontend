@@ -180,7 +180,6 @@ const alunoSlice = createSlice({
             const indice = state.alunos.findIndex(aluno => aluno.codigo === action.payload.aluno.codigo);
             state.alunos[indice] = action.payload.aluno;
             state.mensagem = action.payload.mensagem;
-
         }).addCase(atualizarAluno.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
             state.mensagem = "Atualizando aluno...";
@@ -190,7 +189,7 @@ const alunoSlice = createSlice({
         }).addCase(removerAluno.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
             state.mensagem = action.payload.mensagem;
-            state.alunos = state.alunos.filter(aluno => aluno.codigo !== action.payload.aluno.codigo);
+            if (action.payload.status) { state.alunos = state.alunos.filter(aluno => aluno.codigo !== action.payload.aluno.codigo); }
         }).addCase(removerAluno.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
             state.mensagem = "Removendo aluno...";

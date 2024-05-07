@@ -7,9 +7,6 @@ import TabelaAlunos from "./tabelas/TabelaAlunos";
 
 export default function TelaCadastroAluno(props) {
     const [exibirFormulario, setExibirFormulario] = useState(false);
-    const [mostrarMensagem, setMostrarMensagem] = useState(false);
-    const [mensagem, setMensagem] = useState("");
-    const [tipoMensagem, setTipoMensagem] = useState("");
     const [alunoParaEdicao, setAlunoParaEdicao] = useState({
         nome: '',
         rg: '',
@@ -20,41 +17,29 @@ export default function TelaCadastroAluno(props) {
     });
     const [modoEdicao, setModoEdicao] = useState(false);
 
-    if (mostrarMensagem) {
-        return (
-            <TelaMensagem mensagem={mensagem} tipo={tipoMensagem} setMostrarMensagem={setMostrarMensagem} />
-        );
-    }
-    else {
-        return (
-            <Pagina>
-                <Container className="mt-4">
-                    <Row className="justify-content-center">
-                        {
-                            exibirFormulario ?
-                                <FormCadAluno exibirFormulario={setExibirFormulario}
-                                    alunoParaEdicao={alunoParaEdicao}
-                                    setAlunoParaEdicao={setAlunoParaEdicao}
-                                    modoEdicao={modoEdicao}
-                                    setModoEdicao={setModoEdicao}
-                                    setMostrarMensagem={setMostrarMensagem}
-                                    setMensagem={setMensagem}
-                                    setTipoMensagem={setTipoMensagem}
-                                />
-                                :
-                                <TabelaAlunos exibirFormulario={setExibirFormulario}
-                                    alunoParaEdicao={alunoParaEdicao}
-                                    setAlunoParaEdicao={setAlunoParaEdicao}
-                                    modoEdicao={modoEdicao}
-                                    setModoEdicao={setModoEdicao}
-                                    setMostrarMensagem={setMostrarMensagem}
-                                    setMensagem={setMensagem}
-                                    setTipoMensagem={setTipoMensagem}
-                                />
-                        }
-                    </Row>
-                </Container>
-            </Pagina>
-        )
-    }
+    return (
+        <Pagina>
+            <Container className="mt-4">
+                <Row className="justify-content-center">
+                    {
+                        exibirFormulario ?
+                            <FormCadAluno exibirFormulario={setExibirFormulario}
+                                alunoParaEdicao={alunoParaEdicao}
+                                setAlunoParaEdicao={setAlunoParaEdicao}
+                                modoEdicao={modoEdicao}
+                                setModoEdicao={setModoEdicao}
+                            />
+                            :
+                            <TabelaAlunos exibirFormulario={setExibirFormulario}
+                                alunoParaEdicao={alunoParaEdicao}
+                                setAlunoParaEdicao={setAlunoParaEdicao}
+                                modoEdicao={modoEdicao}
+                                setModoEdicao={setModoEdicao}
+                            />
+                    }
+                </Row>
+            </Container>
+        </Pagina>
+    )
+
 }

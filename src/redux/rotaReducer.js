@@ -35,6 +35,35 @@ export const buscarRotas = createAsyncThunk('rotas/buscar', async (filtro) => {
     }
 });
 
+export const buscarRotasInscricoes = createAsyncThunk('inscricoes-rotas/buscar', async () => {
+    try {
+        let urlBase = 'http://localhost:8080/inscricoes-rota'
+        
+        const resposta = await fetch(urlBase, { method: 'GET' });
+        const dados = await resposta.json();
+        if (dados.status) {
+            return {
+                status: true,
+                listaRotas: dados.listaRotas,
+                mensagem: ''
+            }
+        }
+        else {
+            return {
+                status: false,
+                listaRotas: [],
+                mensagem: 'Ocorreu um erro ao recuperar as rotas da base de dados.'
+            }
+        }
+    } catch (erro) {
+        return {
+            status: false,
+            listaRotas: [],
+            mensagem: 'Ocorreu um erro ao recuperar as rotas da base de dados:' + erro.message
+        }
+    }
+});
+
 export const adicionarRotas = createAsyncThunk('rotas/adicionar', async (rota) => {
     const resposta = await fetch(urlBase, {
         method: 'POST',
@@ -156,7 +185,22 @@ const rotaSlice = createSlice({
         }).addCase(buscarRotas.rejected, (state, action) => {
             state.estado = ESTADO.ERRO;
             state.mensagem = action.error.message;
-        }).addCase(adicionarRotas.fulfilled, (state, action) => {
+        }).addCase(buscarRotasInscricoes.pending,(state,action)=>{
+            state.estado = ESTADO.PENDENTE;
+            state.mensagem = "Buscando rotas...";
+        }).addCase(buscarRotasInscricoes.fulfilled,(state,action)=>{
+            if(action.payload.status){
+                state.estado = ESTADO.OCIOSO
+            }else{
+                state.estado = ESTADO.ERRO
+            }
+            state.rotas = action.payload.listaRotas
+            state.mensagem = action.payload.mensagem
+        }).addCase(buscarRotasInscricoes.rejected,(state,action)=>{
+            state.estado = ESTADO.ERRO;
+            state.mensagem = action.error.message;
+        })
+        .addCase(adicionarRotas.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
             // state.rotas.push(action.payload.rota);
             state.mensagem = action.payload.mensagem;
