@@ -114,6 +114,35 @@ body, div {
 }
 
 .hover-relatorio:hover {
-    transform: scale(0.95); /* Adjust the scale value as needed */
-    transition: transform 0.3s ease; /* Adjust the transition speed if necessary */
+    transform: scale(0.95); 
+    transition: transform 0.3s ease; 
+}
+
+.linhas-titulo-tabela {
+    padding: 1%;
+    text-align: center;
+}
+
+.div-linhas-titulo-tabela {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    flex-direction: row;
+    gap: 3px;
+}
+
+.linhas-tabela {
+    padding: 1%;
+    text-align: center;
+}
+
+.head-tabela {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+}
+
+.tabela {
+    order: collapse; 
+    width: 100%; 
 }
