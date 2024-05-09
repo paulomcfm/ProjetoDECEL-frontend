@@ -28,28 +28,18 @@ function App() {
           <Routes>
             <Route path='/' element={<TelaLogin />} />
 
-            <Route path='/pontos-embarque' element={
-              <RotaProtegida>
-                <TelaCadastroPontoEmbarque />
-              </RotaProtegida>
-              } autenticado={autenticado}
-            />
-            <Route path='/motorista' element={<RotaProtegida> <TelaMotorista /> </RotaProtegida>} autenticado={autenticado}/>
-            <Route path='/esqueci-minha-senha' element={<Esqueci />} />
-            <Route path='/cadastro-user' element={<RotaProtegida> <TelaCadastroUser /> </RotaProtegida>} autenticado={autenticado}/>
-            <Route path='/alunos' element={<RotaProtegida> <TelaCadastroAluno/> </RotaProtegida>} autenticado={autenticado}/>
-            <Route path='/responsaveis' element={<RotaProtegida> <TelaCadastroResponsavel/> </RotaProtegida>} autenticado={autenticado}/>
-            <Route path='/escolas' element={<RotaProtegida> <TelaCadastroEscola/> </RotaProtegida>} autenticado={autenticado}/>
-            <Route path='/menu'element={
-              <RotaProtegida>
-                <TelaMenu />
-              </RotaProtegida>
-            } autenticado={autenticado}/>
-            <Route path='/inscricao-aluno' element={<RotaProtegida> <TelaCadastroInscricao/> </RotaProtegida>} autenticado={autenticado}/>
-            <Route path='/definir-rota' element={<RotaProtegida> <TelaDefinirRotas/> </RotaProtegida>} autenticado={autenticado}/>
-            <Route path='/alocar-aluno' element={<RotaProtegida> <TelaAlocarAluno/> </RotaProtegida>} autenticado={autenticado}/>
-            <Route path='/registrar-manutencao' element={<RotaProtegida> <TelaRegistrarManutencao/> </RotaProtegida>} autenticado={autenticado}/>
-            <Route path='/mapa-rota' element={<RotaProtegida> <MapaPagina/> </RotaProtegida>} autenticado={autenticado}/>
+            <Route path='/pontos-embarque' element={autenticado ? <TelaCadastroPontoEmbarque/> : <RotaProtegida><TelaCadastroPontoEmbarque /></RotaProtegida>} />
+            <Route path='/motorista' element={autenticado ? <TelaMotorista/> : <RotaProtegida><TelaMotorista /></RotaProtegida>} />
+            <Route path='/cadastro-user' element={autenticado ? <TelaCadastroUser/> : <RotaProtegida><TelaCadastroUser /></RotaProtegida>} />
+            <Route path='/alunos' element={autenticado ? <TelaCadastroAluno/> : <RotaProtegida><TelaCadastroAluno /></RotaProtegida>} />
+            <Route path='/responsaveis' element={autenticado ? <TelaCadastroResponsavel/> : <RotaProtegida><TelaCadastroResponsavel /></RotaProtegida>} />
+            <Route path='/escolas' element={autenticado ? <TelaCadastroEscola/> : <RotaProtegida><TelaCadastroEscola /></RotaProtegida>} />
+            <Route path='/menu' element={autenticado ? <TelaMenu/> : <RotaProtegida><TelaMenu /></RotaProtegida>} />
+            <Route path='/inscricao-aluno' element={autenticado ? <TelaCadastroInscricao/> : <RotaProtegida><TelaCadastroInscricao /></RotaProtegida>} />
+            <Route path='/definir-rota' element={autenticado ? <TelaDefinirRotas/> : <RotaProtegida><TelaDefinirRotas /></RotaProtegida>} />
+            <Route path='/alocar-aluno' element={autenticado ? <TelaAlocarAluno/> : <RotaProtegida><TelaAlocarAluno /></RotaProtegida>} />
+            <Route path='/registrar-manutencao' element={autenticado ? <TelaRegistrarManutencao/> : <RotaProtegida><TelaRegistrarManutencao /></RotaProtegida>} />
+            <Route path='/mapa-rota' element={autenticado ? <MapaPagina/> : <RotaProtegida><MapaPagina /></RotaProtegida>} />
             
             <Route path='*' element={<Tela404 />} />
           </Routes>

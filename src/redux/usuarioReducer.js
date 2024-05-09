@@ -149,7 +149,9 @@ export const removerUsuario = createAsyncThunk('usuario/remover', async (usuario
 const initialState = {
     estado: ESTADO.OCIOSO,
     mensagem: "",
-    usuarios: []
+    usuarios: [],
+    autenticado: false, // Adicione um campo para indicar se o usuário está autenticado
+    usuarioAutenticado: null, // Adicione um campo para armazenar informações do usuário autenticado
 };
 
 const usuarioSlice = createSlice({
@@ -205,7 +207,17 @@ const usuarioSlice = createSlice({
         }).addCase(removerUsuario.rejected, (state, action) => {
             state.mensagem = "Erro ao remover o usuário: " + action.error.message;
             state.estado = ESTADO.ERRO;
-        })
+        }).addCase(autenticar.fulfilled, (state, action) => {
+            if (action.payload.status) {
+                state.autenticado = true;
+                state.usuarioAutenticado = action.payload.usuario;
+                state.mensagem = action.payload.mensagem;
+            } else {
+                state.autenticado = false;
+                state.usuarioAutenticado = null;
+                state.mensagem = action.payload.mensagem;
+            }
+        });
     }
 });
 
