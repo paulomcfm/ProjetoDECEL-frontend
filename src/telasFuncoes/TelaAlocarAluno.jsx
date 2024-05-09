@@ -47,7 +47,7 @@ export default function TelaAlocarAluno(props) {
     }, [rotas]);
 
     useEffect(() => {
-        if (inscricoes.length > 0) {
+        if (inscricoes.length > 0 && rotasCarregadas.length > 0) {
             const curYear = new Date().getFullYear();
             // const curYear = 2025;
             const outdatedSubscriptions = inscricoes.filter((inscricao) => {
@@ -69,7 +69,7 @@ export default function TelaAlocarAluno(props) {
     if (!toastController && outdatedRoutes.length > 0) {
         let i = 0;
         outdatedRoutes.forEach((rota) => {
-            const rotaEncontrada = rotasCarregadas.find((r) => r.codigo === rota);
+            const rotaEncontrada = rotasCarregadas.find((r) => r.codigo === rota.codigo);
             if (rotaEncontrada) {
                 toast.warn(`Há alunos com alocações desatualizadas na rota ${rotaEncontrada.nome}`, {
                     position: "bottom-right",
