@@ -17,7 +17,9 @@ export default function FormCadAlunos(props) {
         observacoes: '',
         dataNasc: '',
         celular: '',
-        responsaveis: []
+        responsaveis: [],
+        status: '',
+        motivoInativo: ''
     }
 
     const estadoInicialAluno = props.alunoParaEdicao;
@@ -28,6 +30,7 @@ export default function FormCadAlunos(props) {
     const { estadoResp, mensagemResp, responsaveis } = useSelector((state) => state.responsavel);
     const [responsaveisSelecionados, setResponsaveisSelecionados] = useState([]);
     const [responsaveisAntes, setResponsaveisAntes] = useState([]);
+    const [status, setStatus] = useState(false);
 
     const dispatch = useDispatch();
 
@@ -164,6 +167,14 @@ export default function FormCadAlunos(props) {
     }, []);
 
     useEffect(() => {
+        if (aluno) {
+            if(aluno.status == 'A'){
+                setStatus(true);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
         if (props.alunoParaEdicao.responsaveis.length > 0 && responsaveisSelecionados.length === 0) {
             const responsaveisSelecionados = props.alunoParaEdicao.responsaveis.map(responsavel => {
                 const responsavelCompleto = responsaveis.find(r => r.codigo === responsavel.codigoResponsavel);
@@ -194,6 +205,17 @@ export default function FormCadAlunos(props) {
     function addResponsavel(responsavel) {
         if (!responsaveisSelecionados.find(r => r.codigo === responsavel.codigo)) {
             setResponsaveisSelecionados([...responsaveisSelecionados, responsavel]);
+        }
+    }
+
+    function handleStatus() {
+        setStatus(!status);
+        if (status) {
+            setAluno({ ...aluno, status: 'A' });
+            console.log(aluno);
+        } else {
+            setAluno({ ...aluno, status: 'I' });
+            console.log(aluno);
         }
     }
 
@@ -367,6 +389,31 @@ export default function FormCadAlunos(props) {
                         maxLength={255}
                     />
                 </Form.Group>
+                <Row>
+                    {props.modoEdicao && (
+                        <>
+                            <Col md={2}>
+                                <Form.Label>Situação:</Form.Label>
+                                <Form.Check
+                                    type="switch"
+                                    id="status"
+                                    label={status ? 'Ativo' : 'Inativo'}
+                                    onChange={handleStatus}
+                                    checked={status}
+                                />
+                            </Col>
+                            {!status && <Col md={10}>
+                                <Form.Label>Motivo:</Form.Label>
+                                <Form.Select aria-label="Default select example">
+                                    <option>Selecione o motivo</option>
+                                    <option value="Ensino Médio Completo">Ensino Médio Completo</option>
+                                    <option value="Mudou-se de Álvares Machado">Mudou-se de Álvares Machado</option>
+                                    <option value="Outro">Outro...</option>
+                                </Form.Select>
+                            </Col>}
+                        </>
+                    )}
+                </Row>
                 <p>(*) Campos obrigatórios</p>
                 <Row>
                     <Col md={6} offset={5} className="d-flex justify-content-end">
