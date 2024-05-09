@@ -3,6 +3,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { autenticar } from '../redux/usuarioReducer'; // Importa a função de autenticação
+import { useNavigate } from 'react-router-dom';
 
 export default function TelaLogin() {
     const [username, setUsername] = useState('');
@@ -10,23 +11,23 @@ export default function TelaLogin() {
     const [cpf, setCpf] = useState('');
     const [autenticado, setAutenticado] = useState(false);
     const dispatch = useDispatch(); // Obtém a função dispatch do Redux
-
+    const [erro, setErro] = useState('');
+    const navigate = useNavigate();
     async function handleLogin() {
-        // Despacha a action para autenticar o usuário
         dispatch(autenticar({ nome: username, cpf, senha: password }))
             .then((retorno) => {
                 if (retorno.payload.status) {
                     setAutenticado(true); // Define autenticado como true se a autenticação for bem-sucedida
                 } else {
-                    // Tratamento para autenticação inválida
+                    setErro(true);
                     alert('Usuário, CPF ou senha inválidos.');
                 }
             })
             .catch((error) => {
                 console.error('Erro ao autenticar usuário:', error);
-                // Tratamento para erros de autenticação
                 alert('Erro ao autenticar usuário. Por favor, tente novamente mais tarde.');
             });
+            navigate('/menu', { state: { autenticado: true } });
     }
 
     function formatarCPF(cpf) {
@@ -86,6 +87,7 @@ export default function TelaLogin() {
                             />
                         </Form.Group>
                         <br />
+                        {erro && <Form.Text className="text-danger">Usuário, CPF ou senha inválidos! <br /></Form.Text>}
                         <Button
                             variant="primary"
                             type="button"

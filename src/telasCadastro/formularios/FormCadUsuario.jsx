@@ -60,6 +60,7 @@ export default function FormCadUsuario(props) {
             }));
         }
     }
+    
     async function verificarCamposRepetidos() {
         const camposRepetidosAtualizados = {
                 nome: !!usuarios.find(u => u.nome === usuario.nome && u.cpf !== usuario.cpf),
