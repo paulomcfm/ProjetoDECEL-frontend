@@ -10,6 +10,7 @@ import { buscarRotas } from '../redux/rotaReducer';
 import { format } from 'date-fns';
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 import { MdFilterListAlt } from "react-icons/md";
+import '../templates/style.css';
 
 export default function TabelaInscricoes(props) {
     const [termoBusca, setTermoBusca] = useState('');
@@ -88,7 +89,7 @@ export default function TabelaInscricoes(props) {
                                 border: '1px solid #ced4da',
                                 transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
                             }}
-                            placeholder="Buscar inscrições pelo nome do aluno..."
+                            placeholder="Buscar inscrições pelo nome do aluno ou pelo RG..."
                             value={termoBusca}
                             onChange={e => setTermoBusca(e.target.value)}
                         />
@@ -108,19 +109,26 @@ export default function TabelaInscricoes(props) {
                         </div>
                     </div>
                 </div>
-                <table bordered hover style={{ orderCollapse: 'collapse', width: '100%' }}>
-                    <thead style={{ backgroundColor: '#f8f9fa', borderRadius: '10px' }}>
+                <table bordered hover className='tabela'>
+                    <thead className='head-tabela'>
                         <tr>
-                            <th style={{ padding: '1%', textAlign: 'center' }}>Aluno</th>
-                            <th style={{ padding: '1%', textAlign: 'center' }}>RG</th>
-                            <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer' }} onClick={handleOrdenarPorEscola}>Escola {!ordenarPorEscola ? <FaAngleUp /> : <FaAngleDown />}</th>
-                            <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer' }} onClick={handleOrdenarPorPeriodo}>Período {!ordenarPorPeriodo ? <FaAngleUp /> : <FaAngleDown />}</th>
-                            <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer' }} onClick={handleOrdenarPorRota}>Rota {!ordenarPorRota ? <FaAngleUp /> : <FaAngleDown />}</th>
+                            <th className='linhas-titulo-tabela'>Aluno</th>
+                            <th className='linhas-titulo-tabela'>RG</th>
+                            <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrdenarPorEscola}>
+                                <div className='div-linhas-titulo-tabela'>Escola {!ordenarPorEscola ? <FaAngleUp /> : <FaAngleDown />}
+                                </div>
+                            </th>
+                            <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrdenarPorPeriodo}>
+                                <div className='div-linhas-titulo-tabela'> Período {!ordenarPorPeriodo ? <FaAngleUp /> : <FaAngleDown />}</div>
+                            </th>
+                            <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrdenarPorRota}>
+                                <div className='div-linhas-titulo-tabela'> Rota {!ordenarPorRota ? <FaAngleUp /> : <FaAngleDown />}</div>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
                         {alunosOrdenados
-                            .filter(aluno => aluno.nome.toLowerCase().includes(termoBusca.toLowerCase()))
+                            .filter(aluno => aluno.nome.toLowerCase().includes(termoBusca.toLowerCase()) || aluno.rg.toLowerCase().includes(termoBusca.toLowerCase()))
                             .filter(aluno => {
                                 if (filtroAlunosInscritos && filtroAlunosAlocados) {
                                     return inscricoes.some(inscricao => inscricao.aluno.codigo === aluno.codigo) &&
@@ -141,7 +149,7 @@ export default function TabelaInscricoes(props) {
                                 const periodo = inscricaoAluno ? inscricaoAluno.periodo : '';
                                 return (
                                     <tr key={aluno.codigo}>
-                                        <td style={{ padding: '1%', textAlign: 'center' }}>
+                                        <td className='linhas-tabela'>
 
                                             <OverlayTrigger
                                                 trigger="hover"
@@ -158,11 +166,11 @@ export default function TabelaInscricoes(props) {
                                                     </Popover>
                                                 }
                                             >
-                                                <div style={{ display: 'flex', justifyContent: 'center' }}>{aluno.nome}</div>
+                                                <div>{aluno.nome}</div>
                                             </OverlayTrigger>
                                         </td>
-                                        <td style={{ padding: '1%', textAlign: 'center' }}>{aluno.rg}</td>
-                                        <td style={{ padding: '1%', textAlign: 'center' }}>
+                                        <td className='linhas-tabela'>{aluno.rg}</td>
+                                        <td className='linhas-tabela'>
                                             {escola ?
                                                 <OverlayTrigger
                                                     trigger="hover"
@@ -188,14 +196,14 @@ export default function TabelaInscricoes(props) {
                                                         </Popover>
                                                     }
                                                 >
-                                                    <div style={{ display: 'flex', justifyContent: 'center' }}>{escola.nome}</div>
+                                                    <div>{escola.nome}</div>
                                                 </OverlayTrigger>
                                                 : 'Aluno não inscrito...'}
                                         </td>
-                                        <td style={{ padding: '1%', textAlign: 'center' }}>
+                                        <td className='linhas-tabela'>
                                             {periodo === 'M' ? 'Matutino' : periodo === 'V' ? 'Vespertino' : periodo === 'I' ? 'Integral' : 'Aluno não inscrito...'}
                                         </td>
-                                        <td style={{ padding: '1%', textAlign: 'center' }}>
+                                        <td className='linhas-tabela'>
                                             {rota ?
                                                 <OverlayTrigger
                                                     trigger="hover"
@@ -214,7 +222,7 @@ export default function TabelaInscricoes(props) {
                                                         </Popover>
                                                     }
                                                 >
-                                                    <div style={{ display: 'flex', justifyContent: 'center' }}>{rota.nome}</div>
+                                                    <div>{rota.nome}</div>
                                                 </OverlayTrigger> : 'Aluno não alocado...'}
                                         </td>
                                     </tr>

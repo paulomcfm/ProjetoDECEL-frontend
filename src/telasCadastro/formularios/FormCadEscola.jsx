@@ -3,6 +3,8 @@ import { Form, Button, Row, Col, Table } from 'react-bootstrap';
 import { adicionarEscola, atualizarEscola } from '../../redux/escolaReducer';
 import { buscarPontosEmbarque } from '../../redux/pontosEmbarqueReducer';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast, Bounce } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function FormCadEscolas(props) {
     const estadoInicialEscola = props.escolaParaEdicao;
@@ -79,18 +81,65 @@ export default function FormCadEscolas(props) {
         if (pontoEmbarqueSelecionado) {
             if (form.checkValidity()) {
                 if (!props.modoEdicao) {
-                    dispatch(adicionarEscola(escola));
-                    props.setMensagem('Escola incluída com sucesso');
-                    props.setTipoMensagem('success');
-                    props.setMostrarMensagem(true);
+                    dispatch(adicionarEscola(escola)).then((retorno) => {
+                        if (retorno.payload.status) {
+                            toast.success('Escola incluída com sucesso!', {
+                                position: "top-right",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "light",
+                                transition: Bounce,
+                            });
+                        } else {
+                            toast.error('Escola não incluída! ' + retorno.payload.mensagem, {
+                                position: "top-right",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "light",
+                                transition: Bounce,
+                            });
+                        }
+                    });
                 }
                 else {
-                    dispatch(atualizarEscola(escola));
-                    props.setMensagem('Escola alterada com sucesso');
-                    props.setTipoMensagem('success');
-                    props.setMostrarMensagem(true);
-                    props.setModoEdicao(false);
-                    props.setEscolaParaEdicao(escolaVazia);
+                    dispatch(atualizarEscola(escola)).then((retorno) => {
+                        ;
+                        if (retorno.payload.status) {
+                            toast.success('Escola alterada com sucesso!', {
+                                position: "top-right",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "light",
+                                transition: Bounce,
+                            });
+                            props.setModoEdicao(false);
+                            props.setEscolaParaEdicao(escolaVazia);
+                        } else {
+                            toast.error('Escola não alterada! ' + retorno.payload.mensagem, {
+                                position: "top-right",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "light",
+                                transition: Bounce,
+                            });
+                        }         
+                    });
                 }
                 props.exibirFormulario(false);
                 setEscola(escolaVazia);
