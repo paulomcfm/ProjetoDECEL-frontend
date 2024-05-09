@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import Pagina from '../templates/Pagina';
 import { getInscricoesFora } from '../redux/inscricaoReducer';
 import { buscarRotas } from '../redux/rotaReducer';
+import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 
 export default function RelatorioRotasDiferentes(props) {
     const { inscricoes } = useSelector(state => state.inscricao);
@@ -12,6 +13,8 @@ export default function RelatorioRotasDiferentes(props) {
     const [inscricoesFora, setInscricoesFora] = useState([]);
     const [loadedRotas, setLoadedRotas] = useState([]);
     const dispatch = useDispatch();
+
+    const [orderByNome, setOrderByNome] = useState(false);
 
     useEffect(() => {
         setInscricoesFora(inscricoes);
@@ -23,22 +26,31 @@ export default function RelatorioRotasDiferentes(props) {
         dispatch(buscarRotas());
     }, [dispatch]);
 
+    const handleOrderByNome = () => {
+        setOrderByNome(!orderByNome);
+        if (orderByNome) {
+            setInscricoesFora(inscricoes.sort((a, b) => (a.aluno.nome > b.aluno.nome) ? 1 : ((b.aluno.nome > a.aluno.nome) ? -1 : 0)));
+        } else {
+            setInscricoesFora(inscricoes.sort((a, b) => (a.aluno.nome < b.aluno.nome) ? 1 : ((b.aluno.nome < a.aluno.nome) ? -1 : 0)));
+        }
+    }
+
     return (
         <Pagina>
-            <Container className="mt-4 mb-4 text-center">
+            <Container className="">
                 <h3>Alunos com ponto de embarque fora dos pontos de embarque de sua rota:</h3>
                 {loadedRotas.length > 0 && (
-                    <Table className='mt-4' striped bordered hover >
-                        <thead>
+                    <table bordered hover style={{ borderRadius: 'px', borderCollapse: 'collapse' }}>
+                        <thead style={{backgroundColor: '#f8f9fa', borderRadius: '10px' }}>
                             <tr>
-                                <th className='col-2 align-middle text-center'>Aluno</th>
-                                <th className="align-middle text-center">RG</th>
-                                <th className="align-middle text-center">Endereço</th>
-                                <th className="align-middle text-center">Ponto de Embarque</th>
-                                <th className="align-middle text-center">Escola</th>
-                                <th className="align-middle text-center">Turma, etapa e período</th>
-                                <th className='col-2 align-middle text-center'>Rota</th>
-                                <th className="align-middle text-center">Pontos de Embarque da Rota</th>
+                                <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer'}} onClick={handleOrderByNome}>Aluno {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</th>
+                                <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer'}} onClick={handleOrderByNome}>RG {!orderByNome ? <FaAngleUp /> : <FaAngleDown/>}</th>
+                                <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer'}} onClick={handleOrderByNome}>Endereço {!orderByNome ? <FaAngleUp /> : <FaAngleDown/>}</th>
+                                <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer'}} onClick={handleOrderByNome}>Ponto de Embarque {!orderByNome ? <FaAngleUp /> : <FaAngleDown/>}</th>
+                                <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer'}} onClick={handleOrderByNome}>Escola {!orderByNome ? <FaAngleUp /> : <FaAngleDown/>}</th>
+                                <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer'}} onClick={handleOrderByNome}>Turma, etapa e período {!orderByNome ? <FaAngleUp /> : <FaAngleDown/>}</th>
+                                <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer'}} onClick={handleOrderByNome}>Rota {!orderByNome ? <FaAngleUp /> : <FaAngleDown/>}</th>
+                                <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer'}} onClick={handleOrderByNome}>Pontos de Embarque da Rota {!orderByNome ? <FaAngleUp /> : <FaAngleDown/>}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -75,7 +87,7 @@ export default function RelatorioRotasDiferentes(props) {
                                                                                     : inscricao.anoLetivo.includes('9')
                                                                                         ? '9º Ano'
                                                                                         : ''}
-                                            {inscricao.turma}. {inscricao.etapa === 'I'
+                                            {' ' + inscricao.turma}. {inscricao.etapa === 'I'
                                                 ? 'Educação Infantil'
                                                 : inscricao.etapa === 'F'
                                                     ? 'Ensino Fundamental'
@@ -136,7 +148,7 @@ export default function RelatorioRotasDiferentes(props) {
                                 );
                             })}
                         </tbody>
-                    </Table>
+                    </table>
                 )}
             </Container>
         </Pagina>

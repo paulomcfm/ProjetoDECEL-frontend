@@ -28,9 +28,6 @@ export default function TelaAlocarAluno(props) {
     const [novaRotaSelecionada, setNovaRotaSelecionada] = useState(null);
     const { estadoInsc, mensagemIsnc, inscricoes } = useSelector(state => state.inscricao);
     const { estadoRota, mensagemRota, rotas } = useSelector(state => state.rota);
-    const [mostrarMensagem, setMostrarMensagem] = useState(false);
-    const [mensagem, setMensagem] = useState("");
-    const [tipoMensagem, setTipoMensagem] = useState("");
     const [escolasRota, setEscolasRota] = useState(null);
     const [inscricoesFora, setInscricoesFora] = useState([]);
     const [indiceRotaSelecionadaAnterior, setIndiceRotaSelecionadaAnterior] = useState(null);
@@ -74,7 +71,7 @@ export default function TelaAlocarAluno(props) {
         outdatedRoutes.forEach((rota) => {
             const rotaEncontrada = rotasCarregadas.find((r) => r.codigo === rota);
             if (rotaEncontrada) {
-                toast.warn(`Há alunos com alocações desatualizadas na rota ${rotaEncontrada.nome}`,{
+                toast.warn(`Há alunos com alocações desatualizadas na rota ${rotaEncontrada.nome}`, {
                     position: "bottom-right",
                     autoClose: 5000,
                     hideProgressBar: false,
@@ -204,13 +201,29 @@ export default function TelaAlocarAluno(props) {
         }
         dispatch(atualizarInscricoes(inscricoesAtualizadas)).then(async (retorno) => {
             if (retorno.payload.status) {
-                setMensagem(retorno.payload.mensagem);
-                setTipoMensagem('success');
-                setMostrarMensagem(true);
+                toast.success(retorno.payload.mensagem, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                });
             } else {
-                setMensagem('Inscrição não alterada! ' + retorno.payload.mensagem);
-                setTipoMensagem('danger');
-                setMostrarMensagem(true);
+                toast.error('Inscrição não alterada! ' + retorno.payload.mensagem, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                });
             }
             await dispatch(buscarRotasInscricoes()).then(() => {
                 dispatch(buscarInscricoes()).then(() => {
@@ -224,140 +237,86 @@ export default function TelaAlocarAluno(props) {
                 });
             });
         });
+        document.getElementById('selecionarRota').selectedIndex = 0;
     };
 
     const handleCancelarAlocacao = () => {
         setMostrarModalCancelar(true);
     };
 
-    if (mostrarMensagem) {
-        return (
-            <TelaMensagem mensagem={mensagem} tipo={tipoMensagem} setMostrarMensagem={setMostrarMensagem} />
-        );
-    }
-    else {
-        return (
-            <Pagina>
-                <Container className="mt-4 mb-4 text-center">
-                    <h2>Alocar Alunos</h2>
-                    <Form.Group className="mb-3" controlId="selecionarRota">
-                        <Form.Label>Selecione a rota:</Form.Label>
-                        <Form.Select onChange={(e) => handleSelecionarRota(rotasCarregadas.find(rota => rota.nome === e.target.value))}>
-                            <option value="">Selecione um rota...</option>
-                            {rotasCarregadas.map((rota, index) => (
-                                <option key={index} value={rota.nome}>
-                                    {rota.nome} - {rota.veiculo[0].vei_placa} - {rota.motoristas.map((motorista) => motorista.nome).join('- ')}
-                                </option>
-                            ))}
-                        </Form.Select>
-                    </Form.Group>
-                    {mostrarModalConfirmacao && (
-                        <Modal show={mostrarModalConfirmacao} onHide={cancelarTrocaRota}>
-                            <Modal.Header closeButton onHide={() => setMostrarModalCancelar(false)}>
-                                <Modal.Title>Confirmar Troca de Rota</Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>Deseja realmente trocar de rota?</Modal.Body>
-                            <Modal.Footer className='d-flex justify-content-center'>
-                                <Button variant="primary" onClick={confirmarTrocaRota}>
-                                    Confirmar
-                                </Button>
-                                <Button variant="danger" onClick={cancelarTrocaRota}>
-                                    Cancelar
-                                </Button>
-                            </Modal.Footer>
-                        </Modal>
-                    )}
-                    {rotaEstaSelecionada && rotaSelecionada && (
-                        <>
-                            <Table striped bordered className="mt-4">
-                                <thead>
+    return (
+        <Pagina>
+            <Container className="mt-4 mb-4 text-center">
+                <h2>Alocar Alunos</h2>
+                <Form.Group className="mb-3" controlId="selecionarRota">
+                    <Form.Label>Selecione a rota:</Form.Label>
+                    <Form.Select onChange={(e) => handleSelecionarRota(rotasCarregadas.find(rota => rota.nome === e.target.value))}>
+                        <option value="">Selecione um rota...</option>
+                        {rotasCarregadas.map((rota, index) => (
+                            <option key={index} value={rota.nome}>
+                                {rota.nome} - {rota.veiculo[0].vei_placa} - {rota.motoristas.map((motorista) => motorista.nome).join('- ')}
+                            </option>
+                        ))}
+                    </Form.Select>
+                </Form.Group>
+                {mostrarModalConfirmacao && (
+                    <Modal show={mostrarModalConfirmacao} onHide={cancelarTrocaRota}>
+                        <Modal.Header closeButton onHide={() => setMostrarModalCancelar(false)}>
+                            <Modal.Title>Confirmar Troca de Rota</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>Deseja realmente trocar de rota?</Modal.Body>
+                        <Modal.Footer className='d-flex justify-content-center'>
+                            <Button variant="primary" onClick={confirmarTrocaRota}>
+                                Confirmar
+                            </Button>
+                            <Button variant="danger" onClick={cancelarTrocaRota}>
+                                Cancelar
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+                )}
+                {rotaEstaSelecionada && rotaSelecionada && (
+                    <>
+                        <Table striped bordered className="mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Nome da Rota</th>
+                                    <th>Motoristas</th>
+                                    <th>Monitor</th>
+                                    <th>Placa do Veículo</th>
+                                    <th>Pontos de Embarque</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {rotaSelecionada && (
                                     <tr>
-                                        <th>Nome da Rota</th>
-                                        <th>Motoristas</th>
-                                        <th>Monitor</th>
-                                        <th>Placa do Veículo</th>
-                                        <th>Pontos de Embarque</th>
+                                        <td className="text-center align-middle">{rotaSelecionada.nome}</td>
+                                        <td>
+                                            <ul className="text-center align-middle list-unstyled mb-0">
+                                                {rotaSelecionada.motoristas.map((mot, index) => (
+                                                    <li key={index}>{mot.nome}</li>
+                                                ))}
+                                            </ul>
+                                        </td>
+                                        <td className="text-center align-middle">{rotaSelecionada.monitor[0].mon_nome}</td>
+                                        <td className="text-center align-middle">{rotaSelecionada.veiculo[0].vei_placa}</td>
+                                        <td>
+                                            <ul className="text-center align-middle list-unstyled mb-0">
+                                                {rotaSelecionada.pontos.map((ponto, index) => (
+                                                    <li key={index}>{ponto.rua}, {ponto.numero}</li>
+                                                ))}
+                                            </ul>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {rotaSelecionada && (
-                                        <tr>
-                                            <td className="text-center align-middle">{rotaSelecionada.nome}</td>
-                                            <td>
-                                                <ul className="text-center align-middle list-unstyled mb-0">
-                                                    {rotaSelecionada.motoristas.map((mot, index) => (
-                                                        <li key={index}>{mot.nome}</li>
-                                                    ))}
-                                                </ul>
-                                            </td>
-                                            <td className="text-center align-middle">{rotaSelecionada.monitor[0].mon_nome}</td>
-                                            <td className="text-center align-middle">{rotaSelecionada.veiculo[0].vei_placa}</td>
-                                            <td>
-                                                <ul className="text-center align-middle list-unstyled mb-0">
-                                                    {rotaSelecionada.pontos.map((ponto, index) => (
-                                                        <li key={index}>{ponto.rua}, {ponto.numero}</li>
-                                                    ))}
-                                                </ul>
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </Table>
-                            <>
-                                <h4>Alunos da Rota</h4>
-                                {inscricoesSelecionadas.length === 0 ? (
-                                    <p>Não há alunos alocados na rota</p>
-                                ) : (
-                                    inscricoesSelecionadas.map((inscricao, index) => {
-                                        const possuiPontoFora = inscricoesFora.some(fora => fora.aluno.codigo === inscricao.aluno.codigo);
-
-                                        return (
-                                            <div key={index} className="d-flex justify-content-center align-items-center">
-                                                <OverlayTrigger
-                                                    trigger="hover"
-                                                    key="bottom"
-                                                    placement="bottom"
-                                                    overlay={
-                                                        <Popover id="popover-positioned-bottom">
-                                                            <Popover.Header as="h3">{inscricao.aluno.nome}</Popover.Header>
-                                                            <Popover.Body>
-                                                                {possuiPontoFora && (
-                                                                    <p><PiWarningBold style={{ marginRight: '2% ', color: 'red' }} />Aluno possui ponto de embarque fora dos pontos de embarque da rota!</p>
-                                                                )}
-                                                                <p>RG: {inscricao.aluno.rg}</p>
-                                                                <p>Data de Nascimento: {format(new Date(inscricao.aluno.dataNasc), 'dd/MM/yyyy')}</p>
-                                                                <p>Celular: {inscricao.aluno.celular}</p>
-                                                                <p>Observações: {inscricao.aluno.observacoes}</p>
-                                                            </Popover.Body>
-                                                        </Popover>
-                                                    }
-                                                >
-                                                    <Button variant="light" className="me-2 mb-2 mt-4 w-50">
-                                                        <GrContactInfo style={{ marginRight: '2%' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
-                                                        {possuiPontoFora && (
-                                                            <PiWarningBold style={{ marginLeft: '2%', verticalAlign: 'middle', color: 'red' }} />
-                                                        )}
-                                                    </Button>
-                                                </OverlayTrigger>
-                                                <Button variant="danger" className="mb-2 mt-4 me-2" onClick={() => { setMostrarModalRemover(true); setIndexInscricaoSelecionada(index) }}>
-                                                    Remover
-                                                </Button>
-                                            </div>
-                                        );
-                                    })
                                 )}
-                            </>
-                            <Form.Label className="mt-4">Busque alunos:</Form.Label>
-                            <div className="d-flex">
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Pesquise o nome do aluno..."
-                                    value={termoBusca}
-                                    onChange={(e) => setTermoBusca(e.target.value)}
-                                />
-                            </div>
-                            <div className="mt-2">
-                                {inscricoesFiltradas.map((inscricao, index) => {
+                            </tbody>
+                        </Table>
+                        <>
+                            <h4>Alunos da Rota</h4>
+                            {inscricoesSelecionadas.length === 0 ? (
+                                <p>Não há alunos alocados na rota</p>
+                            ) : (
+                                inscricoesSelecionadas.map((inscricao, index) => {
                                     const possuiPontoFora = inscricoesFora.some(fora => fora.aluno.codigo === inscricao.aluno.codigo);
 
                                     return (
@@ -388,84 +347,132 @@ export default function TelaAlocarAluno(props) {
                                                     )}
                                                 </Button>
                                             </OverlayTrigger>
-                                            <Button
-                                                variant="primary"
-                                                className="mb-2 mt-4 me-2"
-                                                onClick={() => handleAdicionarInscricao(index)}
-                                            >
-                                                Adicionar
+                                            <Button variant="danger" className="mb-2 mt-4 me-2" onClick={() => { setMostrarModalRemover(true); setIndexInscricaoSelecionada(index) }}>
+                                                Remover
                                             </Button>
                                         </div>
                                     );
-                                })}
-                            </div>
-                            <Button
-                                variant="primary"
-                                className="mb-2 mt-4 me-2"
-                                onClick={() => { handleSubmissao() }}
-                            >
-                                Confirmar Alocação
-                            </Button>
-                            <Button
-                                variant="danger"
-                                onClick={() => { handleCancelarAlocacao() }}
-                                className="mb-2 mt-4"
-                            >
-                                Cancelar Alocação
-                            </Button>
-                            {mostrarModalCancelar && (
-                                <Modal show={mostrarModalCancelar} onHide={() => setMostrarModalCancelar(false)}>
-                                    <Modal.Header closeButton onHide={() => setMostrarModalCancelar(false)}>
-                                        <Modal.Title>Cancelar Alocação</Modal.Title>
-                                    </Modal.Header>
-                                    <Modal.Body>
-                                        Deseja realmente cancelar a alocação?
-                                    </Modal.Body>
-                                    <Modal.Footer className='d-flex justify-content-center'>
-                                        <Button variant="danger" onClick={() => {
-                                            setRotaSelecionada(null);
-                                            setRotaEstaSelecionada(false);
-                                            setInscricoesSelecionadas([]);
-                                            setTermoBusca('');
-                                            setInscricoesFiltradas([]);
-                                            setMostrarModalConfirmacao(false);
-                                            setNovaRotaSelecionada(null);
-                                            document.getElementById('selecionarRota').selectedIndex = 0;
-                                            setMostrarModalCancelar(false);
-                                        }}>
-                                            Sim
-                                        </Button>
-                                        <Button variant="secondary" onClick={() => setMostrarModalCancelar(false)}>
-                                            Não
-                                        </Button>
-                                    </Modal.Footer>
-                                </Modal>
-                            )}
-                            {mostrarModalRemover && (
-                                <Modal show={mostrarModalRemover} onHide={() => setMostrarModalRemover(false)}>
-                                    <Modal.Header closeButton onHide={() => setMostrarModalRemover(false)}>
-                                        <Modal.Title>Remover Inscrição</Modal.Title>
-                                    </Modal.Header>
-                                    <Modal.Body>
-                                        Deseja realmente remover essa inscrição?
-                                    </Modal.Body>
-                                    <Modal.Footer className='d-flex justify-content-center'>
-                                        <Button variant="danger" onClick={() => {
-                                            handleRemoverInscricao(indexInscricaoSelecionada);
-                                        }}>
-                                            Sim
-                                        </Button>
-                                        <Button variant="secondary" onClick={() => setMostrarModalRemover(false)}>
-                                            Não
-                                        </Button>
-                                    </Modal.Footer>
-                                </Modal>
+                                })
                             )}
                         </>
-                    )}
-                </Container>
-                <ToastContainer />
-            </Pagina>
-        );
-    }
+                        <Form.Label className="mt-4">Busque alunos:</Form.Label>
+                        <div className="d-flex">
+                            <Form.Control
+                                type="text"
+                                placeholder="Pesquise o nome do aluno..."
+                                value={termoBusca}
+                                onChange={(e) => setTermoBusca(e.target.value)}
+                            />
+                        </div>
+                        <div className="mt-2">
+                            {inscricoesFiltradas.map((inscricao, index) => {
+                                const possuiPontoFora = inscricoesFora.some(fora => fora.aluno.codigo === inscricao.aluno.codigo);
+
+                                return (
+                                    <div key={index} className="d-flex justify-content-center align-items-center">
+                                        <OverlayTrigger
+                                            trigger="hover"
+                                            key="bottom"
+                                            placement="bottom"
+                                            overlay={
+                                                <Popover id="popover-positioned-bottom">
+                                                    <Popover.Header as="h3">{inscricao.aluno.nome}</Popover.Header>
+                                                    <Popover.Body>
+                                                        {possuiPontoFora && (
+                                                            <p><PiWarningBold style={{ marginRight: '2% ', color: 'red' }} />Aluno possui ponto de embarque fora dos pontos de embarque da rota!</p>
+                                                        )}
+                                                        <p>RG: {inscricao.aluno.rg}</p>
+                                                        <p>Data de Nascimento: {format(new Date(inscricao.aluno.dataNasc), 'dd/MM/yyyy')}</p>
+                                                        <p>Celular: {inscricao.aluno.celular}</p>
+                                                        <p>Observações: {inscricao.aluno.observacoes}</p>
+                                                    </Popover.Body>
+                                                </Popover>
+                                            }
+                                        >
+                                            <Button variant="light" className="me-2 mb-2 mt-4 w-50">
+                                                <GrContactInfo style={{ marginRight: '2%' }} /> {`${inscricao.aluno.nome} - RG: ${inscricao.aluno.rg}`}
+                                                {possuiPontoFora && (
+                                                    <PiWarningBold style={{ marginLeft: '2%', verticalAlign: 'middle', color: 'red' }} />
+                                                )}
+                                            </Button>
+                                        </OverlayTrigger>
+                                        <Button
+                                            variant="primary"
+                                            className="mb-2 mt-4 me-2"
+                                            onClick={() => handleAdicionarInscricao(index)}
+                                        >
+                                            Adicionar
+                                        </Button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        <Button
+                            variant="primary"
+                            className="mb-2 mt-4 me-2"
+                            onClick={() => { handleSubmissao() }}
+                        >
+                            Confirmar Alocação
+                        </Button>
+                        <Button
+                            variant="danger"
+                            onClick={() => { handleCancelarAlocacao() }}
+                            className="mb-2 mt-4"
+                        >
+                            Cancelar Alocação
+                        </Button>
+                        {mostrarModalCancelar && (
+                            <Modal show={mostrarModalCancelar} onHide={() => setMostrarModalCancelar(false)}>
+                                <Modal.Header closeButton onHide={() => setMostrarModalCancelar(false)}>
+                                    <Modal.Title>Cancelar Alocação</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    Deseja realmente cancelar a alocação?
+                                </Modal.Body>
+                                <Modal.Footer className='d-flex justify-content-center'>
+                                    <Button variant="danger" onClick={() => {
+                                        setRotaSelecionada(null);
+                                        setRotaEstaSelecionada(false);
+                                        setInscricoesSelecionadas([]);
+                                        setTermoBusca('');
+                                        setInscricoesFiltradas([]);
+                                        setMostrarModalConfirmacao(false);
+                                        setNovaRotaSelecionada(null);
+                                        document.getElementById('selecionarRota').selectedIndex = 0;
+                                        setMostrarModalCancelar(false);
+                                    }}>
+                                        Sim
+                                    </Button>
+                                    <Button variant="secondary" onClick={() => setMostrarModalCancelar(false)}>
+                                        Não
+                                    </Button>
+                                </Modal.Footer>
+                            </Modal>
+                        )}
+                        {mostrarModalRemover && (
+                            <Modal show={mostrarModalRemover} onHide={() => setMostrarModalRemover(false)}>
+                                <Modal.Header closeButton onHide={() => setMostrarModalRemover(false)}>
+                                    <Modal.Title>Remover Inscrição</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    Deseja realmente remover essa inscrição?
+                                </Modal.Body>
+                                <Modal.Footer className='d-flex justify-content-center'>
+                                    <Button variant="danger" onClick={() => {
+                                        handleRemoverInscricao(indexInscricaoSelecionada);
+                                    }}>
+                                        Sim
+                                    </Button>
+                                    <Button variant="secondary" onClick={() => setMostrarModalRemover(false)}>
+                                        Não
+                                    </Button>
+                                </Modal.Footer>
+                            </Modal>
+                        )}
+                    </>
+                )}
+            </Container>
+            <ToastContainer />
+        </Pagina>
+    );
 }
