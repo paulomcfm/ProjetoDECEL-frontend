@@ -27,6 +27,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path='/' element={<TelaLogin />} />
+            <Route path='/esqueci-senha' element={<Esqueci/>} />
 
             <Route path='/pontos-embarque' element={autenticado ? <TelaCadastroPontoEmbarque/> : <RotaProtegida><TelaCadastroPontoEmbarque /></RotaProtegida>} />
             <Route path='/motorista' element={autenticado ? <TelaMotorista/> : <RotaProtegida><TelaMotorista /></RotaProtegida>} />

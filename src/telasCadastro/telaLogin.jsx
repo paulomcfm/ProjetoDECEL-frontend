@@ -30,6 +30,18 @@ export default function TelaLogin() {
             navigate('/menu', { state: { autenticado: true } });
     }
 
+    function obterProvedorDeEmail(enderecoEmail) {
+        // Divide o endereço de e-mail usando "@" como separador
+        const partes = enderecoEmail.split('@');
+        // Retorna o segundo elemento do array resultante
+        return partes[1];
+    }
+    
+    // Exemplo de uso da função
+    const enderecoEmail = 'usuario@example.com';
+    const provedorDeEmail = obterProvedorDeEmail(enderecoEmail);
+    console.log('Provedor de e-mail:', provedorDeEmail); // Saída: example.com    
+
     function formatarCPF(cpf) {
         if (!cpf) return cpf;
         // Remove todos os caracteres não numéricos
