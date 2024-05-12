@@ -14,6 +14,8 @@ import { buscarEscolaPorPonto } from '../redux/escolaReducer';
 import { atualizarInscricoes } from '../redux/alocarReducer';
 import { ToastContainer, toast, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import '../templates/style.css';
+
 
 
 export default function TelaAlocarAluno(props) {
@@ -277,30 +279,30 @@ export default function TelaAlocarAluno(props) {
                 )}
                 {rotaEstaSelecionada && rotaSelecionada && (
                     <>
-                        <Table striped bordered className="mt-4">
-                            <thead>
+                        <table className='tabela'>
+                            <thead className='head-tabela'>
                                 <tr>
-                                    <th>Nome da Rota</th>
-                                    <th>Motoristas</th>
-                                    <th>Monitor</th>
-                                    <th>Placa do Veículo</th>
-                                    <th>Pontos de Embarque</th>
+                                    <th className='linhas-titulo-tabela'>Nome da Rota</th>
+                                    <th className='linhas-titulo-tabela'>Motoristas</th>
+                                    <th className='linhas-titulo-tabela'>Monitor</th>
+                                    <th className='linhas-titulo-tabela'>Placa do Veículo</th>
+                                    <th className='linhas-titulo-tabela'>Pontos de Embarque</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {rotaSelecionada && (
                                     <tr>
-                                        <td className="text-center align-middle">{rotaSelecionada.nome}</td>
-                                        <td>
+                                        <td className='linhas-tabela'>{rotaSelecionada.nome}</td>
+                                        <td className='linhas-tabela'>
                                             <ul className="text-center align-middle list-unstyled mb-0">
                                                 {rotaSelecionada.motoristas.map((mot, index) => (
                                                     <li key={index}>{mot.nome}</li>
                                                 ))}
                                             </ul>
                                         </td>
-                                        <td className="text-center align-middle">{rotaSelecionada.monitor[0].mon_nome}</td>
-                                        <td className="text-center align-middle">{rotaSelecionada.veiculo[0].vei_placa}</td>
-                                        <td>
+                                        <td className='linhas-tabela'>{rotaSelecionada.monitor[0].mon_nome}</td>
+                                        <td className='linhas-tabela'>{rotaSelecionada.veiculo[0].vei_placa}</td>
+                                        <td className='linhas-tabela'>
                                             <ul className="text-center align-middle list-unstyled mb-0">
                                                 {rotaSelecionada.pontos.map((ponto, index) => (
                                                     <li key={index}>{ponto.rua}, {ponto.numero}</li>
@@ -310,9 +312,9 @@ export default function TelaAlocarAluno(props) {
                                     </tr>
                                 )}
                             </tbody>
-                        </Table>
+                        </table>
                         <>
-                            <h4>Alunos da Rota</h4>
+                            <h4 style={{paddingTop: '2%'}}>Alunos da Rota</h4>
                             {inscricoesSelecionadas.length === 0 ? (
                                 <p>Não há alunos alocados na rota</p>
                             ) : (

@@ -6,6 +6,7 @@ import { buscarPontosEmbarque } from '../../redux/pontosEmbarqueReducer';
 import ModalExcluir from '../../templates/ModalExcluir';
 import { ToastContainer, toast, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import '../../templates/style.css';
 
 export default function TabelaEscolas(props) {
     const [termoBusca, setTermoBusca] = useState('');

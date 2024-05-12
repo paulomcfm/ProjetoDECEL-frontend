@@ -40,17 +40,33 @@ export default function RelatorioRotasDiferentes(props) {
             <Container className="">
                 <h3>Alunos com ponto de embarque fora dos pontos de embarque de sua rota:</h3>
                 {loadedRotas.length > 0 && (
-                    <table bordered hover style={{ borderRadius: 'px', borderCollapse: 'collapse' }}>
-                        <thead style={{backgroundColor: '#f8f9fa', borderRadius: '10px' }}>
+                    <table className='tabela'>
+                        <thead className='head-tabela'>
                             <tr>
-                                <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer'}} onClick={handleOrderByNome}>Aluno {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</th>
-                                <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer'}} onClick={handleOrderByNome}>RG {!orderByNome ? <FaAngleUp /> : <FaAngleDown/>}</th>
-                                <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer'}} onClick={handleOrderByNome}>Endereço {!orderByNome ? <FaAngleUp /> : <FaAngleDown/>}</th>
-                                <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer'}} onClick={handleOrderByNome}>Ponto de Embarque {!orderByNome ? <FaAngleUp /> : <FaAngleDown/>}</th>
-                                <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer'}} onClick={handleOrderByNome}>Escola {!orderByNome ? <FaAngleUp /> : <FaAngleDown/>}</th>
-                                <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer'}} onClick={handleOrderByNome}>Turma, etapa e período {!orderByNome ? <FaAngleUp /> : <FaAngleDown/>}</th>
-                                <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer'}} onClick={handleOrderByNome}>Rota {!orderByNome ? <FaAngleUp /> : <FaAngleDown/>}</th>
-                                <th style={{ padding: '1%', textAlign: 'center', cursor: 'pointer'}} onClick={handleOrderByNome}>Pontos de Embarque da Rota {!orderByNome ? <FaAngleUp /> : <FaAngleDown/>}</th>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByNome}>
+                                    <div className='div-linhas-titulo-tabela'>Aluno {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
+                                </th>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer', width: '5%' }} onClick={handleOrderByNome}>
+                                    <div className='div-linhas-titulo-tabela'>RG {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
+                                </th>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByNome}>
+                                    <div className='div-linhas-titulo-tabela'>Endereço {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
+                                </th>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByNome}>
+                                    <div className='div-linhas-titulo-tabela'>Ponto de Embarque {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
+                                </th>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByNome}>
+                                    <div className='div-linhas-titulo-tabela'>Escola {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
+                                </th>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByNome}>
+                                    <div className='div-linhas-titulo-tabela'>Turma, etapa e período {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
+                                </th>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByNome}>
+                                    <div className='div-linhas-titulo-tabela'>Rota {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
+                                </th>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByNome}>
+                                    <div className='div-linhas-titulo-tabela'>Pontos de Embarque da Rota {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
