@@ -31,6 +31,7 @@ export default function FormCadAlunos(props) {
     const [responsaveisSelecionados, setResponsaveisSelecionados] = useState([]);
     const [responsaveisAntes, setResponsaveisAntes] = useState([]);
     const [status, setStatus] = useState(false);
+    const [anotherMotive, setAnotherMotive] = useState(false);
 
     const dispatch = useDispatch();
 
@@ -168,11 +169,21 @@ export default function FormCadAlunos(props) {
 
     useEffect(() => {
         if (aluno) {
-            if(aluno.status == 'A'){
+            if (aluno.status == 'A') {
                 setStatus(true);
             }
+            const motiveSelect = document.getElementById('motiveSelect');
+            const selectedOption = Array.from(motiveSelect.options).find(option => option.selected);
+            const selectedValue = selectedOption ? selectedOption.value : '';
+
+            if (aluno.motivoInativo && aluno.motivoInativo !== selectedValue) {
+                setAnotherMotive(true);
+            } else {
+                setAnotherMotive(false);
+                return aluno.motivoInativo;
+            }
         }
-    }, []);
+    }, [aluno]);
 
     useEffect(() => {
         if (props.alunoParaEdicao.responsaveis.length > 0 && responsaveisSelecionados.length === 0) {
@@ -210,12 +221,11 @@ export default function FormCadAlunos(props) {
 
     function handleStatus() {
         setStatus(!status);
-        if (status) {
+        const newStatus = !status;
+        if (newStatus) {
             setAluno({ ...aluno, status: 'A' });
-            console.log(aluno);
         } else {
             setAluno({ ...aluno, status: 'I' });
-            console.log(aluno);
         }
     }
 
@@ -404,13 +414,42 @@ export default function FormCadAlunos(props) {
                             </Col>
                             {!status && <Col md={10}>
                                 <Form.Label>Motivo:</Form.Label>
-                                <Form.Select aria-label="Default select example">
+                                <Form.Select aria-label="Selecione o motivo da inatividade"
+                                    onChange={(e) => {
+                                        if (e.target.value === 'Outro') {
+                                            setAluno({ ...aluno, motivoInativo: '' });
+                                            setAnotherMotive(true);
+                                        } else {
+                                            setAluno({ ...aluno, motivoInativo: e.target.value });
+                                            setAnotherMotive(false);
+                                        }
+                                    }}
+                                    value={() => {
+
+                                    }}
+                                    id='motiveSelect'
+                                >
                                     <option>Selecione o motivo</option>
                                     <option value="Ensino Médio Completo">Ensino Médio Completo</option>
                                     <option value="Mudou-se de Álvares Machado">Mudou-se de Álvares Machado</option>
+                                    <option value="Deixou de utilizar rede pública">Deixou de utilizar rede pública</option>
                                     <option value="Outro">Outro...</option>
                                 </Form.Select>
                             </Col>}
+                            {anotherMotive && !status && (
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Informe o motivo:</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Motivo da situação inativa"
+                                        id="motivoInativo"
+                                        name="motivoInativo"
+                                        value={aluno.motivoInativo}
+                                        onChange={manipularMudancas}
+                                        maxLength={255}
+                                    />
+                                </Form.Group>
+                            )}
                         </>
                     )}
                 </Row>
