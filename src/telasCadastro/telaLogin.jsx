@@ -10,7 +10,7 @@ export default function TelaLogin() {
     const [password, setPassword] = useState('');
     const [cpf, setCpf] = useState('');
     const [autenticado, setAutenticado] = useState(false);
-    const dispatch = useDispatch(); // Obtém a função dispatch do Redux
+    const dispatch = useDispatch();
     const [erro, setErro] = useState('');
     const navigate = useNavigate();
     async function handleLogin() {
@@ -29,18 +29,6 @@ export default function TelaLogin() {
             });
             navigate('/menu', { state: { autenticado: true } });
     }
-
-    function obterProvedorDeEmail(enderecoEmail) {
-        // Divide o endereço de e-mail usando "@" como separador
-        const partes = enderecoEmail.split('@');
-        // Retorna o segundo elemento do array resultante
-        return partes[1];
-    }
-    
-    // Exemplo de uso da função
-    const enderecoEmail = 'usuario@example.com';
-    const provedorDeEmail = obterProvedorDeEmail(enderecoEmail);
-    console.log('Provedor de e-mail:', provedorDeEmail); // Saída: example.com    
 
     function formatarCPF(cpf) {
         if (!cpf) return cpf;
@@ -112,7 +100,7 @@ export default function TelaLogin() {
                         {/* Redireciona para a página do menu se autenticado */}
                         {autenticado && <Navigate to="/menu" />}
 
-                        <Link to="/esqueci-minha-senha" className="d-block text-center">
+                        <Link to="/esqueci-senha" className="d-block text-center">
                             Esqueci minha senha
                         </Link>
                     </Form>

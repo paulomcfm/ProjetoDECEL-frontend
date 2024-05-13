@@ -18,6 +18,7 @@ import store from './redux/store.js';
 import { Provider } from 'react-redux';
 import RotaProtegida from './RotaProtegida';
 import { useSelector } from 'react-redux';
+import TelaCodigo from './telasCadastro/telaCodigo.jsx';
 
 function App() {
   const autenticado = useSelector(state => state.usuario.autenticado);
@@ -28,7 +29,7 @@ function App() {
           <Routes>
             <Route path='/' element={<TelaLogin />} />
             <Route path='/esqueci-senha' element={<Esqueci/>} />
-
+            <Route path='/codigo' element={<TelaCodigo/>}/>
             <Route path='/pontos-embarque' element={autenticado ? <TelaCadastroPontoEmbarque/> : <RotaProtegida><TelaCadastroPontoEmbarque /></RotaProtegida>} />
             <Route path='/motorista' element={autenticado ? <TelaMotorista/> : <RotaProtegida><TelaMotorista /></RotaProtegida>} />
             <Route path='/cadastro-user' element={autenticado ? <TelaCadastroUser/> : <RotaProtegida><TelaCadastroUser /></RotaProtegida>} />

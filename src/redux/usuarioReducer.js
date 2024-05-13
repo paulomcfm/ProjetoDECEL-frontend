@@ -78,6 +78,29 @@ export const autenticar = createAsyncThunk('usuario/autenticar', async (credenci
     }
 });
 
+export const enviarEmail = createAsyncThunk('usuario/enviar-email', async ({ provedor, email }) => {
+    try {
+        const resposta = await fetch(urlBase, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({provedor, email})
+        });
+        console.log(resposta);
+        if (resposta.ok) {
+            console.log('Variáveis enviadas com sucesso para o backend.');
+            const dados = await resposta.json();
+            return dados;
+        } else {
+            console.error('Erro ao enviar variáveis para o backend.');
+            console.log({provedor, email});
+        }
+    } catch (error) {
+        console.error('Erro de rede:', error);
+    }
+});
+
 export const atualizarUsuario = createAsyncThunk('usuario/atualizar', async (usuario) => {
     const resposta = await fetch(urlBase, {
         method: 'PUT',
