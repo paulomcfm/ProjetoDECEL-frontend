@@ -95,22 +95,22 @@ export const adicionarRotas = createAsyncThunk('rotas/adicionar', async (rota) =
 });
 
 
-export const atualizarRota = createAsyncThunk('rotas/atualizar', async (rota) => {
-    console.log("rota... " + JSON.stringify(rota))
+export const atualizarRota = createAsyncThunk('rotas/atualizar', async ({ rota, aceito }) => {
+    console.log("aceito: "+aceito)
     const resposta = await fetch(urlBase, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(rota)
+        body: JSON.stringify({ 'rota': JSON.stringify(rota), 'aceito': aceito })
     }).catch(erro => {
         return {
             status: false,
             mensagem: 'Ocorreu um erro ao atualizar a rota:' + erro.message
         }
     });
+    const dados = await resposta.json();
     if (resposta.ok) {
-        const dados = await resposta.json();
         return {
             status: dados.status,
             mensagem: dados.mensagem,
@@ -120,7 +120,7 @@ export const atualizarRota = createAsyncThunk('rotas/atualizar', async (rota) =>
     else {
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao atualizar a rota.',
+            mensagem: dados.mensagem,
             rota
         }
     }
