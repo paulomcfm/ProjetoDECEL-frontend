@@ -29,6 +29,9 @@ export default function Esqueci() {
         dispatch(enviarEmail({provedor, email}))
         .then((retorno) => {
             if (retorno.payload.status) {
+                console.log(retorno);
+                console.log(retorno.payload);
+                console.log(retorno.payload.status);
                 alert("Verifique o seu email!");
                 {<Navigate to="/codigo" />}
             } else {
