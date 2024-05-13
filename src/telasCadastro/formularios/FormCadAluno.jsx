@@ -30,8 +30,9 @@ export default function FormCadAlunos(props) {
     const { estadoResp, mensagemResp, responsaveis } = useSelector((state) => state.responsavel);
     const [responsaveisSelecionados, setResponsaveisSelecionados] = useState([]);
     const [responsaveisAntes, setResponsaveisAntes] = useState([]);
-    const [status, setStatus] = useState(false);
+    const [statusStudent, setStatusStundet] = useState(false);
     const [anotherMotive, setAnotherMotive] = useState(false);
+    const [olderMotive, setOlderMotive] = useState('');
 
     const dispatch = useDispatch();
 
@@ -82,7 +83,8 @@ export default function FormCadAlunos(props) {
             celularValidado = validarCelular(aluno.celular);
         }
         aluno.rg = limparString(aluno.rg);
-        if (form.checkValidity() && celularValidado) {
+        const motivoValidado = aluno.status === 'I' && aluno.motivoInativo;
+        if (form.checkValidity() && celularValidado && motivoValidado) {
             if (!props.modoEdicao) {
                 aluno.responsaveis = responsaveisSelecionados;
                 dispatch(adicionarAluno(aluno)).then((retorno) => {
@@ -170,20 +172,23 @@ export default function FormCadAlunos(props) {
     useEffect(() => {
         if (aluno) {
             if (aluno.status == 'A') {
-                setStatus(true);
+                setStatusStundet(true);
             }
-            const motiveSelect = document.getElementById('motiveSelect');
-            const selectedOption = Array.from(motiveSelect.options).find(option => option.selected);
-            const selectedValue = selectedOption ? selectedOption.value : '';
+            if (aluno.motivoInativo) {
+                const motiveSelect = document.getElementById('motiveSelect');
+                if (motiveSelect) {
+                    const selectedOption = Array.from(motiveSelect.options).find(option => option.value === aluno.motivoInativo);
+                    const selectedValue = selectedOption ? selectedOption.value : '';
 
-            if (aluno.motivoInativo && aluno.motivoInativo !== selectedValue) {
-                setAnotherMotive(true);
-            } else {
-                setAnotherMotive(false);
-                return aluno.motivoInativo;
+                    if (aluno.motivoInativo && aluno.motivoInativo !== selectedValue) {
+                        setAnotherMotive(true);
+                    } else {
+                        setAnotherMotive(false);
+                    }
+                }
             }
         }
-    }, [aluno]);
+    }, [aluno.status, aluno.motivoInativo]);
 
     useEffect(() => {
         if (props.alunoParaEdicao.responsaveis.length > 0 && responsaveisSelecionados.length === 0) {
@@ -220,14 +225,25 @@ export default function FormCadAlunos(props) {
     }
 
     function handleStatus() {
-        setStatus(!status);
-        const newStatus = !status;
+        setStatusStundet(!statusStudent);
+        const newStatus = !statusStudent;
         if (newStatus) {
-            setAluno({ ...aluno, status: 'A' });
+            setAluno(prevAluno => {
+                if (prevAluno.motivoInativo !== null) {
+                    setOlderMotive(prevAluno.motivoInativo);
+                }
+                return { ...prevAluno, status: 'A', motivoInativo: null };
+            });
         } else {
-            setAluno({ ...aluno, status: 'I' });
+            setAluno(prevAluno => {
+                if (olderMotive !== '') {
+                    return { ...prevAluno, status: 'I', motivoInativo: olderMotive };
+                }
+                return { ...prevAluno, status: 'I' };
+            });
         }
     }
+
 
     return (
         <>
@@ -407,36 +423,38 @@ export default function FormCadAlunos(props) {
                                 <Form.Check
                                     type="switch"
                                     id="status"
-                                    label={status ? 'Ativo' : 'Inativo'}
+                                    label={statusStudent ? 'Ativo' : 'Inativo'}
                                     onChange={handleStatus}
-                                    checked={status}
+                                    checked={statusStudent}
                                 />
                             </Col>
-                            {!status && <Col md={10}>
-                                <Form.Label>Motivo:</Form.Label>
-                                <Form.Select aria-label="Selecione o motivo da inatividade"
-                                    onChange={(e) => {
-                                        if (e.target.value === 'Outro') {
-                                            setAluno({ ...aluno, motivoInativo: '' });
-                                            setAnotherMotive(true);
-                                        } else {
-                                            setAluno({ ...aluno, motivoInativo: e.target.value });
-                                            setAnotherMotive(false);
-                                        }
-                                    }}
-                                    value={() => {
-
-                                    }}
-                                    id='motiveSelect'
-                                >
-                                    <option>Selecione o motivo</option>
-                                    <option value="Ensino Médio Completo">Ensino Médio Completo</option>
-                                    <option value="Mudou-se de Álvares Machado">Mudou-se de Álvares Machado</option>
-                                    <option value="Deixou de utilizar rede pública">Deixou de utilizar rede pública</option>
-                                    <option value="Outro">Outro...</option>
-                                </Form.Select>
-                            </Col>}
-                            {anotherMotive && !status && (
+                            {!statusStudent && (
+                                <Col md={10}>
+                                    <Form.Label>Motivo:</Form.Label>
+                                    <Form.Select
+                                        aria-label="Selecione o motivo da inatividade"
+                                        onChange={(e) => {
+                                            if (e.target.value === 'Outro') {
+                                                setAluno({ ...aluno, motivoInativo: '' });
+                                                setAnotherMotive(true);
+                                            } else {
+                                                setAluno({ ...aluno, motivoInativo: e.target.value });
+                                                setAnotherMotive(false);
+                                            }
+                                            setOlderMotive('');
+                                        }}
+                                        id='motiveSelect'
+                                        value={aluno.motivoInativo}
+                                    >
+                                        <option>Selecione o motivo</option>
+                                        <option value="Ensino Médio Completo">Ensino Médio Completo</option>
+                                        <option value="Mudou-se de Álvares Machado">Mudou-se de Álvares Machado</option>
+                                        <option value="Deixou de utilizar rede pública">Deixou de utilizar rede pública</option>
+                                        <option value="Outro">Outro...</option>
+                                    </Form.Select>
+                                </Col>
+                            )}
+                            {anotherMotive && !statusStudent && (
                                 <Form.Group className="mb-3">
                                     <Form.Label>Informe o motivo:</Form.Label>
                                     <Form.Control
