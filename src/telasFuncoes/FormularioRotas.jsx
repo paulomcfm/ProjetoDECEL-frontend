@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useState } from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col,Modal,Button } from 'react-bootstrap';
 import Pagina from '../templates/Pagina';
 import Select from 'react-select'
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,7 +15,9 @@ import '../styles/rota.css'
 
 export default function FormularioRotas(props) {
 
-
+  const [mostrarConfirmacao,setMostrarConfirmacao] = useState(false)
+  const [esconder,setEsconder] = useState(true)
+  const [rotaA,setRotaA] = useState({})
   const [mensagemF,setMensagemF] = useState('')
   const [exibirM,setExibirM] = useState(0)
   const [form,setForm] = useState(props.form)
@@ -241,7 +243,23 @@ export default function FormularioRotas(props) {
     }
 
 
-    
+    async function alerta(valor){
+      setEsconder(true)
+      setMostrarConfirmacao(false)
+      if(valor === true){
+          const resposta = await dispatch(atualizarRota({ rota: rotaA, aceito: 1 }));
+          if(resposta.payload.status){
+              setMensagemF(resposta.payload.mensagem)
+              setExibirM(1)
+          }else{
+              setExibirM(2)
+              setMensagemF(resposta.payload.mensagem)
+          }
+          setTimeout(()=>{
+              setExibirM(0)
+          },3000)
+      }
+  }
 
     async function submissao(){
       const nomes = Object.keys(form)
@@ -338,14 +356,21 @@ export default function FormularioRotas(props) {
         }
         // alterar
         else{
-          resposta = await dispatch(atualizarRota(json))
+          resposta = await dispatch(atualizarRota({ rota: json, aceito: 0 }));
+          console.log(resposta.payload.mensagem)
           if(resposta.payload.status){
             setMensagemF('Rota atualizada com sucesso')
             setExibirM(1)
           }
           else{
-            setMensagemF("Não foi possivel atualizar essa rota")
-            setExibirM(2)
+            if(resposta.payload.mensagem.includes('Rota possui inscrições vinculadas a ela')){
+                setRotaA(json)
+                setMostrarConfirmacao(true)
+                setEsconder(false)
+            }else{
+              setMensagemF("Não foi possivel atualizar essa rota")
+              setExibirM(2)
+            }
           }
         }
 
@@ -379,10 +404,28 @@ export default function FormularioRotas(props) {
             {
             exibirM===0?
             <>
+                <Modal show={mostrarConfirmacao} onHide={esconder}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Rota possui inscrições</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>Deseja duplicar a rota?</Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={()=>{
+                                    alerta(false)
+                                }}>
+                                    Cancelar
+                                </Button>
+                                <Button variant="primary" onClick={()=>{
+                                    alerta(true)
+                                }}>
+                                    Confirmar
+                                </Button>
+                            </Modal.Footer>
+                </Modal>
                 <Row className='justify-content-center'>
                     <Col md className='text-center'>
                       <h4>Nome da Rota(*):</h4>
-                      <input type="text" id="nome" className="form-control mb-3 mx-auto"  placeholder="Rota Escola A" style={{width:'400px'}} name='nome' value={form.nome}  onChange={manipularMudancas}/>
+                      <input type="text" id="nome" className="form-control mb-3 mx-auto"  placeholder="Rota Escola A" style={{width:'400px'}} name='nome' value={form.nome} disabled={props.modoEdicao === 'gravar'? false:true}  onChange={manipularMudancas}/>
                     </Col>
                     <Col md className='text-center'>
                       <h4>Quilometragem da Rota(*):</h4>
