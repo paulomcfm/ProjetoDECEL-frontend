@@ -6,6 +6,7 @@ import Pagina from '../templates/Pagina';
 import { getInscricoesFora } from '../redux/inscricaoReducer';
 import { buscarRotas } from '../redux/rotaReducer';
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
+import { set } from 'date-fns';
 
 export default function RelatorioRotasDiferentes(props) {
     const { inscricoes } = useSelector(state => state.inscricao);
@@ -15,6 +16,8 @@ export default function RelatorioRotasDiferentes(props) {
     const dispatch = useDispatch();
 
     const [orderByNome, setOrderByNome] = useState(false);
+    const [orderByPontoEmbarque, setOrderByPontoEmbarque] = useState(false);
+    const [orderByRoute, setOrderByRoute] = useState(false);
 
     useEffect(() => {
         setInscricoesFora(inscricoes);
@@ -24,53 +27,79 @@ export default function RelatorioRotasDiferentes(props) {
     useEffect(() => {
         dispatch(getInscricoesFora(new Date().getFullYear()));
         dispatch(buscarRotas());
-    }, [dispatch]);
-
+    }, [dispatch]);   
+    
     const handleOrderByNome = () => {
         setOrderByNome(!orderByNome);
+        setOrderByPontoEmbarque(false);
+        setOrderByRoute(false);
+    };
+    
+    const handleOrderByPontoEmbarque = () => {
+        setOrderByPontoEmbarque(!orderByPontoEmbarque);
+        setOrderByNome(false);
+        setOrderByRoute(false);
+    };
+    
+    const handleOrderByRoute = () => {
+        setOrderByRoute(!orderByRoute);
+        setOrderByNome(false);
+        setOrderByPontoEmbarque(false);
+    };
+    
+    const sortedSubscriptions = [...inscricoesFora].sort((a, b) => {
         if (orderByNome) {
-            setInscricoesFora(inscricoes.sort((a, b) => (a.aluno.nome > b.aluno.nome) ? 1 : ((b.aluno.nome > a.aluno.nome) ? -1 : 0)));
-        } else {
-            setInscricoesFora(inscricoes.sort((a, b) => (a.aluno.nome < b.aluno.nome) ? 1 : ((b.aluno.nome < a.aluno.nome) ? -1 : 0)));
+            const nomeA = (inscricoesFora.find((inscricao) => inscricao.codigo === a.codigo)?.aluno.nome) || '';
+            const nomeB = (inscricoesFora.find((inscricao) => inscricao.codigo === b.codigo)?.aluno.nome) || '';
+            return nomeA.localeCompare(nomeB);
+        } else if (orderByPontoEmbarque) {
+            const pontoA = (inscricoesFora.find((inscricao) => inscricao.codigo === a.codigo)?.pontoEmbarque.rua) || '';
+            const pontoB = (inscricoesFora.find((inscricao) => inscricao.codigo === b.codigo)?.pontoEmbarque.rua) || '';
+            return pontoA.localeCompare(pontoB);
+        } else if (orderByRoute) {
+            const rotaA = (inscricoesFora.find((inscricao) => inscricao.codigo === a.codigo)?.rota) || '';
+            const rotaB = (inscricoesFora.find((inscricao) => inscricao.codigo === b.codigo)?.rota) || '';
+            return rotaA.localeCompare(rotaB);
         }
-    }
+        return 0;
+    });
 
     return (
         <Pagina>
             <Container className="">
                 <h3>Alunos com ponto de embarque fora dos pontos de embarque de sua rota:</h3>
-                {loadedRotas.length > 0 && (
+                {inscricoesFora.length > 0 && loadedRotas.length > 0 && (
                     <table className='tabela'>
                         <thead className='head-tabela'>
                             <tr>
                                 <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByNome}>
                                     <div className='div-linhas-titulo-tabela'>Aluno {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer', width: '5%' }} onClick={handleOrderByNome}>
-                                    <div className='div-linhas-titulo-tabela'>RG {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer', width: '5%' }}>
+                                    <div className='div-linhas-titulo-tabela'>RG</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByNome}>
-                                    <div className='div-linhas-titulo-tabela'>Endereço {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }}>
+                                    <div className='div-linhas-titulo-tabela'>Endereço</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByNome}>
-                                    <div className='div-linhas-titulo-tabela'>Ponto de Embarque {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByPontoEmbarque}>
+                                    <div className='div-linhas-titulo-tabela'>Ponto de Embarque {!orderByPontoEmbarque ? <FaAngleUp /> : <FaAngleDown />}</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByNome}>
-                                    <div className='div-linhas-titulo-tabela'>Escola {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }}>
+                                    <div className='div-linhas-titulo-tabela'>Escola</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByNome}>
-                                    <div className='div-linhas-titulo-tabela'>Turma, etapa e período {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }}>
+                                    <div className='div-linhas-titulo-tabela'>Turma, etapa e período</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByNome}>
-                                    <div className='div-linhas-titulo-tabela'>Rota {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByRoute}>
+                                    <div className='div-linhas-titulo-tabela'>Rota {!orderByRoute ? <FaAngleUp /> : <FaAngleDown />}</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByNome}>
-                                    <div className='div-linhas-titulo-tabela'>Pontos de Embarque da Rota {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }}>
+                                    <div className='div-linhas-titulo-tabela'>Pontos de Embarque da Rota</div>
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            {inscricoesFora.map((inscricao) => {
+                            {sortedSubscriptions.map((inscricao) => {
                                 const rota = loadedRotas.find((rota) => rota.codigo === inscricao.rota);
                                 return (
                                     <tr key={inscricao.codigo}>
