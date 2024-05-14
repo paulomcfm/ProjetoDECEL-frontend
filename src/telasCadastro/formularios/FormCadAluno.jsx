@@ -83,7 +83,10 @@ export default function FormCadAlunos(props) {
             celularValidado = validarCelular(aluno.celular);
         }
         aluno.rg = limparString(aluno.rg);
-        const motivoValidado = aluno.status === 'I' && aluno.motivoInativo;
+        let motivoValidado = aluno.status === 'I' && aluno.motivoInativo;
+        if(aluno.status === 'A'){
+            motivoValidado = true;
+        }
         if (form.checkValidity() && celularValidado && motivoValidado) {
             if (!props.modoEdicao) {
                 aluno.responsaveis = responsaveisSelecionados;
@@ -151,9 +154,9 @@ export default function FormCadAlunos(props) {
             setFormValidado(false);
             props.exibirFormulario(false);
         }
-        else {
-            setFormValidado(true);
-        }
+        // else {
+        //     setFormValidado(true);
+        // }
 
         e.stopPropagation();
         e.preventDefault();
