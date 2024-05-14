@@ -22,6 +22,27 @@ import TelaCodigo from './telasCadastro/telaCodigo.jsx';
 
 function App() {
   const autenticado = useSelector(state => state.usuario.autenticado);
+  const usuario = useSelector(state => state.usuario);
+  // Verifica se o usuário autenticado é o administrador
+  let isAdmin;
+  console.log(usuario);
+  function verificaAdmin(){
+    if(usuario.nome === "admin")
+      isAdmin=true;
+    else 
+      isAdmin=false;
+  }
+
+  isAdmin=verificaAdmin();
+
+  function MensagemSemPermissao() {
+    return (
+      <div>
+        <p>Você não tem permissão de acesso a esta parte do sistema.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="App">
       <Provider store={store}>
@@ -32,7 +53,7 @@ function App() {
             <Route path='/codigo' element={<TelaCodigo/>}/>
             <Route path='/pontos-embarque' element={autenticado ? <TelaCadastroPontoEmbarque/> : <RotaProtegida><TelaCadastroPontoEmbarque /></RotaProtegida>} />
             <Route path='/motorista' element={autenticado ? <TelaMotorista/> : <RotaProtegida><TelaMotorista /></RotaProtegida>} />
-            <Route path='/cadastro-user' element={autenticado ? <TelaCadastroUser/> : <RotaProtegida><TelaCadastroUser /></RotaProtegida>} />
+            <Route path='/cadastro-user' element={isAdmin ? <TelaCadastroUser/> : <MensagemSemPermissao />} />
             <Route path='/alunos' element={autenticado ? <TelaCadastroAluno/> : <RotaProtegida><TelaCadastroAluno /></RotaProtegida>} />
             <Route path='/responsaveis' element={autenticado ? <TelaCadastroResponsavel/> : <RotaProtegida><TelaCadastroResponsavel /></RotaProtegida>} />
             <Route path='/escolas' element={autenticado ? <TelaCadastroEscola/> : <RotaProtegida><TelaCadastroEscola /></RotaProtegida>} />

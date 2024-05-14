@@ -80,13 +80,7 @@ export const autenticar = createAsyncThunk('usuario/autenticar', async (credenci
 
 export const enviarEmail = createAsyncThunk('usuario/enviar-email', async ({ provedor, email }) => {
     try {
-        const resposta = await fetch(urlBase, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({provedor, email})
-        });
+        const resposta = await fetch(urlBase, { method: 'POST' });
         console.log(resposta);
         if (resposta.ok) {
             console.log('Variáveis enviadas com sucesso para o backend.');
@@ -240,7 +234,18 @@ const usuarioSlice = createSlice({
                 state.usuarioAutenticado = null;
                 state.mensagem = action.payload.mensagem;
             }
-        });
+        }).addCase(enviarEmail.pending, (state, action) => {
+            state.estado = ESTADO.PENDENTE;
+            state.mensagem = "Enviando e-mail...";
+        })
+        .addCase(enviarEmail.fulfilled, (state, action) => {
+            state.estado = ESTADO.OCIOSO;
+            state.mensagem = action.payload.mensagem; // Verifique o que está sendo retornado na ação
+        })
+        .addCase(enviarEmail.rejected, (state, action) => {
+                state.estado = ESTADO.ERRO;
+                state.mensagem = action.error.message || 'Erro desconhecido'; // Verifica se o erro está definido antes de acessá-lo
+            });
     }
 });
 
