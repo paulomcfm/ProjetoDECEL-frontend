@@ -56,6 +56,33 @@ export const getInscricoesFora = createAsyncThunk('inscricao-aluno/buscar-fora',
     }
 });
 
+export const getInscricoesDesatualizadas = createAsyncThunk('inscricao-aluno/buscar-desatualizadas', async (ano) => {
+    try {
+        const resposta = await fetch(urlBase+"/buscar-desatualizadas/"+ ano, { method: 'GET' });
+        const dados = await resposta.json();
+        if (dados.status) {
+            return {
+                status: true,
+                listaInscricoes: dados.listaInscricoes,
+                mensagem: dados.mensagem
+            }
+        }
+        else {
+            return {
+                status: false,
+                listaInscricoes: [],
+                mensagem: 'Ocorreu um erro ao recuperar as inscrições da base de dados.' + dados.mensagem
+            }
+        }
+    } catch (erro) {
+        return {
+            status: false,
+            listaInscricoes: [],
+            mensagem: 'Ocorreu um erro ao recuperar as inscrições da base de dados:' + erro.message
+        }
+    }
+});
+
 export const adicionarInscricao = createAsyncThunk('inscricao-aluno/adicionar', async (inscricao) => {
     const resposta = await fetch(urlBase, {
         method: 'POST',
@@ -188,6 +215,22 @@ const inscricaoSlice = createSlice({
                 state.mensagem = action.payload.mensagem;
             }
         }).addCase(getInscricoesFora.rejected, (state, action) => {
+            state.estado = ESTADO.ERRO;
+            state.mensagem = action.error.message;
+        })
+        .addCase(getInscricoesDesatualizadas.pending, (state, action) => {
+            state.estado = ESTADO.PENDENTE;
+            state.mensagem = "Buscando inscrições...";
+        }).addCase(getInscricoesDesatualizadas.fulfilled, (state, action) => {
+            if (action.payload.status) {
+                state.estado = ESTADO.OCIOSO;
+                state.mensagem = action.payload.mensagem;
+                state.inscricoes = action.payload.listaInscricoes;
+            } else {
+                state.estado = ESTADO.ERRO;
+                state.mensagem = action.payload.mensagem;
+            }
+        }).addCase(getInscricoesDesatualizadas.rejected, (state, action) => {
             state.estado = ESTADO.ERRO;
             state.mensagem = action.error.message;
         })

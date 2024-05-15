@@ -8,7 +8,6 @@ import { PiWarningBold } from "react-icons/pi";
 import { buscarInscricoes } from '../redux/inscricaoReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import { format } from 'date-fns';
-import TelaMensagem from '../telasCadastro/TelaMensagem';
 import { buscarRotasInscricoes } from '../redux/rotaReducer';
 import { buscarEscolaPorPonto } from '../redux/escolaReducer';
 import { atualizarInscricoes } from '../redux/alocarReducer';
@@ -37,6 +36,7 @@ export default function TelaAlocarAluno(props) {
     const [indexInscricaoSelecionada, setIndexInscricaoSelecionada] = useState(null);
     const [outdatedRoutes, setOutdatedRoutes] = useState([]);
     const [toastController, setToastController] = useState(false);
+    const [outdatedSubscriptions, setOutdatedSubscriptions] = useState([]);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -47,49 +47,53 @@ export default function TelaAlocarAluno(props) {
     useEffect(() => {
         setRotasCarregadas(rotas);
     }, [rotas]);
-
+    
     useEffect(() => {
         if (inscricoes.length > 0 && rotasCarregadas.length > 0) {
-            const curYear = new Date().getFullYear();
-            // const curYear = 2025;
-            const outdatedSubscriptions = inscricoes.filter((inscricao) => {
+            // const curYear = new Date().getFullYear();
+            const curYear = 2025;
+            const outdatedRoutesSet = new Set();
+            let oudatedSub = [];
+            inscricoes.forEach((inscricao) => {
                 if (inscricao.dataAlocacao != null) {
                     const dataAlocacao = new Date(inscricao.dataAlocacao);
-                    return dataAlocacao.getFullYear() < curYear;
+                    if (dataAlocacao.getFullYear() < curYear && inscricao.ano !== curYear && !inscricoes.some(i => i.aluno.codigo === inscricao.aluno.codigo && i.ano === curYear) && inscricao.aluno.status === 'A') {
+                        outdatedRoutesSet.add(JSON.stringify(inscricao.rota));
+                        oudatedSub.push(inscricao);
+                    }
                 }
             });
-            const outdatedRoutes = [];
-            outdatedSubscriptions.forEach((inscricao) => {
-                if (!outdatedRoutes.includes(inscricao.rota)) {
-                    outdatedRoutes.push(inscricao.rota);
-                }
-            });
+            const outdatedRoutes = Array.from(outdatedRoutesSet).map(routeString => JSON.parse(routeString));
+            setOutdatedSubscriptions(oudatedSub);
             setOutdatedRoutes(outdatedRoutes);
         }
     }, [inscricoes, rotasCarregadas]);
 
-    if (!toastController && outdatedRoutes.length > 0) {
-        let i = 0;
-        outdatedRoutes.forEach((rota) => {
-            const rotaEncontrada = rotasCarregadas.find((r) => r.codigo === rota.codigo);
-            if (rotaEncontrada) {
-                toast.warn(`Há alunos com alocações desatualizadas na rota ${rotaEncontrada.nome}`, {
-                    position: "bottom-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "light",
-                    delay: i,
-                    transition: Bounce,
-                });
-                i = i + 3000;
-            }
-        });
-        setToastController(true);
-    }
+    useEffect(() => {
+        if (!toastController && outdatedRoutes.length > 0) {
+            outdatedRoutes.forEach((rota, index) => {
+                const rotaEncontrada = rotasCarregadas.find((r) => r.codigo === rota.codigo);
+                if (rotaEncontrada) {
+                    setTimeout(() => {
+                        toast.warn(`Há alunos com alocações desatualizadas na rota ${rotaEncontrada.nome}`, {
+                            position: "bottom-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                            onClick: () => {
+                                window.location.href = 'http://localhost:3000/relatorios/rotas-desatualizadas';
+                            }
+                        });
+                    }, index * 3000);
+                }
+            });
+            setToastController(true);
+        }
+    }, [toastController, outdatedRoutes, rotasCarregadas]);
 
     useEffect(() => {
         if (termoBusca.trim() === '') {
@@ -314,7 +318,7 @@ export default function TelaAlocarAluno(props) {
                             </tbody>
                         </table>
                         <>
-                            <h4 style={{paddingTop: '2%'}}>Alunos da Rota</h4>
+                            <h4 style={{ paddingTop: '2%' }}>Alunos da Rota</h4>
                             {inscricoesSelecionadas.length === 0 ? (
                                 <p>Não há alunos alocados na rota</p>
                             ) : (

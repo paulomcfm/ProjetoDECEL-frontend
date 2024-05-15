@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Container, OverlayTrigger, Popover, Modal } from 'react-bootstrap';
-import { GrContactInfo } from "react-icons/gr";
 import { useSelector, useDispatch } from 'react-redux';
 import Pagina from '../templates/Pagina';
-import { getInscricoesFora } from '../redux/inscricaoReducer';
+import { getInscricoesDesatualizadas } from '../redux/inscricaoReducer';
 import { buscarRotas } from '../redux/rotaReducer';
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 import { ImZoomIn } from "react-icons/im";
@@ -11,16 +10,17 @@ import { format } from 'date-fns';
 import { AlignmentType, Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType, HeadingLevel } from "docx";
 import { MdFileDownload } from "react-icons/md";
 
+
 export default function RelatorioRotasDiferentes(props) {
     const { inscricoes } = useSelector(state => state.inscricao);
     const { rotas } = useSelector(state => state.rota);
-    const [inscricoesFora, setInscricoesFora] = useState([]);
+    const [inscricoesDesatualizadas, setInscricoesDesatualizadas] = useState([]);
     const [loadedRotas, setLoadedRotas] = useState([]);
     const dispatch = useDispatch();
     const [modalArquivo, setModalArquivo] = useState(false);
     const [nomeArquivo, setNomeArquivo] = useState('');
     const [orderByNome, setOrderByNome] = useState(false);
-    const [orderByPontoEmbarque, setOrderByPontoEmbarque] = useState(false);
+    const [orderByAnoInscricao, setOrderByPontoEmbarque] = useState(false);
     const [orderByRoute, setOrderByRoute] = useState(false);
 
     useEffect(() => {
@@ -28,12 +28,13 @@ export default function RelatorioRotasDiferentes(props) {
             const rota = rotas.find((rota) => rota.codigo === inscricao.rota);
             return { ...inscricao, rota };
         });
-        setInscricoesFora(inscricoesCopy);
+        setInscricoesDesatualizadas(inscricoesCopy);
         setLoadedRotas(rotas);
     }, [inscricoes, rotas]);
 
     useEffect(() => {
-        dispatch(getInscricoesFora(new Date().getFullYear()));
+        // dispatch(getInscricoesDesatualizadas(new Date().getFullYear()));
+        dispatch(getInscricoesDesatualizadas(2025));
         dispatch(buscarRotas());
     }, [dispatch]);
 
@@ -43,8 +44,8 @@ export default function RelatorioRotasDiferentes(props) {
         setOrderByRoute(false);
     };
 
-    const handleOrderByPontoEmbarque = () => {
-        setOrderByPontoEmbarque(!orderByPontoEmbarque);
+    const handleOrderByAnoInscricao = () => {
+        setOrderByPontoEmbarque(!orderByAnoInscricao);
         setOrderByNome(false);
         setOrderByRoute(false);
     };
@@ -55,12 +56,12 @@ export default function RelatorioRotasDiferentes(props) {
         setOrderByPontoEmbarque(false);
     };
 
-    const sortedSubscriptions = [...inscricoesFora].sort((a, b) => {
+    const sortedSubscriptions = [...inscricoesDesatualizadas].sort((a, b) => {
         const getValueToCompare = (inscricao) => {
             if (orderByNome) {
                 return inscricao?.aluno?.nome || '';
-            } else if (orderByPontoEmbarque) {
-                return inscricao?.pontoEmbarque?.rua || '';
+            } else if (orderByAnoInscricao) {
+                return inscricao?.ano.toString() || '';
             } else if (orderByRoute) {
                 return inscricao?.rota.nome || '';
             }
@@ -78,7 +79,7 @@ export default function RelatorioRotasDiferentes(props) {
         const rows = table.querySelectorAll('tr');
 
         let ordenarPor = "Aluno";
-        if (orderByPontoEmbarque) ordenarPor = "Ponto de Embarque";
+        if (orderByAnoInscricao) ordenarPor = "Ano Inscrição";
         else if (orderByRoute) ordenarPor = "Rota";
 
         const docTable = new Table({
@@ -125,7 +126,7 @@ export default function RelatorioRotasDiferentes(props) {
                 properties: {},
                 children: [
                     new Paragraph({
-                        text: "Alunos com Ponto de Embarque Fora dos Pontos de Embarque de Sua Rota",
+                        text: "Relatório de Alunos Alocados com Inscrições Desatualizadas",
                         heading: HeadingLevel.TITLE,
                         alignment: AlignmentType.CENTER,
                     }),
@@ -163,19 +164,22 @@ export default function RelatorioRotasDiferentes(props) {
                 </Button>
             </div>
             <Container className="">
-                <h3 style={{ textAlign: 'center', marginTop: '20px', marginBottom: '20px' }}>Alunos com Ponto de Embarque Fora dos Pontos de Embarque de Sua Rota:</h3>
-                {inscricoesFora.length > 0 && loadedRotas.length > 0 && (
+                <h3 style={{ textAlign: 'center', marginTop: '20px', marginBottom: '20px' }}>Alunos alocados com inscrições desatualizadas:</h3>
+                {inscricoesDesatualizadas.length > 0 && loadedRotas.length > 0 && (
                     <table className='tabela'>
                         <thead className='head-tabela'>
                             <tr>
-                                <th className='linhas-titulo-tabela' style={{ width: '10%', cursor: 'pointer' }} onClick={handleOrderByNome}>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByAnoInscricao}>
+                                    <div className='div-linhas-titulo-tabela'>Ano Inscrição {!orderByAnoInscricao ? <FaAngleUp /> : <FaAngleDown />}</div>
+                                </th>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByNome}>
                                     <div className='div-linhas-titulo-tabela'>Aluno {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
                                 </th>
                                 <th className='linhas-titulo-tabela' >
                                     <div className='div-linhas-titulo-tabela'>Endereço</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByPontoEmbarque}>
-                                    <div className='div-linhas-titulo-tabela'>Ponto de Embarque {!orderByPontoEmbarque ? <FaAngleUp /> : <FaAngleDown />}</div>
+                                <th className='linhas-titulo-tabela' >
+                                    <div className='div-linhas-titulo-tabela'>Ponto de Embarque </div>
                                 </th>
                                 <th className='linhas-titulo-tabela' >
                                     <div className='div-linhas-titulo-tabela'>Escola</div>
@@ -186,15 +190,13 @@ export default function RelatorioRotasDiferentes(props) {
                                 <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByRoute}>
                                     <div className='div-linhas-titulo-tabela'>Rota {!orderByRoute ? <FaAngleUp /> : <FaAngleDown />}</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ width: '10%' }}>
-                                    <div className='div-linhas-titulo-tabela'>Pontos de Embarque da Rota</div>
-                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             {sortedSubscriptions.map((inscricao) => {
                                 return (
                                     <tr key={inscricao.codigo}>
+                                        <td className="linhas-tabela">{inscricao.ano}</td>
                                         <td className="linhas-tabela"><OverlayTrigger
                                             trigger="hover"
                                             key="bottom"
@@ -320,34 +322,14 @@ export default function RelatorioRotasDiferentes(props) {
                                                 </div>
                                                 {inscricao.rota.nome}
                                             </div></OverlayTrigger></td>
-                                        <td className="linhas-tabela"><OverlayTrigger
-                                            trigger="hover"
-                                            key="bottom"
-                                            placement="bottom"
-                                            overlay={
-                                                <Popover id="popover-positioned-bottom">
-                                                    <Popover.Header as="h3"></Popover.Header>
-                                                    <Popover.Body>
-                                                        {inscricao.rota.pontos.map((pontoEmbarque) => (
-                                                            <p>{pontoEmbarque.bairro}. {pontoEmbarque.rua}, {pontoEmbarque.numero}</p>
-                                                        ))}
-                                                    </Popover.Body>
-                                                </Popover>
-                                            }
-                                        ><div style={{ display: 'flex', alignItems: 'center' }}>
-                                                <div style={{ width: '15%', marginRight: '2%', textAlign: 'center' }}>
-                                                    <ImZoomIn />
-                                                </div>
-                                                Pontos
-                                            </div></OverlayTrigger></td>
                                     </tr>
                                 );
                             })}
                         </tbody>
                     </table>
                 )}
-                {inscricoesFora.length === 0 && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                    <p>Não há alunos com ponto de embarque fora dos pontos de embarque de sua rota.</p>
+                {inscricoesDesatualizadas.length === 0 && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                    <p>Não há alunos com inscrições desatualizadas.</p>
                 </div>}
                 <Modal show={modalArquivo} onHide={() => setModalArquivo(false)}>
                     <Modal.Header closeButton>
