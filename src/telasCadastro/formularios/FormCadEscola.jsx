@@ -276,9 +276,10 @@ export default function FormCadEscolas(props) {
                         <Button type="submit" variant="primary">
                             {props.modoEdicao ? "Alterar" : "Cadastrar"}
                         </Button>
-                        <Button type="submit" variant="danger" className="ms-2" onClick={() => {
+                        <Button variant="danger" className="ms-2" onClick={() => {
                             props.exibirFormulario(false);
                             props.setModoEdicao(false);
+                            
                         }}>
                             Voltar
                         </Button>
