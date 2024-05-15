@@ -22,18 +22,10 @@ import TelaCodigo from './telasCadastro/telaCodigo.jsx';
 
 function App() {
   const autenticado = useSelector(state => state.usuario.autenticado);
-  const usuario = useSelector(state => state.usuario);
-  // Verifica se o usuário autenticado é o administrador
-  let isAdmin;
-  console.log(usuario);
-  function verificaAdmin(){
-    if(usuario.nome === "admin")
-      isAdmin=true;
-    else 
-      isAdmin=false;
-  }
-
-  isAdmin=verificaAdmin();
+  const isAdmin = useSelector(state => {
+    console.log(state.usuario.nivelAcesso);
+    return state.usuario.nivelAcesso === "admin";
+  });
 
   function MensagemSemPermissao() {
     return (

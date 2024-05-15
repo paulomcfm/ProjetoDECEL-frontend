@@ -67,11 +67,12 @@ export const adicionarUsuario = createAsyncThunk('usuario/adicionar', async (usu
     }
 });
 
-export const autenticar = createAsyncThunk('usuario/autenticar', async (credenciais) => {
-    console.log(credenciais);
+export const autenticar = createAsyncThunk('/autenticar', async (credenciais) => {
+    console.log(credenciais, "aaaaaaaaaaaaaaaa ");
     try {
-        const resposta = await fetch(urlBase, { method: 'GET' });
+        const resposta = await fetch(`${urlBase}/autenticar`, { method: 'POST',  body: JSON.stringify(credenciais)});
         const dados = await resposta.json();
+        console.log(dados+",dadosaa");
         return dados;
     } catch (erro) {
         return { status: false, mensagem: 'Ocorreu um erro ao autenticar o usuário: ' + erro.message };
@@ -169,6 +170,7 @@ const initialState = {
     usuarios: [],
     autenticado: false, // Adicione um campo para indicar se o usuário está autenticado
     usuarioAutenticado: null, // Adicione um campo para armazenar informações do usuário autenticado
+    nivelAcesso: null
 };
 
 const usuarioSlice = createSlice({
@@ -228,10 +230,15 @@ const usuarioSlice = createSlice({
             if (action.payload.status) {
                 state.autenticado = true;
                 state.usuarioAutenticado = action.payload.usuario;
+                state.nivelAcesso = action.payload.usuario && action.payload.usuario.nome === "admin" ? "admin" : "normal";
                 state.mensagem = action.payload.mensagem;
+                console.log(action.payload);
+                console.log('Usuario:', action.payload.usuario);
+                console.log('Nível de Acesso:', state.nivelAcesso);
             } else {
                 state.autenticado = false;
                 state.usuarioAutenticado = null;
+                state.nivelAcesso = null;
                 state.mensagem = action.payload.mensagem;
             }
         }).addCase(enviarEmail.pending, (state, action) => {
