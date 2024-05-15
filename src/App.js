@@ -13,6 +13,7 @@ import MapaPagina from './telasSaida/MapaPagina.jsx'
 import TelaLogin from './telasCadastro/telaLogin.jsx';
 import TelaCadastroUser from './telasCadastro/telaCadastroUser.jsx';
 import RelatorioRotasDiferentes from './telasSaida/RelatorioRotasDiferentes.jsx';
+import RelatorioRotasDesatualizadas from './telasSaida/RelatorioRotasDesatualizadas.jsx';
 import Esqueci from './telasCadastro/telaEsqueci.jsx';
 import RelatorioAlunos from './telasSaida/RelatorioAlunos.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -44,6 +45,7 @@ function App() {
             <Route path='/relatorios/alunos' element={<RelatorioAlunos />} />
             <Route path='/monitor' element={< TelaCadastroMonitor/>} />
             <Route path='/relatorios/rotas-diferentes' element={<RelatorioRotasDiferentes />} />
+            <Route path='/relatorios/rotas-desatualizadas' element={<RelatorioRotasDesatualizadas />} />
             <Route path='*' element={<Tela404 />} />
           </Routes>
         </BrowserRouter>
