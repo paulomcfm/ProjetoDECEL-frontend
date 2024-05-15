@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Container, OverlayTrigger, Popover } from 'react-bootstrap';
-import { GrContactInfo } from "react-icons/gr";
+import { Button, Container, OverlayTrigger, Popover, Modal } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import Pagina from '../templates/Pagina';
 import { getInscricoesDesatualizadas } from '../redux/inscricaoReducer';
 import { buscarRotas } from '../redux/rotaReducer';
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
+import { ImZoomIn } from "react-icons/im";
+import { format } from 'date-fns';
+import { AlignmentType, Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType, HeadingLevel } from "docx";
+import { MdFileDownload } from "react-icons/md";
+
 
 export default function RelatorioRotasDiferentes(props) {
     const { inscricoes } = useSelector(state => state.inscricao);
@@ -13,9 +17,10 @@ export default function RelatorioRotasDiferentes(props) {
     const [inscricoesFora, setInscricoesFora] = useState([]);
     const [loadedRotas, setLoadedRotas] = useState([]);
     const dispatch = useDispatch();
-
+    const [modalArquivo, setModalArquivo] = useState(false);
+    const [nomeArquivo, setNomeArquivo] = useState('');
     const [orderByNome, setOrderByNome] = useState(false);
-    const [orderByPontoEmbarque, setOrderByPontoEmbarque] = useState(false);
+    const [orderByAnoInscricao, setOrderByPontoEmbarque] = useState(false);
     const [orderByRoute, setOrderByRoute] = useState(false);
 
     useEffect(() => {
@@ -32,66 +37,149 @@ export default function RelatorioRotasDiferentes(props) {
         dispatch(getInscricoesDesatualizadas(2025));
         dispatch(buscarRotas());
     }, [dispatch]);
-    
+
     const handleOrderByNome = () => {
         setOrderByNome(!orderByNome);
         setOrderByPontoEmbarque(false);
         setOrderByRoute(false);
     };
-    
-    const handleOrderByPontoEmbarque = () => {
-        setOrderByPontoEmbarque(!orderByPontoEmbarque);
+
+    const handleOrderByAnoInscricao = () => {
+        setOrderByPontoEmbarque(!orderByAnoInscricao);
         setOrderByNome(false);
         setOrderByRoute(false);
     };
-    
+
     const handleOrderByRoute = () => {
         setOrderByRoute(!orderByRoute);
         setOrderByNome(false);
         setOrderByPontoEmbarque(false);
     };
-    
+
     const sortedSubscriptions = [...inscricoesFora].sort((a, b) => {
         const getValueToCompare = (inscricao) => {
             if (orderByNome) {
                 return inscricao?.aluno?.nome || '';
-            } else if (orderByPontoEmbarque) {
-                return inscricao?.pontoEmbarque?.rua || '';
+            } else if (orderByAnoInscricao) {
+                return inscricao?.ano.toString() || '';
             } else if (orderByRoute) {
                 return inscricao?.rota.nome || '';
             }
             return '';
         };
-    
-        const valueA = getValueToCompare(a).toLowerCase(); 
+
+        const valueA = getValueToCompare(a).toLowerCase();
         const valueB = getValueToCompare(b).toLowerCase();
-    
+
         return valueA.localeCompare(valueB);
     });
-    
+
+    const exportTableToWord = async () => {
+        const table = document.querySelector('.tabela');
+        const rows = table.querySelectorAll('tr');
+
+        let ordenarPor = "Aluno";
+        if (orderByAnoInscricao) ordenarPor = "Ano Inscrição";
+        else if (orderByRoute) ordenarPor = "Rota";
+
+        const docTable = new Table({
+            rows: Array.from(rows).map((row, rowIndex) => new TableRow({
+                children: Array.from(row.cells).map(cell => new TableCell({
+                    children: [new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: cell.textContent,
+                                bold: rowIndex === 0,
+                            }),
+                        ],
+                        alignment: AlignmentType.CENTER,
+                        spacing: {
+                            before: 200,
+                            after: 200,
+                        },
+                    })],
+                    width: {
+                        size: 100 / row.cells.length,
+                        type: WidthType.PERCENTAGE,
+                    },
+                    margins: {
+                        top: 100,
+                        bottom: 100,
+                        left: 100,
+                        right: 100,
+                    },
+                })),
+            })),
+            width: {
+                size: 100,
+                type: WidthType.PERCENTAGE,
+            },
+            alignment: AlignmentType.CENTER,
+            margins: {
+                left: 300,
+                right: 300,
+            },
+        });
+
+        const doc = new Document({
+            sections: [{
+                properties: {},
+                children: [
+                    new Paragraph({
+                        text: "Relatório de Alunos Alocados com Inscrições Desatualizadas",
+                        heading: HeadingLevel.TITLE,
+                        alignment: AlignmentType.CENTER,
+                    }),
+                    new Paragraph({
+                        text: `Ordenado por: ${ordenarPor}`,
+                        alignment: AlignmentType.CENTER,
+                    }),
+                    new Paragraph({
+                        text: "",
+                        spacing: {
+                            after: 300,
+                        },
+                    }),
+                    docTable,
+                ].filter(Boolean),
+            }],
+        });
+
+        const blob = await Packer.toBlob(doc);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = nomeArquivo + '.docx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
 
     return (
         <Pagina>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '-6%', padding: '2%' }}>
+                <Button onClick={() => setModalArquivo(true)}>
+                    <MdFileDownload style={{ width: '100%', height: '100%' }} />
+                </Button>
+            </div>
             <Container className="">
-                <h3 style={{ textAlign: 'center', marginTop: '20px', marginBottom: '20px' }}>Alunos com ponto de embarque fora dos pontos de embarque de sua rota:</h3>
+                <h3 style={{ textAlign: 'center', marginTop: '20px', marginBottom: '20px' }}>Alunos alocados com inscrições desatualizadas:</h3>
                 {inscricoesFora.length > 0 && loadedRotas.length > 0 && (
                     <table className='tabela'>
                         <thead className='head-tabela'>
                             <tr>
-                                <th className='linhas-titulo-tabela' style={{ width: '10%',cursor: 'pointer' }}>
-                                    <div className='div-linhas-titulo-tabela'>Ano Inscrição</div>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByAnoInscricao}>
+                                    <div className='div-linhas-titulo-tabela'>Ano Inscrição {!orderByAnoInscricao ? <FaAngleUp /> : <FaAngleDown />}</div>
                                 </th>
                                 <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByNome}>
                                     <div className='div-linhas-titulo-tabela'>Aluno {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ width: '5%' }}>
-                                    <div className='div-linhas-titulo-tabela'>RG</div>
-                                </th>
                                 <th className='linhas-titulo-tabela' >
                                     <div className='div-linhas-titulo-tabela'>Endereço</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByPontoEmbarque}>
-                                    <div className='div-linhas-titulo-tabela'>Ponto de Embarque {!orderByPontoEmbarque ? <FaAngleUp /> : <FaAngleDown />}</div>
+                                <th className='linhas-titulo-tabela' >
+                                    <div className='div-linhas-titulo-tabela'>Ponto de Embarque </div>
                                 </th>
                                 <th className='linhas-titulo-tabela' >
                                     <div className='div-linhas-titulo-tabela'>Escola</div>
@@ -108,13 +196,59 @@ export default function RelatorioRotasDiferentes(props) {
                             {sortedSubscriptions.map((inscricao) => {
                                 return (
                                     <tr key={inscricao.codigo}>
-                                        <td className="align-middle text-center">{inscricao.ano}</td>
-                                        <td className="align-middle text-center">{inscricao.aluno.nome}</td>
-                                        <td className="align-middle text-center">{inscricao.aluno.rg}</td>
-                                        <td className="align-middle text-center">{inscricao.bairro}. {inscricao.rua}, {inscricao.numero}</td>
-                                        <td className="align-middle text-center">{inscricao.pontoEmbarque.bairro}. {inscricao.pontoEmbarque.rua}, {inscricao.pontoEmbarque.numero}</td>
-                                        <td className="align-middle text-center">{inscricao.escola.nome}</td>
-                                        <td className="align-middle text-center">
+                                        <td className="linhas-tabela">{inscricao.ano}</td>
+                                        <td className="linhas-tabela"><OverlayTrigger
+                                            trigger="hover"
+                                            key="bottom"
+                                            placement="bottom"
+                                            overlay={
+                                                <Popover id="popover-positioned-bottom">
+                                                    <Popover.Header as="h3"></Popover.Header>
+                                                    <Popover.Body>
+                                                        <p>RG: {inscricao.aluno.rg}</p>
+                                                        <p>Data de Nascimento: {format(new Date(inscricao.aluno.dataNasc), 'dd/MM/yyyy')}</p>
+                                                        <p>Celular: {inscricao.aluno.celular}</p>
+                                                        <p>Observações: {inscricao.aluno.observacoes}</p>
+                                                    </Popover.Body>
+                                                </Popover>
+                                            }
+                                        ><div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <ImZoomIn style={{ marginRight: '2%' }} />
+                                                {inscricao.aluno.nome}
+                                            </div></OverlayTrigger></td>
+                                        <td className="linhas-tabela">{inscricao.bairro}. {inscricao.rua}, {inscricao.numero}</td>
+                                        <td className="linhas-tabela">{inscricao.pontoEmbarque.bairro}. {inscricao.pontoEmbarque.rua}, {inscricao.pontoEmbarque.numero}</td>
+                                        <td className='linhas-tabela'><OverlayTrigger
+                                            trigger="hover"
+                                            key="bottom"
+                                            placement="bottom"
+                                            overlay={
+                                                <Popover id="popover-positioned-bottom">
+                                                    <Popover.Header as="h3">{inscricao.escola.nome}</Popover.Header>
+                                                    <Popover.Body>
+                                                        <p>
+                                                            Tipo: {inscricao && (
+                                                                <>
+                                                                    {inscricao.escola.tipo === 'I' && 'Educação Infantil '}
+                                                                    {inscricao.escola.tipo === 'F' && 'Ensino Fundamental '}
+                                                                    {inscricao.escola.tipo === 'A' && 'Educação Infantil e Ensino Fundamental '}
+                                                                    {inscricao.escola.tipo === 'M' && 'Ensino Médio '}
+                                                                </>
+                                                            )}
+                                                        </p>
+                                                        <p>Email: {inscricao.escola.email}</p>
+                                                        <p>Telefone: {inscricao.escola.telefone}</p>
+                                                    </Popover.Body>
+                                                </Popover>
+                                            }
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <ImZoomIn style={{ marginRight: '2%' }} />
+                                                {inscricao.escola.nome}
+                                            </div>
+                                        </OverlayTrigger>
+                                        </td>
+                                        <td className="linhas-tabela">
                                             {inscricao.anoLetivo === '1I'
                                                 ? 'Pré 1' :
                                                 inscricao.anoLetivo === '2I'
@@ -162,7 +296,7 @@ export default function RelatorioRotasDiferentes(props) {
                                                             ? 'Integral'
                                                             : ''}
                                         </td>
-                                        <td className="align-middle text-center"><OverlayTrigger
+                                        <td className="linhas-tabela"><OverlayTrigger
                                             trigger="hover"
                                             key="bottom"
                                             placement="bottom"
@@ -179,13 +313,29 @@ export default function RelatorioRotasDiferentes(props) {
                                                     </Popover.Body>
                                                 </Popover>
                                             }
-                                        ><Button variant="secondary" className="w-100"><GrContactInfo style={{ marginRight: '2%' }} />{inscricao.rota.nome}</Button></OverlayTrigger></td>
+                                        ><div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <ImZoomIn style={{ marginRight: '2%' }} />
+                                                {inscricao.rota.nome}
+                                            </div></OverlayTrigger></td>
                                     </tr>
                                 );
                             })}
                         </tbody>
                     </table>
                 )}
+                <Modal show={modalArquivo} onHide={() => setModalArquivo(false)}>
+                    <Modal.Header closeButton>
+                        <strong>Baixar Arquivo</strong>
+                    </Modal.Header>
+                    <Modal.Body style={{ gap: '3%' }}>
+                        <label for="nomeArquivo">Digite o nome do arquivo desejado:</label>
+                        <input type="text" value={nomeArquivo} onChange={(e) => setNomeArquivo(e.target.value)} className="form-control" />
+                    </Modal.Body>
+                    <Modal.Footer className="justify-content-center">
+                        <Button disabled={!nomeArquivo} onClick={() => { exportTableToWord(); setModalArquivo(false); setNomeArquivo(''); }} variant="primary">Baixar</Button>
+                        <Button onClick={() => setModalArquivo(false)} variant="secondary">Cancelar</Button>
+                    </Modal.Footer>
+                </Modal>
             </Container>
         </Pagina>
     );

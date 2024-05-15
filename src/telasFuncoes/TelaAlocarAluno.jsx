@@ -47,11 +47,11 @@ export default function TelaAlocarAluno(props) {
     useEffect(() => {
         setRotasCarregadas(rotas);
     }, [rotas]);
-    // const curYear = new Date().getFullYear();
-
+    
     useEffect(() => {
         if (inscricoes.length > 0 && rotasCarregadas.length > 0) {
-            const curYear = 2026;
+            // const curYear = new Date().getFullYear();
+            const curYear = 2025;
             const outdatedRoutesSet = new Set();
             let oudatedSub = [];
             inscricoes.forEach((inscricao) => {
