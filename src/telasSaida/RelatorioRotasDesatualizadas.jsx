@@ -3,7 +3,7 @@ import { Button, Container, OverlayTrigger, Popover } from 'react-bootstrap';
 import { GrContactInfo } from "react-icons/gr";
 import { useSelector, useDispatch } from 'react-redux';
 import Pagina from '../templates/Pagina';
-import { getInscricoesFora } from '../redux/inscricaoReducer';
+import { getInscricoesDesatualizadas } from '../redux/inscricaoReducer';
 import { buscarRotas } from '../redux/rotaReducer';
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 
@@ -28,7 +28,8 @@ export default function RelatorioRotasDiferentes(props) {
     }, [inscricoes, rotas]);
 
     useEffect(() => {
-        dispatch(getInscricoesFora(new Date().getFullYear()));
+        // dispatch(getInscricoesDesatualizadas(new Date().getFullYear()));
+        dispatch(getInscricoesDesatualizadas(2025));
         dispatch(buscarRotas());
     }, [dispatch]);
     
@@ -77,29 +78,29 @@ export default function RelatorioRotasDiferentes(props) {
                     <table className='tabela'>
                         <thead className='head-tabela'>
                             <tr>
+                                <th className='linhas-titulo-tabela' style={{ width: '10%',cursor: 'pointer' }}>
+                                    <div className='div-linhas-titulo-tabela'>Ano Inscrição</div>
+                                </th>
                                 <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByNome}>
                                     <div className='div-linhas-titulo-tabela'>Aluno {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer', width: '5%' }}>
+                                <th className='linhas-titulo-tabela' style={{ width: '5%' }}>
                                     <div className='div-linhas-titulo-tabela'>RG</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }}>
+                                <th className='linhas-titulo-tabela' >
                                     <div className='div-linhas-titulo-tabela'>Endereço</div>
                                 </th>
                                 <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByPontoEmbarque}>
                                     <div className='div-linhas-titulo-tabela'>Ponto de Embarque {!orderByPontoEmbarque ? <FaAngleUp /> : <FaAngleDown />}</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }}>
+                                <th className='linhas-titulo-tabela' >
                                     <div className='div-linhas-titulo-tabela'>Escola</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }}>
+                                <th className='linhas-titulo-tabela' >
                                     <div className='div-linhas-titulo-tabela'>Turma, etapa e período</div>
                                 </th>
                                 <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByRoute}>
                                     <div className='div-linhas-titulo-tabela'>Rota {!orderByRoute ? <FaAngleUp /> : <FaAngleDown />}</div>
-                                </th>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }}>
-                                    <div className='div-linhas-titulo-tabela'>Pontos de Embarque da Rota</div>
                                 </th>
                             </tr>
                         </thead>
@@ -107,6 +108,7 @@ export default function RelatorioRotasDiferentes(props) {
                             {sortedSubscriptions.map((inscricao) => {
                                 return (
                                     <tr key={inscricao.codigo}>
+                                        <td className="align-middle text-center">{inscricao.ano}</td>
                                         <td className="align-middle text-center">{inscricao.aluno.nome}</td>
                                         <td className="align-middle text-center">{inscricao.aluno.rg}</td>
                                         <td className="align-middle text-center">{inscricao.bairro}. {inscricao.rua}, {inscricao.numero}</td>
@@ -178,21 +180,6 @@ export default function RelatorioRotasDiferentes(props) {
                                                 </Popover>
                                             }
                                         ><Button variant="secondary" className="w-100"><GrContactInfo style={{ marginRight: '2%' }} />{inscricao.rota.nome}</Button></OverlayTrigger></td>
-                                        <td className="align-middle text-center"><OverlayTrigger
-                                            trigger="hover"
-                                            key="bottom"
-                                            placement="bottom"
-                                            overlay={
-                                                <Popover id="popover-positioned-bottom">
-                                                    <Popover.Header as="h3"></Popover.Header>
-                                                    <Popover.Body>
-                                                        {inscricao.rota.pontos.map((pontoEmbarque) => (
-                                                            <p>{pontoEmbarque.bairro}. {pontoEmbarque.rua}, {pontoEmbarque.numero}</p>
-                                                        ))}
-                                                    </Popover.Body>
-                                                </Popover>
-                                            }
-                                        ><Button variant="secondary" className="w-100"><GrContactInfo style={{ marginRight: '2%' }} />Pontos</Button></OverlayTrigger></td>
                                     </tr>
                                 );
                             })}

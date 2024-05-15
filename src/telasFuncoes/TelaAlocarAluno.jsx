@@ -8,7 +8,6 @@ import { PiWarningBold } from "react-icons/pi";
 import { buscarInscricoes } from '../redux/inscricaoReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import { format } from 'date-fns';
-import TelaMensagem from '../telasCadastro/TelaMensagem';
 import { buscarRotasInscricoes } from '../redux/rotaReducer';
 import { buscarEscolaPorPonto } from '../redux/escolaReducer';
 import { atualizarInscricoes } from '../redux/alocarReducer';
@@ -48,17 +47,17 @@ export default function TelaAlocarAluno(props) {
     useEffect(() => {
         setRotasCarregadas(rotas);
     }, [rotas]);
+    // const curYear = new Date().getFullYear();
 
     useEffect(() => {
         if (inscricoes.length > 0 && rotasCarregadas.length > 0) {
-            // const curYear = new Date().getFullYear();
-            const curYear = 2025;
+            const curYear = 2026;
             const outdatedRoutesSet = new Set();
             let oudatedSub = [];
             inscricoes.forEach((inscricao) => {
                 if (inscricao.dataAlocacao != null) {
                     const dataAlocacao = new Date(inscricao.dataAlocacao);
-                    if (dataAlocacao.getFullYear() < curYear) {
+                    if (dataAlocacao.getFullYear() < curYear && inscricao.ano !== curYear && !inscricoes.some(i => i.aluno.codigo === inscricao.aluno.codigo && i.ano === curYear) && inscricao.aluno.status === 'A') {
                         outdatedRoutesSet.add(JSON.stringify(inscricao.rota));
                         oudatedSub.push(inscricao);
                     }
@@ -69,9 +68,6 @@ export default function TelaAlocarAluno(props) {
             setOutdatedRoutes(outdatedRoutes);
         }
     }, [inscricoes, rotasCarregadas]);
-    
-    
-    
 
     useEffect(() => {
         if (!toastController && outdatedRoutes.length > 0) {
@@ -90,7 +86,7 @@ export default function TelaAlocarAluno(props) {
                             theme: "light",
                             onClick: () => {
                                 window.location.href = 'http://localhost:3000/relatorios/rotas-desatualizadas';
-                            }
+                            }
                         });
                     }, index * 3000);
                 }
@@ -322,7 +318,7 @@ export default function TelaAlocarAluno(props) {
                             </tbody>
                         </table>
                         <>
-                            <h4 style={{paddingTop: '2%'}}>Alunos da Rota</h4>
+                            <h4 style={{ paddingTop: '2%' }}>Alunos da Rota</h4>
                             {inscricoesSelecionadas.length === 0 ? (
                                 <p>Não há alunos alocados na rota</p>
                             ) : (
