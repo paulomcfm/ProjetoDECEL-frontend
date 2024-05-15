@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Container, Table, Modal, Form, ModalFooter } from 'react-bootstrap';
+import { Button, Container, Modal, Form, ModalFooter } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarEscolas } from '../../redux/escolaReducer';
 import { buscarPontosEmbarque } from '../../redux/pontosEmbarqueReducer';
@@ -7,6 +7,8 @@ import { buscarInscricoes, removerInscricao } from '../../redux/inscricaoReducer
 import { buscarAlunos } from '../../redux/alunoReducer';
 import { MdFilterListAlt } from "react-icons/md";
 import ModalExcluir from '../../templates/ModalExcluir';
+import { ToastContainer, toast, Bounce } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function TabelaInscricoes(props) {
     const [termoBusca, setTermoBusca] = useState('');
@@ -16,8 +18,6 @@ export default function TabelaInscricoes(props) {
     const [anosSelecionados, setAnosSelecionados] = useState([]);
     const [inscricaoSelecionada, setInscricaoSelecionada] = useState(null);
     const [inscricoesFiltradas, setInscricoesFiltradas] = useState([]);
-    const [filtroAlunosInscritos, setFiltroAlunosInscritos] = useState(false);
-    const [filtroAlunosAlocados, setFiltroAlunosAlocados] = useState(false);
     const dispatch = useDispatch();
 
     function obterAnosInscricoes(inscricoes) {
@@ -131,13 +131,29 @@ export default function TabelaInscricoes(props) {
     function confirmarExclusao() {
         dispatch(removerInscricao(inscricaoSelecionada)).then((retorno) => {
             if (retorno.payload.status) {
-                props.setMensagem('Inscrição excluída com sucesso!');
-                props.setTipoMensagem('success');
-                props.setMostrarMensagem(true);
+                toast.success('Inscrição removida com sucesso!', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                });
             } else {
-                props.setMensagem('Inscrição não excluída! ' + retorno.payload.mensagem);
-                props.setTipoMensagem('danger');
-                props.setMostrarMensagem(true);
+                toast.error('Inscrição não excluída! ' + retorno.payload.mensagem, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                });
             }
         });
         setMostrarModalExcluir(false); 
@@ -145,6 +161,7 @@ export default function TabelaInscricoes(props) {
 
     return (
         <Container>
+            <ToastContainer />
             <Button
                 type="button"
                 className="d-flex align-items-center mb-4 mt-2 mx-auto justify-content-center"
@@ -189,30 +206,30 @@ export default function TabelaInscricoes(props) {
                     </div>
                 </div>
             </div>
-            <Table striped bordered hover>
-                <thead>
+            <table className='tabela'>
+                <thead className='head-tabela'>
                     <tr>
-                        <th>Aluno</th>
-                        <th>RG</th>
-                        <th>Endereço</th>
-                        <th>Ponto de Embarque</th>
-                        <th>Escola</th>
-                        <th>Turma</th>
-                        <th>Etapa</th>
-                        <th>Período</th>
-                        <th>Ano</th>
-                        <th>Ações</th>
+                        <th className='linhas-titulo-tabela'>Aluno</th>
+                        <th className='linhas-titulo-tabela'>RG</th>
+                        <th className='linhas-titulo-tabela'>Endereço</th>
+                        <th className='linhas-titulo-tabela'>Ponto de Embarque</th>
+                        <th className='linhas-titulo-tabela'>Escola</th>
+                        <th className='linhas-titulo-tabela'>Turma</th>
+                        <th className='linhas-titulo-tabela'>Etapa</th>
+                        <th className='linhas-titulo-tabela'>Período</th>
+                        <th className='linhas-titulo-tabela'>Ano</th>
+                        <th className='linhas-titulo-tabela'>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     {inscricoesFiltradas.map(inscricao => (
                         <tr key={`${inscricao.aluno.codigo}-${inscricao.ano}`}>
-                            <td>{alunos ? alunos.find(alu => alu.codigo === inscricao.aluno.codigo)?.nome : 'Carregando...'}</td>
-                            <td>{alunos ? alunos.find(alu => alu.codigo === inscricao.aluno.codigo)?.rg : 'Carregando...'}</td>
-                            <td>{inscricao.rua}, {inscricao.numero}, {inscricao.bairro}, {inscricao.cep.replace(/^(\d{5})(\d{3})$/, '$1-$2')}</td>
-                            <td>{pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.rua : 'Carregando...'}, {pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.numero : 'Carregando...'}, {pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.bairro : 'Carregando...'}, {pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.cep.replace(/^(\d{5})(\d{3})$/, '$1-$2') : 'Carregando...'}</td>
-                            <td>{escolas ? escolas.find(esc => esc.codigo === inscricao.escola.codigo)?.nome : 'Carregando...'}</td>
-                            <td>
+                            <td className='linhas-tabela'>{alunos ? alunos.find(alu => alu.codigo === inscricao.aluno.codigo)?.nome : 'Carregando...'}</td>
+                            <td className='linhas-tabela'>{alunos ? alunos.find(alu => alu.codigo === inscricao.aluno.codigo)?.rg : 'Carregando...'}</td>
+                            <td className='linhas-tabela'>{inscricao.rua}, {inscricao.numero}, {inscricao.bairro}, {inscricao.cep.replace(/^(\d{5})(\d{3})$/, '$1-$2')}</td>
+                            <td className='linhas-tabela' style={{width: '20%'}}>{pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.rua : 'Carregando...'}, {pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.numero : 'Carregando...'}, {pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.bairro : 'Carregando...'}, {pontosEmbarque ? pontosEmbarque.find(ponto => ponto.codigo === inscricao.pontoEmbarque.codigo)?.cep.replace(/^(\d{5})(\d{3})$/, '$1-$2') : 'Carregando...'}</td>
+                            <td className='linhas-tabela' style={{width: '10%'}}>{escolas ? escolas.find(esc => esc.codigo === inscricao.escola.codigo)?.nome : 'Carregando...'}</td>
+                            <td className='linhas-tabela' style={{width: '7%'}}>
                                 {inscricao.anoLetivo === '1I'
                                     ? 'Pré 1' :
                                     inscricao.anoLetivo === '2I'
@@ -237,7 +254,7 @@ export default function TabelaInscricoes(props) {
                                                                             ? '9º Ano'
                                                                             : ''} {inscricao.turma}
                             </td>
-                            <td>{inscricao.etapa === 'I'
+                            <td className='linhas-tabela'>{inscricao.etapa === 'I'
                                 ? 'Educação Infantil'
                                 : inscricao.etapa === 'F'
                                     ? 'Ensino Fundamental'
@@ -254,7 +271,7 @@ export default function TabelaInscricoes(props) {
                                                 : 'II'
                                             : ''}
                             </td>
-                            <td>{inscricao.periodo === 'M'
+                            <td className='linhas-tabela'>{inscricao.periodo === 'M'
                                 ? 'Matutino'
                                 : inscricao.periodo === 'V'
                                     ? 'Vespertino'
@@ -262,8 +279,8 @@ export default function TabelaInscricoes(props) {
                                         ? 'Integral'
                                         : ''}
                             </td>
-                            <td>{inscricao.ano}</td>
-                            <td style={{ width: '106px', alignItems: 'center', justifyContent: 'center' }}>
+                            <td className='linhas-tabela'>{inscricao.ano}</td>
+                            <td className='linhas-tabela' style={{width: '10%'}}>
                                 <Button variant="danger" onClick={() => {
                                     excluirInscricao(inscricao);
                                 }}>
@@ -339,7 +356,7 @@ export default function TabelaInscricoes(props) {
                     onConfirmar={confirmarExclusao}
                     onCancelar={() => setMostrarModalExcluir(false)}
                 />
-            </Table>
+            </table>
         </Container>
     );
 }
