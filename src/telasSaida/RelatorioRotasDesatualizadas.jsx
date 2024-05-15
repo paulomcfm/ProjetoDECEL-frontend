@@ -14,7 +14,7 @@ import { MdFileDownload } from "react-icons/md";
 export default function RelatorioRotasDiferentes(props) {
     const { inscricoes } = useSelector(state => state.inscricao);
     const { rotas } = useSelector(state => state.rota);
-    const [inscricoesFora, setInscricoesFora] = useState([]);
+    const [inscricoesDesatualizadas, setInscricoesDesatualizadas] = useState([]);
     const [loadedRotas, setLoadedRotas] = useState([]);
     const dispatch = useDispatch();
     const [modalArquivo, setModalArquivo] = useState(false);
@@ -28,7 +28,7 @@ export default function RelatorioRotasDiferentes(props) {
             const rota = rotas.find((rota) => rota.codigo === inscricao.rota);
             return { ...inscricao, rota };
         });
-        setInscricoesFora(inscricoesCopy);
+        setInscricoesDesatualizadas(inscricoesCopy);
         setLoadedRotas(rotas);
     }, [inscricoes, rotas]);
 
@@ -56,7 +56,7 @@ export default function RelatorioRotasDiferentes(props) {
         setOrderByPontoEmbarque(false);
     };
 
-    const sortedSubscriptions = [...inscricoesFora].sort((a, b) => {
+    const sortedSubscriptions = [...inscricoesDesatualizadas].sort((a, b) => {
         const getValueToCompare = (inscricao) => {
             if (orderByNome) {
                 return inscricao?.aluno?.nome || '';
@@ -165,7 +165,7 @@ export default function RelatorioRotasDiferentes(props) {
             </div>
             <Container className="">
                 <h3 style={{ textAlign: 'center', marginTop: '20px', marginBottom: '20px' }}>Alunos alocados com inscrições desatualizadas:</h3>
-                {inscricoesFora.length > 0 && loadedRotas.length > 0 && (
+                {inscricoesDesatualizadas.length > 0 && loadedRotas.length > 0 && (
                     <table className='tabela'>
                         <thead className='head-tabela'>
                             <tr>
@@ -213,7 +213,9 @@ export default function RelatorioRotasDiferentes(props) {
                                                 </Popover>
                                             }
                                         ><div style={{ display: 'flex', alignItems: 'center' }}>
-                                                <ImZoomIn style={{ marginRight: '2%' }} />
+                                                <div style={{ width: '15%', marginRight: '2%', textAlign: 'center' }}>
+                                                    <ImZoomIn />
+                                                </div>
                                                 {inscricao.aluno.nome}
                                             </div></OverlayTrigger></td>
                                         <td className="linhas-tabela">{inscricao.bairro}. {inscricao.rua}, {inscricao.numero}</td>
@@ -224,7 +226,6 @@ export default function RelatorioRotasDiferentes(props) {
                                             placement="bottom"
                                             overlay={
                                                 <Popover id="popover-positioned-bottom">
-                                                    <Popover.Header as="h3">{inscricao.escola.nome}</Popover.Header>
                                                     <Popover.Body>
                                                         <p>
                                                             Tipo: {inscricao && (
@@ -243,7 +244,9 @@ export default function RelatorioRotasDiferentes(props) {
                                             }
                                         >
                                             <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                <ImZoomIn style={{ marginRight: '2%' }} />
+                                            <div style={{ width: '15%', marginRight: '2%', textAlign: 'center' }}>
+                                                    <ImZoomIn />
+                                                </div>
                                                 {inscricao.escola.nome}
                                             </div>
                                         </OverlayTrigger>
@@ -286,8 +289,8 @@ export default function RelatorioRotasDiferentes(props) {
                                                     inscricao.anoLetivo.includes('4') ||
                                                     inscricao.anoLetivo.includes('5') ||
                                                     inscricao.anoLetivo.includes('6'))
-                                                    ? 'I'
-                                                    : 'II'
+                                                    ? ' I'
+                                                    : ' II'
                                                 : ''}, {inscricao.periodo === 'M'
                                                     ? 'Matutino'
                                                     : inscricao.periodo === 'V'
@@ -314,7 +317,9 @@ export default function RelatorioRotasDiferentes(props) {
                                                 </Popover>
                                             }
                                         ><div style={{ display: 'flex', alignItems: 'center' }}>
-                                                <ImZoomIn style={{ marginRight: '2%' }} />
+                                                <div style={{ width: '15%', marginRight: '2%', textAlign: 'center' }}>
+                                                    <ImZoomIn />
+                                                </div>
                                                 {inscricao.rota.nome}
                                             </div></OverlayTrigger></td>
                                     </tr>
@@ -323,6 +328,9 @@ export default function RelatorioRotasDiferentes(props) {
                         </tbody>
                     </table>
                 )}
+                {inscricoesDesatualizadas.length === 0 && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                    <p>Não há alunos com inscrições desatualizadas.</p>
+                </div>}
                 <Modal show={modalArquivo} onHide={() => setModalArquivo(false)}>
                     <Modal.Header closeButton>
                         <strong>Baixar Arquivo</strong>

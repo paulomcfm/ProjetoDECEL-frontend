@@ -211,12 +211,44 @@ export default function RelatorioRotasDiferentes(props) {
                                                 </Popover>
                                             }
                                         ><div style={{ display: 'flex', alignItems: 'center' }}>
-                                                <ImZoomIn style={{ marginRight: '2%' }} />
+                                                <div style={{ width: '15%', marginRight: '2%', textAlign: 'center' }}>
+                                                    <ImZoomIn />
+                                                </div>
                                                 {inscricao.aluno.nome}
                                             </div></OverlayTrigger></td>
                                         <td className="linhas-tabela">{inscricao.bairro}. {inscricao.rua}, {inscricao.numero}</td>
                                         <td className="linhas-tabela">{inscricao.pontoEmbarque.bairro}. {inscricao.pontoEmbarque.rua}, {inscricao.pontoEmbarque.numero}</td>
-                                        <td className="linhas-tabela">{inscricao.escola.nome}</td>
+                                        <td className='linhas-tabela'><OverlayTrigger
+                                            trigger="hover"
+                                            key="bottom"
+                                            placement="bottom"
+                                            overlay={
+                                                <Popover id="popover-positioned-bottom">
+                                                    <Popover.Body>
+                                                        <p>
+                                                            Tipo: {inscricao && (
+                                                                <>
+                                                                    {inscricao.escola.tipo === 'I' && 'Educação Infantil '}
+                                                                    {inscricao.escola.tipo === 'F' && 'Ensino Fundamental '}
+                                                                    {inscricao.escola.tipo === 'A' && 'Educação Infantil e Ensino Fundamental '}
+                                                                    {inscricao.escola.tipo === 'M' && 'Ensino Médio '}
+                                                                </>
+                                                            )}
+                                                        </p>
+                                                        <p>Email: {inscricao.escola.email}</p>
+                                                        <p>Telefone: {inscricao.escola.telefone}</p>
+                                                    </Popover.Body>
+                                                </Popover>
+                                            }
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                            <div style={{ width: '15%', marginRight: '2%', textAlign: 'center' }}>
+                                                    <ImZoomIn />
+                                                </div>
+                                                {inscricao.escola.nome}
+                                            </div>
+                                        </OverlayTrigger>
+                                        </td>
                                         <td className="linhas-tabela">
                                             {inscricao.anoLetivo === '1I'
                                                 ? 'Pré 1' :
@@ -255,8 +287,8 @@ export default function RelatorioRotasDiferentes(props) {
                                                     inscricao.anoLetivo.includes('4') ||
                                                     inscricao.anoLetivo.includes('5') ||
                                                     inscricao.anoLetivo.includes('6'))
-                                                    ? 'I'
-                                                    : 'II'
+                                                    ? ' I'
+                                                    : ' II'
                                                 : ''}, {inscricao.periodo === 'M'
                                                     ? 'Matutino'
                                                     : inscricao.periodo === 'V'
@@ -283,7 +315,9 @@ export default function RelatorioRotasDiferentes(props) {
                                                 </Popover>
                                             }
                                         ><div style={{ display: 'flex', alignItems: 'center' }}>
-                                                <ImZoomIn style={{ marginRight: '2%' }} />
+                                                <div style={{ width: '15%', marginRight: '2%', textAlign: 'center' }}>
+                                                    <ImZoomIn />
+                                                </div>
                                                 {inscricao.rota.nome}
                                             </div></OverlayTrigger></td>
                                         <td className="linhas-tabela"><OverlayTrigger
@@ -301,7 +335,9 @@ export default function RelatorioRotasDiferentes(props) {
                                                 </Popover>
                                             }
                                         ><div style={{ display: 'flex', alignItems: 'center' }}>
-                                                <ImZoomIn style={{ marginRight: '2%' }} />
+                                                <div style={{ width: '15%', marginRight: '2%', textAlign: 'center' }}>
+                                                    <ImZoomIn />
+                                                </div>
                                                 Pontos
                                             </div></OverlayTrigger></td>
                                     </tr>
@@ -310,6 +346,9 @@ export default function RelatorioRotasDiferentes(props) {
                         </tbody>
                     </table>
                 )}
+                {inscricoesFora.length === 0 && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                    <p>Não há alunos com ponto de embarque fora dos pontos de embarque de sua rota.</p>
+                </div>}
                 <Modal show={modalArquivo} onHide={() => setModalArquivo(false)}>
                     <Modal.Header closeButton>
                         <strong>Baixar Arquivo</strong>
