@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { buscarRotas } from "../../redux/rotaReducer";
 import { Row, Col, Container, Table,Modal,Button } from "react-bootstrap";
 import { removerRota,buscarRotasInscricoes } from "../../redux/rotaReducer";
+import '../../templates/style.css'
 
 export default function TabelaRotas(props){
     const dispatch = useDispatch();
@@ -137,15 +138,16 @@ export default function TabelaRotas(props){
         // console.log("Rota: "+JSON.stringify(rota))
         return (
             <tr key={rota.codigo}>
-                <td>{rota.nome}</td>
-                <td>{rota.km}</td>
-                <td>{defPeriodo(rota.periodo)}</td>
-                <td>{rota.tempoInicio}</td>
-                <td>{rota.volta}</td>
-                <td>{rota.veiculo[0].vei_placa}</td>
-                <td>{rota.monitor[0].mon_nome}</td>
-                <td>{motoristasNomes(rota.motoristas)}</td>
-                <td style={{ display: 'flex', gap: '5px' }}>
+                <td className='linhas-tabela'>{rota.nome}</td>
+                <td className='linhas-tabela'>{rota.km}</td>
+                <td className='linhas-tabela'>{defPeriodo(rota.periodo)}</td>
+                <td className='linhas-tabela'>{rota.tempoInicio}</td>
+                <td className='linhas-tabela'>{rota.volta}</td>
+                <td className='linhas-tabela'>{rota.veiculo[0].vei_placa}</td>
+                <td className='linhas-tabela'>{rota.monitor[0].mon_nome}</td>
+                <td className='linhas-tabela'>{motoristasNomes(rota.motoristas)}</td>
+                <td className='linhas-tabela'>{rota.status==true? 'Ativo':'Desativado'}</td>
+                <td className='linhas-tabela' style={{ display: 'flex', gap: '5px' }}>
                       <button type="button" className="btn btn-danger" onClick={()=>{remover(rota.codigo)}}>
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-trash-fill" viewBox="0 0 16 16">
                               <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
@@ -231,18 +233,19 @@ export default function TabelaRotas(props){
                     <input type="text" id="nome" className="form-control mb-3 mx-auto"  placeholder="Pesquisar Rota..." style={{width:'400px'}} name='nome'  onChange={manipularMudancas}/>
                 </Col>
             </Row>
-            <Table>
-                <thead>
+            <table className='tabela'>
+                <thead className='head-tabela'>
                     <tr>
-                    <th scope="col">Nome</th>
-                    <th scope="col">Km</th>
-                    <th scope="col">Periodo</th>
-                    <th scope="col">Ida</th>
-                    <th scope="col">Volta</th>
-                    <th scope="col">Veiculo</th>
-                    <th scope="col">Monitor</th>
-                    <th scope="col">Motoristas</th>
-                    <th scope="col" style={{width:'125px'}}>Ações</th>
+                    <th className='linhas-titulo-tabela' >Nome</th>
+                    <th className='linhas-titulo-tabela' >Km</th>
+                    <th className='linhas-titulo-tabela' >Periodo</th>
+                    <th className='linhas-titulo-tabela' >Ida</th>
+                    <th className='linhas-titulo-tabela' >Volta</th>
+                    <th className='linhas-titulo-tabela' >Veiculo</th>
+                    <th className='linhas-titulo-tabela' >Monitor</th>
+                    <th className='linhas-titulo-tabela' >Motoristas</th>
+                    <th className='linhas-titulo-tabela' >Status</th>
+                    <th className='linhas-titulo-tabela'  style={{width:'125px'}}>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -257,7 +260,7 @@ export default function TabelaRotas(props){
                         })
                     }
                 </tbody>
-            </Table>
+            </table>
         </Container>
     )
 }
