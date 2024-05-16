@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Container, OverlayTrigger, Popover, Modal } from 'react-bootstrap';
-import { GrContactInfo } from "react-icons/gr";
 import { useSelector, useDispatch } from 'react-redux';
 import Pagina from '../templates/Pagina';
 import { getInscricoesFora } from '../redux/inscricaoReducer';

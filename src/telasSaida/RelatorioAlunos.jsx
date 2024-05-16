@@ -13,6 +13,7 @@ import { MdFilterListAlt } from "react-icons/md";
 import { PiWarningBold } from "react-icons/pi";
 import { ToastContainer, toast, Bounce } from 'react-toastify';
 import { MdFileDownload } from "react-icons/md";
+import { IoInformationCircleSharp } from "react-icons/io5";
 import 'react-toastify/dist/ReactToastify.css';
 import '../templates/style.css';
 import { AlignmentType, Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType, HeadingLevel } from "docx";
@@ -315,7 +316,7 @@ export default function TabelaInscricoes(props) {
                                                     </Popover>
                                                 }
                                             >
-                                                <div>{aluno.nome} {aluno.status === 'I' && <PiWarningBold style={{ marginLeft: '2%', verticalAlign: 'middle', color: 'red' }} />}</div>
+                                                <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2%'}}>{aluno.nome} {aluno.status === 'I' && <PiWarningBold style={{ marginLeft: '2%', verticalAlign: 'middle', color: 'red' }} />}<IoInformationCircleSharp /> </div>
                                             </OverlayTrigger>
                                         </td>
                                         <td className='linhas-tabela'>{aluno.rg}</td>
@@ -345,7 +346,7 @@ export default function TabelaInscricoes(props) {
                                                         </Popover>
                                                     }
                                                 >
-                                                    <div>{escola.nome}</div>
+                                                    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2%'}}>{escola.nome}<IoInformationCircleSharp /></div>
                                                 </OverlayTrigger>
                                                 : 'Aluno não inscrito...'}
                                         </td>
@@ -371,7 +372,7 @@ export default function TabelaInscricoes(props) {
                                                         </Popover>
                                                     }
                                                 >
-                                                    <div>{rota.nome}</div>
+                                                    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2%'}}>{rota.nome}<IoInformationCircleSharp /></div>
                                                 </OverlayTrigger> : 'Aluno não alocado...'}
                                         </td>
                                     </tr>
