@@ -67,32 +67,33 @@ export const adicionarUsuario = createAsyncThunk('usuario/adicionar', async (usu
     }
 });
 
-export const autenticar = createAsyncThunk('/autenticar', async (credenciais) => {
-    console.log(credenciais, "aaaaaaaaaaaaaaaa ");
+export const autenticarUsuario = createAsyncThunk('/autenticar', async (credenciais) => {
     try {
-        const resposta = await fetch(`${urlBase}/autenticar`, { method: 'POST',  body: JSON.stringify(credenciais)});
+        // Chame a função de autenticar na controller aqui e passe as credenciais
+        const resposta = await fetch(urlBase, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(credenciais)
+        });
         const dados = await resposta.json();
-        console.log(dados+",dadosaa");
-        return dados;
-    } catch (erro) {
-        return { status: false, mensagem: 'Ocorreu um erro ao autenticar o usuário: ' + erro.message };
-    }
-});
-
-export const enviarEmail = createAsyncThunk('usuario/enviar-email', async ({ provedor, email }) => {
-    try {
-        const resposta = await fetch(urlBase, { method: 'POST' });
-        console.log(resposta);
-        if (resposta.ok) {
-            console.log('Variáveis enviadas com sucesso para o backend.');
-            const dados = await resposta.json();
-            return dados;
+        if (dados.status) {
+            return {
+                autenticado: true,
+                usuario: dados.usuario
+            };
         } else {
-            console.error('Erro ao enviar variáveis para o backend.');
-            console.log({provedor, email});
+            return {
+                autenticado: false,
+                mensagem: dados.mensagem
+            };
         }
     } catch (error) {
-        console.error('Erro de rede:', error);
+        return {
+            autenticado: false,
+            mensagem: 'Ocorreu um erro ao tentar autenticar: ' + error.message
+        };
     }
 });
 
@@ -226,33 +227,19 @@ const usuarioSlice = createSlice({
         }).addCase(removerUsuario.rejected, (state, action) => {
             state.mensagem = "Erro ao remover o usuário: " + action.error.message;
             state.estado = ESTADO.ERRO;
-        }).addCase(autenticar.fulfilled, (state, action) => {
+        }).addCase(autenticarUsuario.fulfilled, (state, action) => {
             if (action.payload.status) {
                 state.autenticado = true;
                 state.usuarioAutenticado = action.payload.usuario;
-                state.nivelAcesso = action.payload.usuario && action.payload.usuario.nome === "admin" ? "admin" : "normal";
                 state.mensagem = action.payload.mensagem;
                 console.log(action.payload);
-                console.log('Usuario:', action.payload.usuario);
-                console.log('Nível de Acesso:', state.nivelAcesso);
             } else {
                 state.autenticado = false;
                 state.usuarioAutenticado = null;
                 state.nivelAcesso = null;
                 state.mensagem = action.payload.mensagem;
             }
-        }).addCase(enviarEmail.pending, (state, action) => {
-            state.estado = ESTADO.PENDENTE;
-            state.mensagem = "Enviando e-mail...";
-        })
-        .addCase(enviarEmail.fulfilled, (state, action) => {
-            state.estado = ESTADO.OCIOSO;
-            state.mensagem = action.payload.mensagem; // Verifique o que está sendo retornado na ação
-        })
-        .addCase(enviarEmail.rejected, (state, action) => {
-                state.estado = ESTADO.ERRO;
-                state.mensagem = action.error.message || 'Erro desconhecido'; // Verifica se o erro está definido antes de acessá-lo
-            });
+        });
     }
 });
 

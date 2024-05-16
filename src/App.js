@@ -22,6 +22,7 @@ import TelaCodigo from './telasCadastro/telaCodigo.jsx';
 
 function App() {
   const autenticado = useSelector(state => state.usuario.autenticado);
+  console.log(autenticado);
   const isAdmin = useSelector(state => {
     console.log(state.usuario.nivelAcesso);
     return state.usuario.nivelAcesso === "admin";
