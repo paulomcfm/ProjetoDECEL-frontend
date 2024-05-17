@@ -70,7 +70,7 @@ export const adicionarUsuario = createAsyncThunk('usuario/adicionar', async (usu
 export const autenticarUsuario = createAsyncThunk('/autenticar', async (credenciais) => {
     try {
         // Chame a função de autenticar na controller aqui e passe as credenciais
-        const resposta = await fetch(urlBase, {
+        const resposta = await fetch("http://localhost:8080/autenticar", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -78,6 +78,8 @@ export const autenticarUsuario = createAsyncThunk('/autenticar', async (credenci
             body: JSON.stringify(credenciais)
         });
         const dados = await resposta.json();
+        console.log(dados);
+        console.log(dados.status, "aaaaaa");
         if (dados.status) {
             return {
                 autenticado: true,
@@ -177,8 +179,7 @@ const initialState = {
 const usuarioSlice = createSlice({
     name: 'usuario',
     initialState,
-    reducers: {
-    },
+    reducers: {},
     extraReducers: (builder) => {
         builder.addCase(buscarUsuarios.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
@@ -232,6 +233,12 @@ const usuarioSlice = createSlice({
                 state.autenticado = true;
                 state.usuarioAutenticado = action.payload.usuario;
                 state.mensagem = action.payload.mensagem;
+                // Verifica se o usuário autenticado é admin
+                if (action.payload.usuario.nome === "admin") {
+                    state.nivelAcesso = "admin";
+                } else {
+                    state.nivelAcesso = "normal";
+                }
                 console.log(action.payload);
             } else {
                 state.autenticado = false;
