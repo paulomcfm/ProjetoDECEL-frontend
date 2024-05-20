@@ -20,7 +20,6 @@ export default function TelaLogin() {
                 if (retorno.payload.autenticado) {
                     console.log(retorno);
                     console.log(retorno.payload);
-                    console.log(retorno.payload.autenticado);
                     setAutenticado(true); // Define autenticado como true se a autenticação for bem-sucedida
                 } else {
                     // Define a mensagem de erro de autenticação
@@ -33,6 +32,7 @@ export default function TelaLogin() {
             setErroAutenticacao('Erro ao autenticar usuário. Por favor, tente novamente mais tarde.');
         }
     }
+    
     function formatarCPF(cpf) {
         if (!cpf) return cpf;
         // Remove todos os caracteres não numéricos

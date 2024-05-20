@@ -79,7 +79,7 @@ export default function TabelaUsuarios(props) {
                     </tr>
                 </thead>
                 <tbody>
-                    {usuariosFiltrados.map(usuario => (
+                    {usuariosFiltrados && usuariosFiltrados.map(usuario => (
                         <tr key={usuario.cpf}>
                             <td>{usuario.nome}</td>
                             <td>{usuario.senha}</td>

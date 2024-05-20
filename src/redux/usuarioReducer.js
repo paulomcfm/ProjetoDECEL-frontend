@@ -172,7 +172,6 @@ const initialState = {
     mensagem: "",
     usuarios: [],
     autenticado: false, // Adicione um campo para indicar se o usuário está autenticado
-    usuarioAutenticado: null, // Adicione um campo para armazenar informações do usuário autenticado
     nivelAcesso: null
 };
 
@@ -229,22 +228,16 @@ const usuarioSlice = createSlice({
             state.mensagem = "Erro ao remover o usuário: " + action.error.message;
             state.estado = ESTADO.ERRO;
         }).addCase(autenticarUsuario.fulfilled, (state, action) => {
-            if (action.payload.status) {
+            console.log("eeeeeeeeeeeee", action.payload.autenticado);
+            if (action.payload.autenticado) {
                 state.autenticado = true;
-                state.usuarioAutenticado = action.payload.usuario;
                 state.mensagem = action.payload.mensagem;
-                // Verifica se o usuário autenticado é admin
-                if (action.payload.usuario.nome === "admin") {
-                    state.nivelAcesso = "admin";
-                } else {
-                    state.nivelAcesso = "normal";
-                }
+                state.nivelAcesso = action.payload.usuario.nome === 'admin' ? 'admin' : 'normal';
                 console.log(action.payload);
             } else {
                 state.autenticado = false;
-                state.usuarioAutenticado = null;
-                state.nivelAcesso = null;
                 state.mensagem = action.payload.mensagem;
+                state.nivelAcesso = null;
             }
         });
     }
