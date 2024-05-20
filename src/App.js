@@ -48,6 +48,7 @@ function App() {
             <Route path='/relatorios/rotas-diferentes' element={<RelatorioRotasDiferentes />} />
             <Route path='/relatorios/rotas-desatualizadas' element={<RelatorioRotasDesatualizadas />} />
             <Route path='relatorios/alunos-nao-inscritos' element={<RelatorioAlunosNaoInscritos />} />
+            
             <Route path='*' element={<Tela404 />} />
           </Routes>
         </BrowserRouter>

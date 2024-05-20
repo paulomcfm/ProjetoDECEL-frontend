@@ -31,7 +31,8 @@ export default function RelatorioAlunosNaoInscritos(props) {
         dispatch(buscarInscricoes());
     }, [dispatch]);
 
-    const anoAtual = new Date().getFullYear();
+    // const anoAtual = new Date().getFullYear();
+    const anoAtual = 2025;
 
     const alunosAtivos = alunos.filter(aluno => aluno.status === 'A'
         && (aluno.nome.toLowerCase().includes(termoBusca.toLowerCase()) || aluno.rg.includes(termoBusca)));
@@ -48,6 +49,8 @@ export default function RelatorioAlunosNaoInscritos(props) {
         !alunosInscritosAnoAtual.includes(aluno.codigo)
         && alunosInscritosOutrosAnos.includes(aluno.codigo)
     );
+
+    //colocar coluna: ano inscricao, rota(para poder filtrar por nao alocados), escola(para poder filtrar por não inscritos)
 
     const handleMotivoChange = (e) => {
         const value = e.target.value;
