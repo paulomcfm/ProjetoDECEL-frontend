@@ -22,6 +22,7 @@ import TelaMenu from './telasCadastro/TelaMenu.jsx'
 import store from './redux/store.js';
 import { Provider } from 'react-redux';
 import './recursos/App.css';
+import TelaAlertaManutencao from './telasSaida/TelaAlertaManutenção.jsx';
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
             <Route path='/relatorios/rotas-diferentes' element={<RelatorioRotasDiferentes />} />
             <Route path='/relatorios/rotas-desatualizadas' element={<RelatorioRotasDesatualizadas />} />
             <Route path='relatorios/alunos-nao-inscritos' element={<RelatorioAlunosNaoInscritos />} />
+            <Route path='/teste' element={< TelaAlertaManutencao/>} />
             <Route path='*' element={<Tela404 />} />
           </Routes>
         </BrowserRouter>
