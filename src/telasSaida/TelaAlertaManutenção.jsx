@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Row, Col } from 'react-bootstrap';
+import { CSSTransition } from 'react-transition-group';
+import Pagina from '../templates/Pagina.jsx';
+import './telacss.css'
 
 export default function TelaAlertaManutencao(props) {
+    const [filtro,setFiltro] = useState('')
     const [listaManutencao, setListaManutencao] = useState([
         {
             "placa": "ABC123",
@@ -85,57 +89,76 @@ export default function TelaAlertaManutencao(props) {
         }
     ]);
 
-    const [veiculoSelecionado, setVeiculoSelecionado] = useState(null);
+    const [veiculosSelecionados, setVeiculosSelecionados] = useState([]);
 
     function handleButtonClick(index) {
-        if (veiculoSelecionado === index) {
-            // Se o mesmo botão for clicado novamente, fecha a tabela
-            setVeiculoSelecionado(null);
+        if (veiculosSelecionados.includes(index)) {
+            setVeiculosSelecionados(veiculosSelecionados.filter(item => item !== index));
         } else {
-            // Caso contrário, exibe a tabela correspondente ao botão clicado
-            setVeiculoSelecionado(index);
+            setVeiculosSelecionados([...veiculosSelecionados, index]);
         }
-    }
-
-    function listarVeiculos(veiculo, index) {
-        return (
-            <div key={veiculo.placa} style={{width:'100%',marginTop:'2px'}}>
-                <Button style={{ marginLeft: '50%'}} onClick={() => handleButtonClick(index)}>
-                    {veiculo.placa}
-                </Button>
-                {veiculoSelecionado === index && listarManutencoes(veiculo.manutencoes)}
-            </div>
-        );
     }
 
     function listarManutencoes(manutencoes) {
         return (
-            <table className='tabela' style={{ width: '100%' }}>
-                <thead className='head-tabela'>
-                    <tr>
-                        <th className='linhas-titulo-tabela'>Tipo</th>
-                        <th className='linhas-titulo-tabela'>Data</th>
-                        <th className='linhas-titulo-tabela'>Observações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {manutencoes.map(manut => (
-                        <tr key={manut.codigo}>
-                            <td className='linhas-tabela'>{manut.tipo === 'P' ? "Preventiva" : "Corretiva"}</td>
-                            <td className='linhas-tabela'>{manut.data}</td>
-                            <td className='linhas-tabela'>{manut.observacoes}</td>
+            <CSSTransition
+                in={veiculosSelecionados !== null}
+                timeout={500}
+                classNames="manutencoes"
+                unmountOnExit
+            >
+                <table className="tabela" style={{ width: '100%' }}>
+                    <thead className="head-tabela">
+                        <tr>
+                            <th className="linhas-titulo-tabela">Tipo</th>
+                            <th className="linhas-titulo-tabela">Data</th>
+                            <th className="linhas-titulo-tabela">Observações</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {manutencoes.map(manut => (
+                            <tr key={manut.codigo}>
+                                <td className="linhas-tabela">{manut.tipo === 'P' ? "Preventiva" : "Corretiva"}</td>
+                                <td className="linhas-tabela">{manut.data}</td>
+                                <td className="linhas-tabela">{manut.observacoes}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </CSSTransition>
+        );
+    }
+
+    function manipularMudancas(event) {
+        const { value } = event.target;
+        setFiltro(value);
+    }
+
+    function listarVeiculos(veiculo, index) {
+        return (
+            <div key={veiculo.placa} style={{ width: '100%', marginTop: '2px' }}>
+                <Button style={{ width: '100%' }} onClick={() => handleButtonClick(index)}>
+                    {veiculo.placa}
+                </Button>
+                {veiculosSelecionados.includes(index) && listarManutencoes(veiculo.manutencoes)}
+            </div>
         );
     }
 
     return (
-        <div className="d-flex flex-column justify-content-center align-items-center" style={{ minHeight: '100vh', width: '100%' }}>
-            {listaManutencao.map((veiculo, index) => (
-                listarVeiculos(veiculo, index)
-            ))}
-        </div>
+        <Pagina>
+            <Row className="justify-content-center align-items-center" style={{ marginTop: '10%' }}>
+                <Col>
+                    <input type="text" id="nome" className="form-control mb-3 mx-auto" placeholder="Pesquisar Rota..." style={{ width: '400px' }} name="nome" onChange={manipularMudancas} />
+                </Col>
+            </Row>
+            <Row className="justify-content-center align-items-center" style={{ marginTop: '5%' }}>
+                <Col>
+                    {listaManutencao.map((veiculo, index) => (
+                        listarVeiculos(veiculo, index)
+                    ))}
+                </Col>
+            </Row>
+        </Pagina>
     );
 }

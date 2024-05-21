@@ -1,0 +1,17 @@
+.manutencoes-enter {
+    opacity: 0;
+}
+
+.manutencoes-enter-active {
+    opacity: 1;
+    transition: opacity 500ms;
+}
+
+.manutencoes-exit {
+    opacity: 1;
+}
+
+.manutencoes-exit-active {
+    opacity: 0;
+    transition: opacity 500ms;
+}
