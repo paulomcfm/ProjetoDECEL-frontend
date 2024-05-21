@@ -76,7 +76,7 @@ export default function TelaLogin() {
                         {autenticado && <Navigate to="/menu" />}
                         <br />
                         {erroAutenticacao && <div className="text-danger">{erroAutenticacao}</div>}
-                        <Link to="/esqueci-minha-senha" className="d-block text-center">
+                        <Link to="/esqueci-senha" className="d-block text-center">
                             Esqueci minha senha
                         </Link>
                     </Form>

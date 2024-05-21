@@ -14,10 +14,10 @@ import TelaRegistrarManutencao from './telasFuncoes/TelaRegistrarManutencao.jsx'
 import MapaPagina from './telasSaida/MapaPagina.jsx';
 import TelaLogin from './telasCadastro/telaLogin.jsx';
 import TelaCadastroUser from './telasCadastro/telaCadastroUser.jsx';
-import Esqueci from './telasCadastro/telaEsqueci.jsx';
+import TelaEsqueci from './telasCadastro/telaEsqueci.jsx'
 import TelaMenu from './telasCadastro/TelaMenu.jsx';
-import TelaCodigo from './telasCadastro/telaCodigo.jsx';
-import RotaProtegida from './rotaProtegida.js';
+import TelaCodigo from './telasCadastro/telaCodigo.jsx'
+import RotaProtegida from './rotaProtegida.js'
 import MensagemPermissaoNegada from './mensagemPermissaonegada.jsx';
 
 function App() {
@@ -27,7 +27,7 @@ function App() {
     <div className="App">
       <Routes>
         <Route path='/' element={<TelaLogin />} />
-        <Route path='/esqueci-senha' element={<Esqueci />} />
+        <Route path='/esqueci-senha' element={<TelaEsqueci />} />
         <Route path='/codigo' element={<TelaCodigo />} />
         
         <Route path='/pontos-embarque' element={autenticado ? <TelaCadastroPontoEmbarque /> : <RotaProtegida><TelaCadastroPontoEmbarque /></RotaProtegida>} />

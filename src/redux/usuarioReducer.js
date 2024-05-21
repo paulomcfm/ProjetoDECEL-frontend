@@ -167,12 +167,30 @@ export const removerUsuario = createAsyncThunk('usuario/remover', async (usuario
     }
 });
 
+export const solicitarCodigoRedefinicao = createAsyncThunk('/solicitar-redefinicao', async (email) => {
+    const resposta = await fetch('http://localhost:8080/enviar-email/solicitar-redefinicao', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    });
+    return await resposta.json();
+});
+
+export const redefinirSenha = createAsyncThunk('/redefinirSenha', async ({ codigo, novaSenha }) => {
+    const resposta = await fetch('http://localhost:8080/enviar-email/redefinir-senha', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ codigo, novaSenha })
+    });
+    return await resposta.json();
+});
+
 const initialState = {
     estado: ESTADO.OCIOSO,
     mensagem: "",
     usuarios: [],
     autenticado: false, // Adicione um campo para indicar se o usuário está autenticado
-    nivelAcesso: null
+    nivelAcesso: "normal"
 };
 
 const usuarioSlice = createSlice({
