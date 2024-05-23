@@ -2,20 +2,20 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { solicitarCodigoRedefinicao } from '../redux/usuarioReducer.js';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function TelaEsqueci() {
     const [email, setEmail] = useState('');
     const [mensagem, setMensagem] = useState('');
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         const resposta = dispatch(solicitarCodigoRedefinicao(email));
-        setMensagem(resposta.mensagem);
-        if(resposta.ok)
-        {
-            <Navigate to="/codigo"/>
+        setMensagem(resposta.payload.mensagem);
+        if (resposta.payload.ok) {
+            navigate('/codigo', { state: { email } });  // Pass email as state
         }
     };
 

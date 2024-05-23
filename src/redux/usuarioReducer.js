@@ -176,11 +176,11 @@ export const solicitarCodigoRedefinicao = createAsyncThunk('/solicitar-redefinic
     return await resposta.json();
 });
 
-export const redefinirSenha = createAsyncThunk('/redefinirSenha', async ({ codigo, novaSenha }) => {
+export const redefinirSenha = createAsyncThunk('/redefinirSenha', async ({ email, codigo, novaSenha }) => {
     const resposta = await fetch('http://localhost:8080/enviar-email/redefinir-senha', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ codigo, novaSenha })
+        body: JSON.stringify({ email, codigo, novaSenha })
     });
     return await resposta.json();
 });
@@ -257,6 +257,24 @@ const usuarioSlice = createSlice({
                 state.mensagem = action.payload.mensagem;
                 state.nivelAcesso = null;
             }
+        }).addCase(solicitarCodigoRedefinicao.pending, (state) => {
+            state.estado = 'PENDENTE';
+            state.mensagem = "Solicitando código de redefinição...";
+        }).addCase(solicitarCodigoRedefinicao.fulfilled, (state, action) => {
+            state.estado = 'OCIOSO';
+            state.mensagem = action.payload.mensagem;
+        }).addCase(solicitarCodigoRedefinicao.rejected, (state, action) => {
+            state.estado = 'ERRO';
+            state.mensagem = action.error.message;
+        }).addCase(redefinirSenha.pending, (state) => {
+            state.estado = 'PENDENTE';
+            state.mensagem = "Redefinindo senha...";
+        }).addCase(redefinirSenha.fulfilled, (state, action) => {
+            state.estado = 'OCIOSO';
+            state.mensagem = action.payload.mensagem;
+        }).addCase(redefinirSenha.rejected, (state, action) => {
+            state.estado = 'ERRO';
+            state.mensagem = action.error.message;
         });
     }
 });
