@@ -38,10 +38,10 @@ function App() {
         <Route path='/escolas' element={autenticado ? <TelaCadastroEscola /> : <RotaProtegida><TelaCadastroEscola /></RotaProtegida>} />
         <Route path='/menu' element={autenticado ? <TelaMenu /> : <RotaProtegida><TelaMenu /></RotaProtegida>} />
         <Route path='/inscricao-aluno' element={autenticado ? <TelaCadastroInscricao /> : <RotaProtegida><TelaCadastroInscricao /></RotaProtegida>} />
-        <Route path='/definir-rota' element={autenticado ? <TelaDefinirRotas /> : <RotaProtegida><TelaDefinirRotas /></RotaProtegida>} />
+        <Route path='/definir-rota' element={<TelaDefinirRotas />} />
         <Route path='/alocar-aluno' element={autenticado ? <TelaAlocarAluno /> : <RotaProtegida><TelaAlocarAluno /></RotaProtegida>} />
         <Route path='/registrar-manutencao' element={autenticado ? <TelaRegistrarManutencao /> : <RotaProtegida><TelaRegistrarManutencao /></RotaProtegida>} />
-        <Route path='/mapa-rota' element={autenticado ? <MapaPagina /> : <RotaProtegida><MapaPagina /></RotaProtegida>} />
+        <Route path='/mapa-rota' element={<MapaPagina />} />
         
         <Route path='*' element={<Tela404 />} />
       </Routes>
