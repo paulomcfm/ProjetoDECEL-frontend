@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import TelaCadastroEscola from './telasCadastro/telaCadastroEscola.jsx';
+import TelaCadastroMonitor from './telasCadastro/TelaCadastroMonitor.jsx';
 import TelaCadastroResponsavel from './telasCadastro/telaCadastroResponsavel.jsx';
 import TelaCadastroAluno from './telasCadastro/telaCadastroAluno.jsx';
 import TelaCadastroPontoEmbarque from './telasCadastro/telaCadastroPontoEmbarque.jsx';
@@ -19,6 +20,17 @@ import TelaMenu from './telasCadastro/TelaMenu.jsx';
 import TelaCodigo from './telasCadastro/telaCodigo.jsx'
 import RotaProtegida from './rotaProtegida.js'
 import MensagemPermissaoNegada from './mensagemPermissaonegada.jsx';
+import RelatorioRotasDiferentes from './telasSaida/RelatorioRotasDiferentes.jsx';
+import RelatorioRotasDesatualizadas from './telasSaida/RelatorioRotasDesatualizadas.jsx';
+import Esqueci from './telasCadastro/telaEsqueci.jsx';
+import RelatorioAlunos from './telasSaida/RelatorioAlunos.jsx';
+import RelatorioAlunosNaoInscritos from './telasSaida/RelatorioNaoInscritos.jsx';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import TelaMenu from './telasCadastro/TelaMenu.jsx'
+import store from './redux/store.js';
+import { Provider } from 'react-redux';
+import './recursos/App.css';
+import TelaAlertaManutencao from './telasSaida/TelaAlertaManutenção.jsx';
 
 function App() {
   const autenticado = useSelector(state => state.usuario.autenticado);
@@ -43,7 +55,13 @@ function App() {
         <Route path='/alocar-aluno' element={autenticado ? <TelaAlocarAluno /> : <RotaProtegida><TelaAlocarAluno /></RotaProtegida>} />
         <Route path='/registrar-manutencao' element={autenticado ? <TelaRegistrarManutencao /> : <RotaProtegida><TelaRegistrarManutencao /></RotaProtegida>} />
         <Route path='/mapa-rota' element={<MapaPagina />} />
-        
+        <Route path='/relatorios/alunos' element={<RelatorioAlunos />} />
+        <Route path='/monitor' element={< TelaCadastroMonitor/>} />
+        <Route path='/relatorios/rotas-diferentes' element={<RelatorioRotasDiferentes />} />
+        <Route path='/relatorios/rotas-desatualizadas' element={<RelatorioRotasDesatualizadas />} />
+        <Route path='relatorios/alunos-nao-inscritos' element={<RelatorioAlunosNaoInscritos />} />
+        <Route path='/teste' element={< TelaAlertaManutencao/>} />
+          
         <Route path='*' element={<Tela404 />} />
       </Routes>
     </div>

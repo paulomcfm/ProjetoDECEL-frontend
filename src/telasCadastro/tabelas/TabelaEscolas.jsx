@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Container, Table } from 'react-bootstrap';
+import { Button, Container } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarEscolas, removerEscola } from '../../redux/escolaReducer';
 import { buscarPontosEmbarque } from '../../redux/pontosEmbarqueReducer';
+import ModalExcluir from '../../templates/ModalExcluir';
+import { ToastContainer, toast, Bounce } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import '../../templates/style.css';
 
 export default function TabelaEscolas(props) {
     const [termoBusca, setTermoBusca] = useState('');
     const { escolas } = useSelector(state => state.escola);
+    const [escolaSelecionada, setEscolaSelecionada] = useState(null); 
+    const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false);
     const dispatch = useDispatch();
 
     const escolaVazia = {
@@ -32,9 +38,39 @@ export default function TabelaEscolas(props) {
     const { pontosEmbarque } = useSelector(state => state.pontoEmbarque);
 
     function excluirEscola(escola) {
-        if (window.confirm('Deseja realmente excluir essa escola?')) {
-            dispatch(removerEscola(escola));
-        }
+        setEscolaSelecionada(escola);
+        setMostrarModalExcluir(true);
+    }
+
+    function confirmarExclusao() {
+        dispatch(removerEscola(escolaSelecionada)).then((retorno) => {
+            if (retorno.payload.status) {
+                toast.success('Escola excluída com sucesso!', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                });
+            } else {
+                toast.error('Escola não excluída! ' + retorno.payload.mensagem, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                });
+            }
+        });
+        setMostrarModalExcluir(false); 
     }
 
     function editarEscola(escola) {
@@ -49,9 +85,10 @@ export default function TabelaEscolas(props) {
 
     return (
         <Container>
+            <ToastContainer />
             <Button
                 type="button"
-                className="d-flex align-items-center mb-4 mt-2 mx-auto"
+                className="d-flex align-items-center mb-4 mt-2 mx-auto justify-content-center"
                 style={{ width: '142px' }}
                 onClick={() => {
                     props.setEscolaParaEdicao(escolaVazia);
@@ -78,28 +115,28 @@ export default function TabelaEscolas(props) {
                     onChange={e => setTermoBusca(e.target.value)}
                 />
             </div>
-            <Table striped bordered hover>
-                <thead>
+            <table className='tabela'>
+                <thead className='head-tabela'>
                     <tr>
-                        <th>Nome</th>
-                        <th>Endereço</th>
-                        <th>CEP</th>
-                        <th>Tipo</th>
-                        <th>Email</th>
-                        <th>Telefone</th>
-                        <th>Ações</th>
+                        <th className='linhas-titulo-tabela'>Nome</th>
+                        <th className='linhas-titulo-tabela'>Endereço</th>
+                        <th className='linhas-titulo-tabela'>CEP</th>
+                        <th className='linhas-titulo-tabela'>Tipo</th>
+                        <th className='linhas-titulo-tabela'>Email</th>
+                        <th className='linhas-titulo-tabela'>Telefone</th>
+                        <th className='linhas-titulo-tabela'>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     {escolasFiltradas.map(escola => (
                         <tr key={escola.codigo}>
-                            <td>{escola.nome}</td>
-                            <td>{pontosEmbarque.find(ponto => ponto.codigo === escola.pontoEmbarque.codigo)?.rua}
+                            <td className='linhas-tabela' style={{ width: '15%'}}>{escola.nome}</td>
+                            <td className='linhas-tabela'>{pontosEmbarque.find(ponto => ponto.codigo === escola.pontoEmbarque.codigo)?.rua}
                                 , {pontosEmbarque.find(ponto => ponto.codigo === escola.pontoEmbarque.codigo)?.numero}
                                 , {pontosEmbarque.find(ponto => ponto.codigo === escola.pontoEmbarque.codigo)?.bairro}</td>
-                            <td>{pontosEmbarque.find(ponto => ponto.codigo === escola.pontoEmbarque.codigo)?.cep
+                            <td className='linhas-tabela' style={{width: '9%'}}>{pontosEmbarque.find(ponto => ponto.codigo === escola.pontoEmbarque.codigo)?.cep
                                 .replace(/^(\d{5})(\d{3})$/, '$1-$2')}</td>
-                            <td>
+                            <td className='linhas-tabela'>
                                 {escola.tipo === 'I'
                                     ? 'Educação Infantil'
                                     : escola.tipo === 'F'
@@ -110,9 +147,9 @@ export default function TabelaEscolas(props) {
                                                 ? 'Ensino Médio'
                                                 : ''}
                             </td>
-                            <td>{escola.email}</td>
-                            <td>{escola.telefone}</td>
-                            <td>
+                            <td className='linhas-tabela'>{escola.email}</td>
+                            <td className='linhas-tabela' style={{width: '13%'}}>{escola.telefone}</td>
+                            <td className='linhas-tabela' style={{width: '10%'}}>
                                 <Button variant="danger" onClick={() => {
                                     excluirEscola(escola);
                                 }}>
@@ -145,7 +182,13 @@ export default function TabelaEscolas(props) {
                         </tr>
                     ))}
                 </tbody>
-            </Table>
+                <ModalExcluir
+                    mostrarModalExcluir={mostrarModalExcluir}
+                    mensagemExcluir="Deseja realmente excluir esta escola?"
+                    onConfirmar={confirmarExclusao}
+                    onCancelar={() => setMostrarModalExcluir(false)}
+                />
+            </table>
         </Container>
     );
 }

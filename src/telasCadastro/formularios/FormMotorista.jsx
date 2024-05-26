@@ -61,66 +61,69 @@ export default function FormMotorista(props) {
 
 
           return (
-            <Form noValidate style={{ marginTop: '100px' }} validated={formValidado} onSubmit={manipularEnvio}>
-              <Row className="justify-content-center">
-                <Col xs={12} md={6}>
-                  {/* Input do nome */}
-                  <Form.Group>
-                        <Form.Label>Nome(*):</Form.Label><br/>
-                        <Form.Control type="text" placeholder="" value={motorista.nome} name='nome' onChange={manipularMudancas} required/>
-                    <Form.Control.Feedback type="invalid">Informe o nome!</Form.Control.Feedback>
-                  </Form.Group>
-                </Col>
-              </Row>
+            <>
+              <h2 className="text-center">{props.modo === 'gravar'?'Cadastrar Motorista':'Alterar Motorista'}</h2>
+              <Form noValidate style={{ marginTop: '100px' }} validated={formValidado} onSubmit={manipularEnvio}>
+                <Row className="justify-content-center">
+                  <Col xs={12} md={6}>
+                    {/* Input do nome */}
+                    <Form.Group>
+                          <Form.Label>Nome(*):</Form.Label><br/>
+                          <Form.Control type="text" placeholder="" value={motorista.nome} name='nome' onChange={manipularMudancas} required/>
+                      <Form.Control.Feedback type="invalid">Informe o nome!</Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
+                </Row>
 
-              <Row className="justify-content-center">
-                <Col xs={12} md={6}>
-                  {/* Input da CNH */}
-                    <Form.Label>Cnh(*):</Form.Label><br/>
-                    <Form.Control type="text" placeholder="" value={motorista.cnh} name='cnh' onChange={manipularMudancas} required disabled={props.modo !== 'gravar'} />
-                </Col>
-              </Row>
-              
-              <Row className="justify-content-center">
-                <Col xs={12} md={6}>
-                  {/* Input do Telefone */}
-                  <label htmlFor="celular">Telefone</label>
-                  <InputMask
-                    style={{width:'300px'}}
-                    className="form-control"
-                    mask="(99) 99999-9999"
-                    maskChar="_"
-                    placeholder="(99) 99999-9999"
-                    name="celular"
-                    value={motorista.celular}
-                    onChange={manipularMudancas}
-                    required
-                  />
-                </Col>
-              </Row>
-              <br />
-              <Row className="justify-content-center">
-                <Col xs={12} md={1}>
-                    { props.modo === 'gravar'?
-                      <button type="submit"  className="btn btn-primary">Cadastrar</button>
-                      :
-                      <button type="submit" className="btn btn-primary">Alterar</button>
-                    }
-                </Col>
-                <Col xs={12} md={1}>
-                <button type="button" className="btn btn-danger" onClick={()=>{props.setTela(true)}}>Voltar</button>
-                </Col>
-              </Row>
-              {
-                exibirMensagem === true
-                ?
-                <div className="alert alert-success" role="alert" style={{textAlign:'center',marginTop:'60px',width:'1000px', margin: '0 auto'}}>
-                  {mensagemForm}
-                </div>
-                :
-                null
-              }
+                <Row className="justify-content-center">
+                  <Col xs={12} md={6}>
+                    {/* Input da CNH */}
+                      <Form.Label>Cnh(*):</Form.Label><br/>
+                      <Form.Control type="text" placeholder="" value={motorista.cnh} name='cnh' onChange={manipularMudancas} required disabled={props.modo !== 'gravar'} />
+                  </Col>
+                </Row>
+                
+                <Row className="justify-content-center">
+                  <Col xs={12} md={6}>
+                    {/* Input do Telefone */}
+                    <label htmlFor="celular">Telefone</label>
+                    <InputMask
+                      style={{width:'300px'}}
+                      className="form-control"
+                      mask="(99) 99999-9999"
+                      maskChar="_"
+                      placeholder="(99) 99999-9999"
+                      name="celular"
+                      value={motorista.celular}
+                      onChange={manipularMudancas}
+                      required
+                    />
+                  </Col>
+                </Row>
+                <br />
+                <Row className="justify-content-center">
+                  <Col xs={12} md={1}>
+                      { props.modo === 'gravar'?
+                        <button type="submit"  className="btn btn-primary">Cadastrar</button>
+                        :
+                        <button type="submit" className="btn btn-primary">Alterar</button>
+                      }
+                  </Col>
+                  <Col xs={12} md={1}>
+                  <button type="button" className="btn btn-danger" onClick={()=>{props.setTela(true)}}>Voltar</button>
+                  </Col>
+                </Row>
+                {
+                  exibirMensagem === true
+                  ?
+                  <div className="alert alert-success" role="alert" style={{textAlign:'center',marginTop:'60px',width:'1000px', margin: '0 auto'}}>
+                    {mensagemForm}
+                  </div>
+                  :
+                  null
+                }
 
-            </Form>
+              </Form>
+            </>
           );
 }

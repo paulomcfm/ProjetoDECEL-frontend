@@ -3,10 +3,13 @@ import { Button, Container, Table } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarPontosEmbarque, removerPontoEmbarque } from '../../redux/pontosEmbarqueReducer';
 import { useEffect } from 'react';
+import ModalExcluir from '../../templates/ModalExcluir';
 
 export default function TabelaPontosEmbarque(props) {
     const [termoBusca, setTermoBusca] = useState('');
-    const { estado, mensagem, pontosEmbarque } = useSelector(state => state.pontoEmbarque);
+    const [pontoEmbarqueSelecionado, setPontoEmbarqueSelecionado] = useState(null); 
+    const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false);
+    const { pontosEmbarque } = useSelector(state => state.pontoEmbarque);
     const dispatch = useDispatch();
 
     const PontoEmbarqueVazio = {
@@ -18,9 +21,23 @@ export default function TabelaPontosEmbarque(props) {
     };
 
     function excluirPontoEmbarque(pontoEmbarque) {
-        if (window.confirm('Deseja realmente excluir esse ponto de embarque?')) {
-            dispatch(removerPontoEmbarque(pontoEmbarque));
-        }
+        setPontoEmbarqueSelecionado(pontoEmbarque);
+        setMostrarModalExcluir(true);
+    }
+
+    function confirmarExclusao() {
+        dispatch(removerPontoEmbarque(pontoEmbarqueSelecionado)).then((retorno) => {
+            if (retorno.payload.status) {
+                props.setMensagem('Ponto de embarque excluído com sucesso!');
+                props.setTipoMensagem('success');
+                props.setMostrarMensagem(true);
+            } else {
+                props.setMensagem('Ponto de embarque não excluído! ' + retorno.payload.mensagem);
+                props.setTipoMensagem('danger');
+                props.setMostrarMensagem(true);
+            }
+        });
+        setMostrarModalExcluir(false);
     }
 
     function editarPontoEmbarque(pontoEmbarque) {
@@ -41,7 +58,7 @@ export default function TabelaPontosEmbarque(props) {
         <Container>
             <Button
                 type="button"
-                className="d-flex align-items-center mb-4 mt-2 mx-auto"
+                className="d-flex align-items-center mb-4 mt-2 mx-auto justify-content-center"
                 style={{ width: '142px' }}
                 onClick={() => {
                     props.setPontoEmbarqueParaEdicao(PontoEmbarqueVazio);
@@ -72,7 +89,7 @@ export default function TabelaPontosEmbarque(props) {
                     <tr>
                         <th>Endereço</th>
                         <th>CEP</th>
-                        <th>Ações</th>
+                        <th style={{ width: '9%' }}>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -113,6 +130,12 @@ export default function TabelaPontosEmbarque(props) {
                         </tr>
                     ))}
                 </tbody>
+                <ModalExcluir
+                    mostrarModalExcluir={mostrarModalExcluir}
+                    mensagemExcluir="Deseja realmente excluir este ponto de embarque?"
+                    onConfirmar={confirmarExclusao}
+                    onCancelar={() => setMostrarModalExcluir(false)}
+                />
             </Table>
         </Container>
     );

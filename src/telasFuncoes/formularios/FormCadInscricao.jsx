@@ -1,20 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Container, Row, Col, Table } from 'react-bootstrap';
+import { Form, Button, Container, Row, Col, Table, Popover, OverlayTrigger } from 'react-bootstrap';
 import '../../templates/style.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarEscolas } from '../../redux/escolaReducer';
 import { buscarAlunos } from '../../redux/alunoReducer';
 import { buscarPontosEmbarque } from '../../redux/pontosEmbarqueReducer';
 import { adicionarInscricao, atualizarInscricao } from '../../redux/inscricaoReducer';
+import { format } from 'date-fns';
+import { toast, Bounce } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function FormCadInscricao(props) {
     const { inscricoes } = useSelector(state => state.inscricao);
     const [formValidado, setFormValidado] = useState(false);
-    const estadoInicialInscricao = props.inscricaoParaEdicao;
+    const estadoInicialInscricao = {
+        ...props.inscricaoParaEdicao,
+        ano: new Date().getFullYear()
+    };
     const [inscricao, setInscricao] = useState(estadoInicialInscricao);
+    const alunoSelecionadoRelatorio = props.alunoSelecionadoRelatorio || null;
     const [alunoSelecionado, setAlunoSelecionado] = useState(false);
     const [escolaSelecionada, setEscolaSelecionada] = useState(false);
     const [pontoEmbarqueSelecionado, setPontoEmbarqueSelecionado] = useState(false);
+    console.log(alunoSelecionadoRelatorio);
 
     const inscricaoVazia = {
         ano: '',
@@ -81,13 +89,21 @@ function FormCadInscricao(props) {
         (aluno.nome.toLowerCase().includes(termoBuscaAlunos.toLowerCase()) ||
             aluno.rg.includes(termoBuscaAlunos)) &&
         !inscricoes.some(inscricao => inscricao.aluno.codigo === aluno.codigo && inscricao.ano === anoAtual)
+        && aluno.status !== 'I'
     );
 
-    const handleSelecionarAluno = (aluno) => {
+    const handleSelecionarAluno = async (aluno) => {
         setTermoBuscaAlunos(`${aluno.nome} - ${aluno.rg}`);
-        setInscricao({ ...inscricao, aluno: aluno });
+        const inscricaoAnoPassado = await buscarInscricaoAnoPassado(aluno.codigo);
+        if (inscricaoAnoPassado) {
+            setInscricao({ ...inscricao, ...inscricaoAnoPassado, aluno: aluno });
+            setCepRaw(inscricaoAnoPassado.cep);
+        } else {
+            setInscricao({ ...inscricao, aluno: aluno });
+        }
         setAlunoSelecionado(true);
     };
+
 
     const { pontosEmbarque } = useSelector(state => state.pontoEmbarque);
     const [termoBuscaPontosEmbarque, setTermoBuscaPontosEmbarque] = useState('');
@@ -125,20 +141,66 @@ function FormCadInscricao(props) {
                     else
                         inscricao.etapa = 'I';
                     if (!props.modoEdicao) {
-                        dispatch(adicionarInscricao(inscricao));
-                        props.setMensagem('Inscrição incluída com sucesso');
-                        props.setTipoMensagem('success');
-                        props.setMostrarMensagem(true);
-                        props.exibirFormulario(false);
+                        dispatch(adicionarInscricao(inscricao)).then((retorno) => {
+                            if (retorno.payload.status) {
+                                toast.success('Aluno inscrito com sucesso!', {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                    theme: "light",
+                                    transition: Bounce,
+                                });
+                            } else {
+                                toast.error('Aluno não inscrito! ' + retorno.payload.mensagem, {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                    theme: "light",
+                                    transition: Bounce,
+                                });
+                            }
+                        });
                     } else {
-                        dispatch(atualizarInscricao(inscricao));
-                        props.setMensagem('Inscrição alterada com sucesso');
-                        props.setTipoMensagem('success');
-                        props.setMostrarMensagem(true);
-                        props.setModoEdicao(false);
-                        props.exibirFormulario(false);
-                        props.setInscricaoParaEdicao(inscricaoVazia);
+                        dispatch(atualizarInscricao(inscricao)).then((retorno) => {
+                            if (retorno.payload.status) {
+                                toast.success('Inscrição alterada com sucesso!', {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                    theme: "light",
+                                    transition: Bounce,
+                                });
+                                props.setModoEdicao(false);
+                                props.setInscricaoParaEdicao(inscricaoVazia);
+                            } else {
+                                toast.error('Inscrição não alterada! ' + retorno.payload.mensagem, {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                    theme: "light",
+                                    transition: Bounce,
+                                });
+                            }
+                        });
                     }
+                    props.setAlunoSelecionadoRelatorio(null);
+                    props.exibirFormulario(false);
                     setInscricao(inscricaoVazia);
                     setFormValidado(false);
                 }
@@ -215,11 +277,23 @@ function FormCadInscricao(props) {
         }
     }, [props.modoEdicao, inscricao]);
 
+    async function buscarInscricaoAnoPassado(alunoCodigo) {
+        const anoPassado = new Date().getFullYear() - 1;
+        const inscricaoAnoPassado = inscricoes.find(inscricao =>
+            inscricao.aluno.codigo === alunoCodigo && inscricao.ano === anoPassado
+        );
+        return inscricaoAnoPassado;
+    }
+
+    useEffect(() => {
+        if (alunoSelecionadoRelatorio) {
+            handleSelecionarAluno(alunoSelecionadoRelatorio);
+        }
+    }, [alunoSelecionadoRelatorio]);
 
     return (
         <Container className="mt-4 mb-4">
             <h2 className="text-center">Inscrever Aluno</h2>
-
             <Form noValidate validated={formValidado} onSubmit={manipularSubmissao}>
                 <Form.Group className="mb-3">
                     <Form.Label>Aluno(*):</Form.Label>
@@ -228,19 +302,37 @@ function FormCadInscricao(props) {
                         placeholder="Buscar por nome ou RG"
                         value={props.modoEdicao ? (inscricao.aluno?.nome + ' - ' + inscricao.aluno?.rg) : termoBuscaAlunos}
                         onChange={(e) => setTermoBuscaAlunos(e.target.value)}
-                        disabled={props.modoEdicao}
+                        disabled={props.modoEdicao || alunoSelecionadoRelatorio}
                         isInvalid={formValidado && !alunoSelecionado}
                         required />
                     <Form.Control.Feedback type="invalid">
                         Por favor, selecione um aluno.
                     </Form.Control.Feedback>
+                    {console.log(inscricao.aluno)}
                 </Form.Group>
                 {termoBuscaAlunos.length > 0 && (
                     <Table striped bordered hover className="table-white" variant="white">
                         <tbody>
                             {alunosFiltrados.map(aluno => (
                                 <tr key={aluno.codigo} onClick={() => handleSelecionarAluno(aluno)} style={{ alignItems: 'center' }}>
-                                    <td style={{ textAlign: 'center' }}>{aluno.nome} - {aluno.rg}</td>
+                                    <OverlayTrigger
+                                        trigger="hover"
+                                        key="bottom"
+                                        placement="bottom"
+                                        overlay={
+                                            <Popover id="popover-positioned-bottom">
+                                                <Popover.Header as="h3">{aluno.nome}</Popover.Header>
+                                                <Popover.Body>
+                                                    <p>RG: {aluno.rg}</p>
+                                                    <p>Data de Nascimento: {format(new Date(aluno.dataNasc), 'dd/MM/yyyy')}</p>
+                                                    <p>Celular: {aluno.celular}</p>
+                                                    <p>Observações: {aluno.observacoes}</p>
+                                                </Popover.Body>
+                                            </Popover>
+                                        }
+                                    >
+                                        <td style={{ textAlign: 'center' }}>{aluno.nome} - {aluno.rg}</td>
+                                    </OverlayTrigger>
                                 </tr>
                             ))}
                         </tbody>
@@ -269,6 +361,7 @@ function FormCadInscricao(props) {
                             ))}
                         </tbody>
                     </Table>
+
                 )}
                 <Form.Group className="mb-3">
                     <Form.Label>Escola(*):</Form.Label>
@@ -444,9 +537,10 @@ function FormCadInscricao(props) {
                         <Button type="submit" variant="primary">
                             {props.modoEdicao ? "Alterar Inscricao" : "Inscrever Aluno"}
                         </Button>
-                        <Button type="submit" variant="danger" className="ms-2" onClick={() => {
+                        <Button variant="danger" className="ms-2" onClick={() => {
                             props.exibirFormulario(false);
                             props.setModoEdicao(false);
+                            props.setAlunoSelecionadoRelatorio(null);
                         }}>
                             Voltar
                         </Button>

@@ -4,8 +4,41 @@ import ESTADO from '../recursos/estado';
 const urlBase = 'http://localhost:8080/definir-rota';
 
 
-export const buscarRotas = createAsyncThunk('rotas/buscar', async () => {
+export const buscarRotas = createAsyncThunk('rotas/buscar', async (filtro) => {
     try {
+        let url = urlBase;
+        if(filtro!=undefined) {
+            url = url + '/' + filtro;
+        }
+        const resposta = await fetch(url, { method: 'GET' });
+        const dados = await resposta.json();
+        if (dados.status) {
+            return {
+                status: true,
+                listaRotas: dados.listaRotas,
+                mensagem: ''
+            }
+        }
+        else {
+            return {
+                status: false,
+                listaRotas: [],
+                mensagem: 'Ocorreu um erro ao recuperar as rotas da base de dados.'
+            }
+        }
+    } catch (erro) {
+        return {
+            status: false,
+            listaRotas: [],
+            mensagem: 'Ocorreu um erro ao recuperar as rotas da base de dados:' + erro.message
+        }
+    }
+});
+
+export const buscarRotasInscricoes = createAsyncThunk('inscricoes-rotas/buscar', async () => {
+    try {
+        let urlBase = 'http://localhost:8080/inscricoes-rota'
+        
         const resposta = await fetch(urlBase, { method: 'GET' });
         const dados = await resposta.json();
         if (dados.status) {
@@ -32,7 +65,7 @@ export const buscarRotas = createAsyncThunk('rotas/buscar', async () => {
 });
 
 export const adicionarRotas = createAsyncThunk('rotas/adicionar', async (rota) => {
-const resposta = await fetch(urlBase, {
+    const resposta = await fetch(urlBase, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -62,22 +95,22 @@ const resposta = await fetch(urlBase, {
 });
 
 
-export const atualizarRota = createAsyncThunk('rotas/atualizar', async (rota) => {
-    console.log("rota... "+JSON.stringify(rota))
+export const atualizarRota = createAsyncThunk('rotas/atualizar', async ({ rota, aceito }) => {
+    console.log("aceito: "+aceito)
     const resposta = await fetch(urlBase, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(rota)
+        body: JSON.stringify({ 'rota': JSON.stringify(rota), 'aceito': aceito })
     }).catch(erro => {
         return {
             status: false,
             mensagem: 'Ocorreu um erro ao atualizar a rota:' + erro.message
         }
     });
+    const dados = await resposta.json();
     if (resposta.ok) {
-        const dados = await resposta.json();
         return {
             status: dados.status,
             mensagem: dados.mensagem,
@@ -87,7 +120,7 @@ export const atualizarRota = createAsyncThunk('rotas/atualizar', async (rota) =>
     else {
         return {
             status: false,
-            mensagem: 'Ocorreu um erro ao atualizar a rota.',
+            mensagem: dados.mensagem,
             rota
         }
     }
@@ -95,7 +128,7 @@ export const atualizarRota = createAsyncThunk('rotas/atualizar', async (rota) =>
 
 
 export const removerRota = createAsyncThunk('rotas/remover', async (rota) => {
-    const urlB = urlBase+'/'+rota
+    const urlB = urlBase + '/' + rota
     const resposta = await fetch(urlB, {
         method: 'DELETE',
         headers: {
@@ -152,7 +185,22 @@ const rotaSlice = createSlice({
         }).addCase(buscarRotas.rejected, (state, action) => {
             state.estado = ESTADO.ERRO;
             state.mensagem = action.error.message;
-        }).addCase(adicionarRotas.fulfilled, (state, action) => {
+        }).addCase(buscarRotasInscricoes.pending,(state,action)=>{
+            state.estado = ESTADO.PENDENTE;
+            state.mensagem = "Buscando rotas...";
+        }).addCase(buscarRotasInscricoes.fulfilled,(state,action)=>{
+            if(action.payload.status){
+                state.estado = ESTADO.OCIOSO
+            }else{
+                state.estado = ESTADO.ERRO
+            }
+            state.rotas = action.payload.listaRotas
+            state.mensagem = action.payload.mensagem
+        }).addCase(buscarRotasInscricoes.rejected,(state,action)=>{
+            state.estado = ESTADO.ERRO;
+            state.mensagem = action.error.message;
+        })
+        .addCase(adicionarRotas.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
             // state.rotas.push(action.payload.rota);
             state.mensagem = action.payload.mensagem;
@@ -173,8 +221,8 @@ const rotaSlice = createSlice({
             state.estado = ESTADO.ERRO;
         }).addCase(removerRota.fulfilled, (state, action) => {
             state.estado = ESTADO.OCIOSO;
-            if(action.payload.status === true)
-                state.rotas = state.rotas.filter(rota => rota.codigo!=action.payload.rota)
+            if (action.payload.status === true)
+                state.rotas = state.rotas.filter(rota => rota.codigo != action.payload.rota)
             else
                 state.estado = ESTADO.ERRO
             state.mensagem = action.payload.mensagem;

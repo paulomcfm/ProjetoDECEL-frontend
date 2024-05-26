@@ -42,6 +42,9 @@ export default function TelaCadastroPontoEmbarque(props) {
                                     setPontoEmbarqueParaEdicao={setPontoEmbarqueParaEdicao}
                                     modoEdicao={modoEdicao}
                                     setModoEdicao={setModoEdicao}
+                                    setMostrarMensagem={setMostrarMensagem}
+                                    setMensagem={setMensagem}
+                                    setTipoMensagem={setTipoMensagem}
                                 />
                         }
                     </Row>

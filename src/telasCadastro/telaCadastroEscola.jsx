@@ -52,6 +52,9 @@ export default function TelaCadastroEscola(props) {
                                     setEscolaParaEdicao={setEscolaParaEdicao}
                                     modoEdicao={modoEdicao}
                                     setModoEdicao={setModoEdicao}
+                                    setMostrarMensagem={setMostrarMensagem}
+                                    setMensagem={setMensagem}
+                                    setTipoMensagem={setTipoMensagem}
                                 />
                         }
                     </Row>

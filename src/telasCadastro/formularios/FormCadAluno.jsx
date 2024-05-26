@@ -6,6 +6,8 @@ import { buscarResponsaveis } from '../../redux/responsavelReducer';
 import { useEffect } from 'react';
 import validarCelular from '../../validacoes/validarCelular';
 import InputMask from 'react-input-mask';
+import { ToastContainer, toast, Bounce } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function FormCadAlunos(props) {
 
@@ -15,7 +17,9 @@ export default function FormCadAlunos(props) {
         observacoes: '',
         dataNasc: '',
         celular: '',
-        responsaveis: []
+        responsaveis: [],
+        status: '',
+        motivoInativo: ''
     }
     const estadoInicialAluno = props.alunoParaEdicao;
     const [aluno, setAluno] = useState(estadoInicialAluno);
@@ -25,6 +29,9 @@ export default function FormCadAlunos(props) {
     const { estadoResp, mensagemResp, responsaveis } = useSelector((state) => state.responsavel);
     const [responsaveisSelecionados, setResponsaveisSelecionados] = useState([]);
     const [responsaveisAntes, setResponsaveisAntes] = useState([]);
+    const [statusStudent, setStatusStundet] = useState(false);
+    const [anotherMotive, setAnotherMotive] = useState(false);
+    const [olderMotive, setOlderMotive] = useState('');
 
     const dispatch = useDispatch();
 
@@ -75,18 +82,38 @@ export default function FormCadAlunos(props) {
             celularValidado = validarCelular(aluno.celular);
         }
         aluno.rg = limparString(aluno.rg);
-        if (form.checkValidity() && celularValidado) {
+        let motivoValidado = aluno.status === 'I' && aluno.motivoInativo;
+        if(aluno.status === 'A'){
+            motivoValidado = true;
+        }
+        if (form.checkValidity() && celularValidado && motivoValidado) {
             if (!props.modoEdicao) {
                 aluno.responsaveis = responsaveisSelecionados;
                 dispatch(adicionarAluno(aluno)).then((retorno) => {
                     if (retorno.payload.status) {
-                        props.setMensagem('Aluno incluído com sucesso!');
-                        props.setTipoMensagem('success');
-                        props.setMostrarMensagem(true);
+                        toast.success('Aluno incluído com sucesso!', {
+                            position: "top-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                            transition: Bounce,
+                        });
                     } else {
-                        props.setMensagem('Aluno não incluído! ' + retorno.payload.mensagem);
-                        props.setTipoMensagem('danger');
-                        props.setMostrarMensagem(true);
+                        toast.error('Aluno não incluído! ' + retorno.payload.mensagem, {
+                            position: "top-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                            transition: Bounce,
+                        });
                     }
                 });
             }
@@ -94,15 +121,31 @@ export default function FormCadAlunos(props) {
                 aluno.responsaveis = responsaveisSelecionados;
                 dispatch(atualizarAluno(aluno)).then((retorno) => {
                     if (retorno.payload.status) {
-                        props.setMensagem('Aluno alterado com sucesso');
-                        props.setTipoMensagem('success');
-                        props.setMostrarMensagem(true);
+                        toast.success('Aluno alterado com sucesso!', {
+                            position: "top-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                            transition: Bounce,
+                        });
                         props.setModoEdicao(false);
                         props.setAlunoParaEdicao(alunoVazio);
                     } else {
-                        props.setMensagem('Aluno não alterado! ' + retorno.payload.mensagem);
-                        props.setTipoMensagem('danger');
-                        props.setMostrarMensagem(true);
+                        toast.error('Aluno não alterado! ' + retorno.payload.mensagem, {
+                            position: "top-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                            transition: Bounce,
+                        });
                     }
                 });
             }
@@ -110,9 +153,9 @@ export default function FormCadAlunos(props) {
             setFormValidado(false);
             props.exibirFormulario(false);
         }
-        else {
-            setFormValidado(true);
-        }
+        // else {
+        //     setFormValidado(true);
+        // }
 
         e.stopPropagation();
         e.preventDefault();
@@ -127,6 +170,27 @@ export default function FormCadAlunos(props) {
     useEffect(() => {
         dispatch(buscarResponsaveis());
     }, []);
+
+    useEffect(() => {
+        if (aluno) {
+            if (aluno.status == 'A') {
+                setStatusStundet(true);
+            }
+            if (aluno.motivoInativo) {
+                const motiveSelect = document.getElementById('motiveSelect');
+                if (motiveSelect) {
+                    const selectedOption = Array.from(motiveSelect.options).find(option => option.value === aluno.motivoInativo);
+                    const selectedValue = selectedOption ? selectedOption.value : '';
+
+                    if (aluno.motivoInativo && aluno.motivoInativo !== selectedValue) {
+                        setAnotherMotive(true);
+                    } else {
+                        setAnotherMotive(false);
+                    }
+                }
+            }
+        }
+    }, [aluno.status, aluno.motivoInativo]);
 
     useEffect(() => {
         if (props.alunoParaEdicao.responsaveis.length > 0 && responsaveisSelecionados.length === 0) {
@@ -161,6 +225,27 @@ export default function FormCadAlunos(props) {
             setResponsaveisSelecionados([...responsaveisSelecionados, responsavel]);
         }
     }
+
+    function handleStatus() {
+        setStatusStundet(!statusStudent);
+        const newStatus = !statusStudent;
+        if (newStatus) {
+            setAluno(prevAluno => {
+                if (prevAluno.motivoInativo !== null) {
+                    setOlderMotive(prevAluno.motivoInativo);
+                }
+                return { ...prevAluno, status: 'A', motivoInativo: null };
+            });
+        } else {
+            setAluno(prevAluno => {
+                if (olderMotive !== '') {
+                    return { ...prevAluno, status: 'I', motivoInativo: olderMotive };
+                }
+                return { ...prevAluno, status: 'I' };
+            });
+        }
+    }
+
 
     return (
         <>
@@ -332,6 +417,62 @@ export default function FormCadAlunos(props) {
                         maxLength={255}
                     />
                 </Form.Group>
+                <Row>
+                    {props.modoEdicao && (
+                        <>
+                            <Col md={2}>
+                                <Form.Label>Situação:</Form.Label>
+                                <Form.Check
+                                    type="switch"
+                                    id="status"
+                                    label={statusStudent ? 'Ativo' : 'Inativo'}
+                                    onChange={handleStatus}
+                                    checked={statusStudent}
+                                />
+                            </Col>
+                            {!statusStudent && (
+                                <Col md={10}>
+                                    <Form.Label>Motivo:</Form.Label>
+                                    <Form.Select
+                                        aria-label="Selecione o motivo da inatividade"
+                                        onChange={(e) => {
+                                            if (e.target.value === 'Outro') {
+                                                setAluno({ ...aluno, motivoInativo: '' });
+                                                setAnotherMotive(true);
+                                            } else {
+                                                setAluno({ ...aluno, motivoInativo: e.target.value });
+                                                setAnotherMotive(false);
+                                            }
+                                            setOlderMotive('');
+                                        }}
+                                        id='motiveSelect'
+                                        value={aluno.motivoInativo}
+                                    >
+                                        <option>Selecione o motivo</option>
+                                        <option value="Ensino Médio Completo">Ensino Médio Completo</option>
+                                        <option value="Mudou-se de Álvares Machado">Mudou-se de Álvares Machado</option>
+                                        <option value="Deixou de utilizar rede pública">Deixou de utilizar rede pública</option>
+                                        <option value="Outro">Outro...</option>
+                                    </Form.Select>
+                                </Col>
+                            )}
+                            {anotherMotive && !statusStudent && (
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Informe o motivo:</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Motivo da situação inativa"
+                                        id="motivoInativo"
+                                        name="motivoInativo"
+                                        value={aluno.motivoInativo}
+                                        onChange={manipularMudancas}
+                                        maxLength={255}
+                                    />
+                                </Form.Group>
+                            )}
+                        </>
+                    )}
+                </Row>
                 <p>(*) Campos obrigatórios</p>
                 <Row>
                     <Col md={6} offset={5} className="d-flex justify-content-end">
