@@ -23,6 +23,7 @@ import MensagemPermissaoNegada from './mensagemPermissaonegada.jsx';
 function App() {
   const autenticado = useSelector(state => state.usuario.autenticado);
   const isAdmin = useSelector(state => state.usuario.nivelAcesso === "admin");
+
   return (
     <div className="App">
       <Routes>

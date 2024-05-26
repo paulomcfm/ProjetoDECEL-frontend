@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { solicitarCodigoRedefinicao } from '../redux/usuarioReducer.js';
 import { Container, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import '../styles/TelaEsqueci.css';
 
 export default function TelaEsqueci() {
     const [email, setEmail] = useState('');
@@ -17,24 +18,23 @@ export default function TelaEsqueci() {
             setLoading(true);
             const resposta = await dispatch(solicitarCodigoRedefinicao(email));
             setLoading(false);
-            setMensagem(resposta.payload.mensagem);
-            setTimeout(()=>{
+            setMensagem("Código enviado para seu E-mail!");
+            setTimeout(() => {
                 if (resposta.payload) {
                     navigate('/codigo', { state: { email } });  // Pass email as state
                 }
-            }, 1500)
-            
+            }, 1500);
+
         } catch (error) {
             console.error('Erro ao solicitar código de redefinição:', error);
-            // Trate o erro, se necessário
+            setMensagem("Erro ao enviar código");
         }
     };
 
     return (
         <Container>
+            <br />
             <h2>Esqueci Minha Senha</h2>
-            <br />
-            <br />
             <Form onSubmit={handleSubmit}>
                 <Form.Group controlId="formEmail">
                     <Form.Label>Email</Form.Label>
@@ -47,12 +47,11 @@ export default function TelaEsqueci() {
                     />
                 </Form.Group>
                 <br />
-                
                 <Button variant="primary" type="submit">
-                    {loading ? <Spinner /> : "Solicitar Código de Redefinição"}
+                    {loading ? <Spinner animation="border" size="sm" /> : "Solicitar Código de Redefinição"}
                 </Button>
             </Form>
-            <br />
+
             {mensagem && <Alert variant="info">{mensagem}</Alert>}
         </Container>
     );

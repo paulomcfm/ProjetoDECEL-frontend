@@ -1,22 +1,21 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { Link, Navigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { autenticarUsuario } from '../redux/usuarioReducer';
+import '../styles/TelaLogin.css';
 
 export default function TelaLogin() {
     const dispatch = useDispatch();
+    const autenticado = useSelector(state => state.usuario.autenticado);
     const [credenciais, setCredenciais] = useState({ nome: '', senha: '', cpf: '' });
-    const [autenticado, setAutenticado] = useState(false);
     const [erroAutenticacao, setErroAutenticacao] = useState('');
 
     async function handleLogin(event) {
         event.preventDefault();
         try {
             const retorno = await dispatch(autenticarUsuario(credenciais));
-            if (retorno.payload.autenticado) {
-                setAutenticado(true);
-            } else {
+            if (!retorno.payload.autenticado) {
                 setErroAutenticacao('Usuário, CPF ou senha inválidos.');
             }
         } catch (error) {
@@ -24,7 +23,7 @@ export default function TelaLogin() {
             setErroAutenticacao('Erro ao autenticar usuário. Por favor, tente novamente mais tarde.');
         }
     }
-    
+
     function formatarCPF(cpf) {
         if (!cpf) return cpf;
         cpf = cpf.replace(/\D/g, '');
@@ -45,7 +44,7 @@ export default function TelaLogin() {
     }
 
     return (
-        <Container className="mt-5">
+        <Container className="mt-5 tela-login">
             <Row className="justify-content-center">
                 <Col md={6}>
                     <div className="login-form">
@@ -53,15 +52,15 @@ export default function TelaLogin() {
                         <Form onSubmit={handleLogin}>
                             <Form.Group controlId="formNome">
                                 <Form.Label>Nome</Form.Label>
-                                <Form.Control type="text" name="nome" value={credenciais.nome} onChange={handleInputChange} />
+                                <Form.Control type="text" name="nome" value={credenciais.nome} onChange={handleInputChange} className="form-control"/>
                             </Form.Group>
                             <Form.Group controlId="formSenha">
                                 <Form.Label>Senha</Form.Label>
-                                <Form.Control type="password" name="senha" value={credenciais.senha} onChange={handleInputChange} />
+                                <Form.Control type="password" name="senha" value={credenciais.senha} onChange={handleInputChange} className="form-control"/>
                             </Form.Group>
                             <Form.Group controlId="formCpf">
                                 <Form.Label>CPF</Form.Label>
-                                <Form.Control type="text" name="cpf" value={credenciais.cpf} onChange={handleCpfChange} maxLength="14" />
+                                <Form.Control type="text" name="cpf" value={credenciais.cpf} onChange={handleCpfChange} maxLength="14" className="form-control"/>
                             </Form.Group>
                             <br />
                             <Button variant="primary" type="submit" className="btn-login">Login</Button>

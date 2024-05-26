@@ -1,6 +1,28 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ESTADO from '../recursos/estado.js';
+
 const urlBase = 'http://localhost:8080/usuario';
+
+// Função para salvar o estado de autenticação no localStorage
+const saveAuthToLocalStorage = (state) => {
+    localStorage.setItem('autenticado', state.autenticado);
+    localStorage.setItem('nivelAcesso', state.nivelAcesso);
+    localStorage.setItem('usuario', JSON.stringify(state.usuario));
+};
+
+// Função para carregar o estado de autenticação do localStorage
+const loadAuthFromLocalStorage = () => {
+    return {
+        autenticado: localStorage.getItem('autenticado') === 'true',
+        nivelAcesso: localStorage.getItem('nivelAcesso'),
+        usuario: JSON.parse(localStorage.getItem('usuario'))
+    };
+};
+
+export const logoutUsuario = createAsyncThunk('usuario/logout', async () => {
+    localStorage.removeItem('autenticado'); // Remove a autenticação do localStorage
+    return {};
+});
 
 export const buscarUsuarios = createAsyncThunk('usuario/buscar', async () => {
     try {
@@ -69,7 +91,6 @@ export const adicionarUsuario = createAsyncThunk('usuario/adicionar', async (usu
 
 export const autenticarUsuario = createAsyncThunk('/autenticar', async (credenciais) => {
     try {
-        // Chame a função de autenticar na controller aqui e passe as credenciais
         const resposta = await fetch("http://localhost:8080/autenticar", {
             method: 'POST',
             headers: {
@@ -78,9 +99,8 @@ export const autenticarUsuario = createAsyncThunk('/autenticar', async (credenci
             body: JSON.stringify(credenciais)
         });
         const dados = await resposta.json();
-        console.log(dados);
-        console.log(dados.status, "aaaaaa");
         if (dados.status) {
+            localStorage.setItem('autenticado', 'true'); // Armazena a autenticação no localStorage
             return {
                 autenticado: true,
                 usuario: dados.usuario
@@ -189,13 +209,18 @@ const initialState = {
     estado: ESTADO.OCIOSO,
     mensagem: "",
     usuarios: [],
-    autenticado: false, // Adicione um campo para indicar se o usuário está autenticado
-    nivelAcesso: "normal"
+    autenticado: false,
+    nivelAcesso: "normal",
+    usuario: null
 };
+
+// Carregar estado de autenticação do localStorage
+const persistedState = loadAuthFromLocalStorage();
+
 
 const usuarioSlice = createSlice({
     name: 'usuario',
-    initialState,
+    initialState: { ...initialState, ...persistedState },
     reducers: {},
     extraReducers: (builder) => {
         builder.addCase(buscarUsuarios.pending, (state, action) => {
@@ -251,11 +276,14 @@ const usuarioSlice = createSlice({
                 state.autenticado = true;
                 state.mensagem = action.payload.mensagem;
                 state.nivelAcesso = action.payload.usuario.nome === 'admin' ? 'admin' : 'normal';
-                console.log(action.payload);
+                state.usuario = action.payload.usuario;
+                saveAuthToLocalStorage(state);
             } else {
                 state.autenticado = false;
                 state.mensagem = action.payload.mensagem;
                 state.nivelAcesso = null;
+                state.usuario = null;
+                saveAuthToLocalStorage(state);
             }
         }).addCase(solicitarCodigoRedefinicao.pending, (state) => {
             state.estado = 'PENDENTE';
@@ -275,6 +303,9 @@ const usuarioSlice = createSlice({
         }).addCase(redefinirSenha.rejected, (state, action) => {
             state.estado = 'ERRO';
             state.mensagem = action.error.message;
+        }).addCase(logoutUsuario.fulfilled, (state) => {
+            state.autenticado = false;
+            state.nivelAcesso = "normal";
         });
     }
 });
