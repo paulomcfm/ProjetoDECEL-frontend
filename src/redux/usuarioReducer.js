@@ -1,6 +1,28 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ESTADO from '../recursos/estado.js';
+
 const urlBase = 'http://localhost:8080/usuario';
+
+// Função para salvar o estado de autenticação no localStorage
+const saveAuthToLocalStorage = (state) => {
+    localStorage.setItem('autenticado', state.autenticado);
+    localStorage.setItem('nivelAcesso', state.nivelAcesso);
+    localStorage.setItem('usuario', JSON.stringify(state.usuario));
+};
+
+// Função para carregar o estado de autenticação do localStorage
+const loadAuthFromLocalStorage = () => {
+    return {
+        autenticado: localStorage.getItem('autenticado') === 'true',
+        nivelAcesso: localStorage.getItem('nivelAcesso'),
+        usuario: JSON.parse(localStorage.getItem('usuario'))
+    };
+};
+
+export const logoutUsuario = createAsyncThunk('usuario/logout', async () => {
+    localStorage.removeItem('autenticado'); // Remove a autenticação do localStorage
+    return {};
+});
 
 export const buscarUsuarios = createAsyncThunk('usuario/buscar', async () => {
     try {
@@ -67,20 +89,39 @@ export const adicionarUsuario = createAsyncThunk('usuario/adicionar', async (usu
     }
 });
 
-export const autenticar = createAsyncThunk('usuario/autenticar', async (credenciais) => {
-    console.log(credenciais);
+export const autenticarUsuario = createAsyncThunk('/autenticar', async (credenciais) => {
     try {
-        const resposta = await fetch(urlBase, { method: 'GET' });
+        const resposta = await fetch("http://localhost:8080/autenticar", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(credenciais)
+        });
         const dados = await resposta.json();
-        return dados;
-    } catch (erro) {
-        return { status: false, mensagem: 'Ocorreu um erro ao autenticar o usuário: ' + erro.message };
+        if (dados.status) {
+            localStorage.setItem('autenticado', 'true'); // Armazena a autenticação no localStorage
+            return {
+                autenticado: true,
+                usuario: dados.usuario
+            };
+        } else {
+            return {
+                autenticado: false,
+                mensagem: dados.mensagem
+            };
+        }
+    } catch (error) {
+        return {
+            autenticado: false,
+            mensagem: 'Ocorreu um erro ao tentar autenticar: ' + error.message
+        };
     }
 });
 
 export const atualizarUsuario = createAsyncThunk('usuario/atualizar', async (usuario) => {
     const resposta = await fetch(urlBase, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
@@ -146,17 +187,41 @@ export const removerUsuario = createAsyncThunk('usuario/remover', async (usuario
     }
 });
 
+export const solicitarCodigoRedefinicao = createAsyncThunk('/solicitar-redefinicao', async (email) => {
+    const resposta = await fetch('http://localhost:8080/enviar-email/solicitar-redefinicao', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    });
+    return await resposta.json();
+});
+
+export const redefinirSenha = createAsyncThunk('/redefinirSenha', async ({ email, codigo, novaSenha }) => {
+    const resposta = await fetch('http://localhost:8080/enviar-email/redefinir-senha', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, codigo, novaSenha })
+    });
+    return await resposta.json();
+});
+
 const initialState = {
     estado: ESTADO.OCIOSO,
     mensagem: "",
-    usuarios: []
+    usuarios: [],
+    autenticado: false,
+    nivelAcesso: "normal",
+    usuario: null
 };
+
+// Carregar estado de autenticação do localStorage
+const persistedState = loadAuthFromLocalStorage();
+
 
 const usuarioSlice = createSlice({
     name: 'usuario',
-    initialState,
-    reducers: {
-    },
+    initialState: { ...initialState, ...persistedState },
+    reducers: {},
     extraReducers: (builder) => {
         builder.addCase(buscarUsuarios.pending, (state, action) => {
             state.estado = ESTADO.PENDENTE;
@@ -205,7 +270,43 @@ const usuarioSlice = createSlice({
         }).addCase(removerUsuario.rejected, (state, action) => {
             state.mensagem = "Erro ao remover o usuário: " + action.error.message;
             state.estado = ESTADO.ERRO;
-        })
+        }).addCase(autenticarUsuario.fulfilled, (state, action) => {
+            console.log("eeeeeeeeeeeee", action.payload.autenticado);
+            if (action.payload.autenticado) {
+                state.autenticado = true;
+                state.mensagem = action.payload.mensagem;
+                state.nivelAcesso = action.payload.usuario.nome === 'admin' ? 'admin' : 'normal';
+                state.usuario = action.payload.usuario;
+                saveAuthToLocalStorage(state);
+            } else {
+                state.autenticado = false;
+                state.mensagem = action.payload.mensagem;
+                state.nivelAcesso = null;
+                state.usuario = null;
+                saveAuthToLocalStorage(state);
+            }
+        }).addCase(solicitarCodigoRedefinicao.pending, (state) => {
+            state.estado = 'PENDENTE';
+            state.mensagem = "Solicitando código de redefinição...";
+        }).addCase(solicitarCodigoRedefinicao.fulfilled, (state, action) => {
+            state.estado = 'OCIOSO';
+            state.mensagem = action.payload.mensagem;
+        }).addCase(solicitarCodigoRedefinicao.rejected, (state, action) => {
+            state.estado = 'ERRO';
+            state.mensagem = action.error.message;
+        }).addCase(redefinirSenha.pending, (state) => {
+            state.estado = 'PENDENTE';
+            state.mensagem = "Redefinindo senha...";
+        }).addCase(redefinirSenha.fulfilled, (state, action) => {
+            state.estado = 'OCIOSO';
+            state.mensagem = action.payload.mensagem;
+        }).addCase(redefinirSenha.rejected, (state, action) => {
+            state.estado = 'ERRO';
+            state.mensagem = action.error.message;
+        }).addCase(logoutUsuario.fulfilled, (state) => {
+            state.autenticado = false;
+            state.nivelAcesso = "normal";
+        });
     }
 });
 

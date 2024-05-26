@@ -1,46 +1,58 @@
-import { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
-import { Form, Button, Container, Row, Col } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { solicitarCodigoRedefinicao } from '../redux/usuarioReducer.js';
+import { Container, Form, Button, Alert, Spinner } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import '../styles/TelaEsqueci.css';
 
-export default function Esqueci() {
+export default function TelaEsqueci() {
     const [email, setEmail] = useState('');
+    const [mensagem, setMensagem] = useState('');
+    const [loading, setLoading] = useState(false);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    function handleEnviar() {
-        // Lógica para enviar o e-mail e solicitar a redefinição da senha
-        console.log('E-mail enviado para: ', email);
-        // Navegar de volta para a tela de login
-        // Pode usar o componente Navigate ou window.location.href = '/login'
-    }
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            setLoading(true);
+            const resposta = await dispatch(solicitarCodigoRedefinicao(email));
+            setLoading(false);
+            setMensagem("Código enviado para seu E-mail!");
+            setTimeout(() => {
+                if (resposta.payload) {
+                    navigate('/codigo', { state: { email } });  // Pass email as state
+                }
+            }, 1500);
+
+        } catch (error) {
+            console.error('Erro ao solicitar código de redefinição:', error);
+            setMensagem("Erro ao enviar código");
+        }
+    };
 
     return (
         <Container>
-            <Row className="justify-content-md-center">
-                <Col xs={12} md={6}>
-                    <h2 className="text-center">Esqueci Minha Senha</h2>
-                    <Form>
-                        <Form.Group controlId="formBasicEmail">
-                            <Form.Label>Email</Form.Label>
-                            <Form.Control
-                                type="email"
-                                placeholder="Digite seu e-mail"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                pattern="\S+@\S+\.\S+"
-                            />
-                        </Form.Group>
-                        <br />
-                        <div className="text-center">
-                            <Button variant="primary" onClick={handleEnviar} className="mb-3">
-                                Enviar
-                            </Button>
-                        </div>
-                        <div className="text-center">
-                            <Link to="/">Voltar para o login</Link>
-                        </div>
-                    </Form>
-                </Col>
-            </Row>
+            <br />
+            <h2>Esqueci Minha Senha</h2>
+            <Form onSubmit={handleSubmit}>
+                <Form.Group controlId="formEmail">
+                    <Form.Label>Email</Form.Label>
+                    <Form.Control
+                        type="email"
+                        placeholder="xxxx@xxxx.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                </Form.Group>
+                <br />
+                <Button variant="primary" type="submit">
+                    {loading ? <Spinner animation="border" size="sm" /> : "Solicitar Código de Redefinição"}
+                </Button>
+            </Form>
+
+            {mensagem && <Alert variant="info">{mensagem}</Alert>}
         </Container>
     );
 }
