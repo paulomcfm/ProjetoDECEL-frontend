@@ -18,17 +18,12 @@ import TelaCadastroUser from './telasCadastro/telaCadastroUser.jsx';
 import TelaEsqueci from './telasCadastro/telaEsqueci.jsx'
 import TelaMenu from './telasCadastro/TelaMenu.jsx';
 import TelaCodigo from './telasCadastro/telaCodigo.jsx'
-import RotaProtegida from './rotaProtegida.js'
+import RotaProtegida from './RotaProtegida.js'
 import MensagemPermissaoNegada from './mensagemPermissaonegada.jsx';
 import RelatorioRotasDiferentes from './telasSaida/RelatorioRotasDiferentes.jsx';
 import RelatorioRotasDesatualizadas from './telasSaida/RelatorioRotasDesatualizadas.jsx';
-import Esqueci from './telasCadastro/telaEsqueci.jsx';
 import RelatorioAlunos from './telasSaida/RelatorioAlunos.jsx';
 import RelatorioAlunosNaoInscritos from './telasSaida/RelatorioNaoInscritos.jsx';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import TelaMenu from './telasCadastro/TelaMenu.jsx'
-import store from './redux/store.js';
-import { Provider } from 'react-redux';
 import './recursos/App.css';
 import TelaAlertaManutencao from './telasSaida/TelaAlertaManutenção.jsx';
 
@@ -51,16 +46,16 @@ function App() {
         <Route path='/escolas' element={autenticado ? <TelaCadastroEscola /> : <RotaProtegida><TelaCadastroEscola /></RotaProtegida>} />
         <Route path='/menu' element={autenticado ? <TelaMenu /> : <RotaProtegida><TelaMenu /></RotaProtegida>} />
         <Route path='/inscricao-aluno' element={autenticado ? <TelaCadastroInscricao /> : <RotaProtegida><TelaCadastroInscricao /></RotaProtegida>} />
-        <Route path='/definir-rota' element={<TelaDefinirRotas />} />
+        <Route path='/definir-rota' element={autenticado ? <TelaDefinirRotas /> : <RotaProtegida><TelaDefinirRotas /></RotaProtegida>}/>
         <Route path='/alocar-aluno' element={autenticado ? <TelaAlocarAluno /> : <RotaProtegida><TelaAlocarAluno /></RotaProtegida>} />
         <Route path='/registrar-manutencao' element={autenticado ? <TelaRegistrarManutencao /> : <RotaProtegida><TelaRegistrarManutencao /></RotaProtegida>} />
-        <Route path='/mapa-rota' element={<MapaPagina />} />
-        <Route path='/relatorios/alunos' element={<RelatorioAlunos />} />
-        <Route path='/monitor' element={< TelaCadastroMonitor/>} />
-        <Route path='/relatorios/rotas-diferentes' element={<RelatorioRotasDiferentes />} />
-        <Route path='/relatorios/rotas-desatualizadas' element={<RelatorioRotasDesatualizadas />} />
-        <Route path='relatorios/alunos-nao-inscritos' element={<RelatorioAlunosNaoInscritos />} />
-        <Route path='/teste' element={< TelaAlertaManutencao/>} />
+        <Route path='/mapa-rota' element={autenticado? <MapaPagina /> : <RotaProtegida><MapaPagina /></RotaProtegida>} />
+        <Route path='/relatorios/alunos' element={autenticado? <RelatorioAlunos /> : <RotaProtegida><RelatorioAlunos /></RotaProtegida>} />
+        <Route path='/monitor' element={autenticado? < TelaCadastroMonitor/> : <RotaProtegida><TelaCadastroMonitor /></RotaProtegida>} />
+        <Route path='/relatorios/rotas-diferentes' element={autenticado? <RelatorioRotasDiferentes />  : <RotaProtegida><RelatorioRotasDiferentes /></RotaProtegida>} />
+        <Route path='/relatorios/rotas-desatualizadas' element={autenticado? <RelatorioRotasDesatualizadas />  : <RotaProtegida><RelatorioRotasDesatualizadas /></RotaProtegida>} />
+        <Route path='relatorios/alunos-nao-inscritos' element={autenticado? <RelatorioAlunosNaoInscritos />  : <RotaProtegida><RelatorioAlunosNaoInscritos /></RotaProtegida>} />
+        <Route path='/teste' element={autenticado ? <TelaAlertaManutencao/> : <RotaProtegida><TelaAlertaManutencao /></RotaProtegida>} />
           
         <Route path='*' element={<Tela404 />} />
       </Routes>
