@@ -1,17 +1,68 @@
+.tabela {
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 10px;
+}
+
+.head-tabela {
+    background-color: #343a40;
+    color: white;
+    text-align: center;
+}
+
+.linhas-tabela, .linhas-titulo-tabela {
+    padding: 10px;
+    text-align: center;
+}
+
+.linhas-tabela {
+    border-bottom: 1px solid #dee2e6;
+}
+
+button {
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0069d9;
+}
+
 .manutencoes-enter {
     opacity: 0;
+    transform: scale(0.9);
 }
 
 .manutencoes-enter-active {
     opacity: 1;
-    transition: opacity 500ms;
+    transform: scale(1);
+    transition: opacity 500ms, transform 500ms;
 }
 
 .manutencoes-exit {
     opacity: 1;
+    transform: scale(1);
 }
 
 .manutencoes-exit-active {
     opacity: 0;
-    transition: opacity 500ms;
+    transform: scale(0.9);
+    transition: opacity 500ms, transform 500ms;
+}
+
+.card {
+    background-color: #f8f9fa;
+}
+
+.form-control {
+    border-radius: 15px;
+}
+
+.shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.text-center {
+    margin-top: 20px;
 }
