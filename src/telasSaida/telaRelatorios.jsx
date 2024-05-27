@@ -62,7 +62,7 @@ export default function Relatorios(props) {
                             onChange={e => setTermoBusca(e.target.value)}
                         />
                     </div>
-                    <Container style={{ marginTop: '40px', display: 'flex', flexDirection: 'column', marginLeft: '4%', marginRight: '4%' }}>
+                    <Container style={{ marginTop: '40px', display: 'flex', flexDirection: 'column', marginLeft: '4%', marginRight: '4%', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
                         <div style={{ margin: '1%', fontSize: '25px', display: 'flex', flexDirection: 'row' }}>
                             <TbReportAnalytics />
                             <p><strong>Relatórios</strong></p>
