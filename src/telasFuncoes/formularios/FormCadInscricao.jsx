@@ -301,7 +301,10 @@ function FormCadInscricao(props) {
                         type="text"
                         placeholder="Buscar por nome ou RG"
                         value={props.modoEdicao ? (inscricao.aluno?.nome + ' - ' + inscricao.aluno?.rg) : termoBuscaAlunos}
-                        onChange={(e) => setTermoBuscaAlunos(e.target.value)}
+                        onChange={(e) => {
+                            setTermoBuscaAlunos(e.target.value);
+                            setAlunoSelecionado(false);
+                        }}
                         disabled={props.modoEdicao || alunoSelecionadoRelatorio}
                         isInvalid={formValidado && !alunoSelecionado}
                         required />
@@ -344,7 +347,10 @@ function FormCadInscricao(props) {
                         type="text"
                         placeholder="Buscar por rua ou CEP"
                         value={termoBuscaPontosEmbarque}
-                        onChange={(e) => setTermoBuscaPontosEmbarque(e.target.value)}
+                        onChange={(e) => {
+                            setTermoBuscaPontosEmbarque(e.target.value)
+                            setPontoEmbarqueSelecionado(false);
+                        }}
                         isInvalid={formValidado && !pontoEmbarqueSelecionado}
                         required />
                     <Form.Control.Feedback type="invalid">
@@ -370,7 +376,8 @@ function FormCadInscricao(props) {
                         placeholder="Buscar por nome"
                         value={termoBuscaEscolas}
                         onChange={(e) => {
-                            setTermoBuscaEscolas(e.target.value)
+                            setTermoBuscaEscolas(e.target.value);
+                            setEscolaSelecionada(false);
                         }}
                         isInvalid={formValidado && !escolaSelecionada}
                         required />
