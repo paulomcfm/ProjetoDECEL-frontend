@@ -26,6 +26,7 @@ import RelatorioAlunos from './telasSaida/RelatorioAlunos.jsx';
 import RelatorioAlunosNaoInscritos from './telasSaida/RelatorioNaoInscritos.jsx';
 import './recursos/App.css';
 import TelaAlertaManutencao from './telasSaida/TelaAlertaManutenção.jsx';
+import Relatorios from './telasSaida/telaRelatorios.jsx'
 
 function App() {
   const autenticado = useSelector(state => state.usuario.autenticado);
@@ -37,7 +38,6 @@ function App() {
         <Route path='/' element={<TelaLogin />} />
         <Route path='/esqueci-senha' element={<TelaEsqueci />} />
         <Route path='/codigo' element={<TelaCodigo />} />
-        
         <Route path='/pontos-embarque' element={autenticado ? <TelaCadastroPontoEmbarque /> : <RotaProtegida><TelaCadastroPontoEmbarque /></RotaProtegida>} />
         <Route path='/motorista' element={autenticado ? <TelaMotorista /> : <RotaProtegida><TelaMotorista /></RotaProtegida>} />
         <Route path='/cadastro-user' element={isAdmin ? <TelaCadastroUser /> : <MensagemPermissaoNegada/>} />
@@ -56,7 +56,7 @@ function App() {
         <Route path='/relatorios/rotas-desatualizadas' element={autenticado? <RelatorioRotasDesatualizadas />  : <RotaProtegida><RelatorioRotasDesatualizadas /></RotaProtegida>} />
         <Route path='relatorios/alunos-nao-inscritos' element={autenticado? <RelatorioAlunosNaoInscritos />  : <RotaProtegida><RelatorioAlunosNaoInscritos /></RotaProtegida>} />
         <Route path='/teste' element={autenticado ? <TelaAlertaManutencao/> : <RotaProtegida><TelaAlertaManutencao /></RotaProtegida>} />
-          
+        <Route path='relatorios' element={autenticado? <Relatorios />  : <RotaProtegida><Relatorios /></RotaProtegida>} />
         <Route path='*' element={<Tela404 />} />
       </Routes>
     </div>
