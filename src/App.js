@@ -29,7 +29,7 @@ import TelaAlertaManutencao from './telasSaida/TelaAlertaManutenção.jsx';
 
 function App() {
   const autenticado = useSelector(state => state.usuario.autenticado);
-  const isAdmin = useSelector(state => state.usuario.nivelAcesso === "admin");
+  const isAdmin = useSelector(state => state.usuario.nivelAcesso === "administrador");
 
   return (
     <div className="App">

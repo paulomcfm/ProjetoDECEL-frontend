@@ -10,13 +10,19 @@ export default function TabelaUsuarios(props) {
 
     const usuarioVazio = {
         nome: '',
-        senha:'',
+        senha: '',
         cpf: '',
         email: '',
-        celular: ''
+        celular: '',
+        nivel: ''
     };
 
     function excluirUsuario(usuario) {
+        const administradores = usuarios.filter(user => user.nivel === 'administrador');
+        if (usuario.nivel === 'administrador' && administradores.length <= 1) {
+            alert('Não é possível excluir o último administrador.');
+            return;
+        }
         if (window.confirm('Deseja realmente excluir esse usuário?')) {
             dispatch(removerUsuario(usuario));
         }
@@ -31,7 +37,13 @@ export default function TabelaUsuarios(props) {
     useEffect(() => {
         dispatch(buscarUsuarios());
     }, [dispatch]);
-    
+
+    useEffect(() => {
+        if (mensagem === 'Usuário adicionado com sucesso' || mensagem === 'Usuário atualizado com sucesso') {
+            props.exibirFormulario(false);
+        }
+    }, [mensagem, props]);
+
     const usuariosFiltrados = usuarios.filter(usuario =>
         usuario.nome.toLowerCase().includes(termoBusca.toLowerCase())
     );
@@ -71,10 +83,10 @@ export default function TabelaUsuarios(props) {
                 <thead>
                     <tr>
                         <th>Nome</th>
-                        <th>Senha</th>
                         <th>CPF</th>
                         <th>Email</th>
                         <th>Celular</th>
+                        <th>Nivel</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -82,10 +94,10 @@ export default function TabelaUsuarios(props) {
                     {usuariosFiltrados && usuariosFiltrados.map(usuario => (
                         <tr key={usuario.cpf}>
                             <td>{usuario.nome}</td>
-                            <td>{usuario.senha}</td>
                             <td>{usuario.cpf}</td>
                             <td>{usuario.email}</td>
                             <td>{usuario.celular}</td>
+                            <td>{usuario.nivel}</td>
                             <td>
                                 <Button variant="danger" onClick={() => {
                                     excluirUsuario(usuario);
