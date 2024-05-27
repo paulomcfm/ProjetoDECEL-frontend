@@ -1,107 +1,76 @@
-import { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
-import { autenticar } from '../redux/usuarioReducer'; // Importa a função de autenticação
+import { Link, Navigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { autenticarUsuario } from '../redux/usuarioReducer';
+import '../styles/TelaLogin.css';
 
 export default function TelaLogin() {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [cpf, setCpf] = useState('');
-    const [autenticado, setAutenticado] = useState(false);
-    const dispatch = useDispatch(); // Obtém a função dispatch do Redux
+    const dispatch = useDispatch();
+    const autenticado = useSelector(state => state.usuario.autenticado);
+    const [credenciais, setCredenciais] = useState({ nome: '', senha: '', cpf: '' });
+    const [erroAutenticacao, setErroAutenticacao] = useState('');
 
-    async function handleLogin() {
-        // Despacha a action para autenticar o usuário
-        dispatch(autenticar({ nome: username, cpf, senha: password }))
-            .then((retorno) => {
-                if (retorno.payload.status) {
-                    setAutenticado(true); // Define autenticado como true se a autenticação for bem-sucedida
-                } else {
-                    // Tratamento para autenticação inválida
-                    alert('Usuário, CPF ou senha inválidos.');
-                }
-            })
-            .catch((error) => {
-                console.error('Erro ao autenticar usuário:', error);
-                // Tratamento para erros de autenticação
-                alert('Erro ao autenticar usuário. Por favor, tente novamente mais tarde.');
-            });
+    async function handleLogin(event) {
+        event.preventDefault();
+        try {
+            const retorno = await dispatch(autenticarUsuario(credenciais));
+            if (!retorno.payload.autenticado) {
+                setErroAutenticacao('Usuário, CPF ou senha inválidos.');
+            }
+        } catch (error) {
+            console.error('Erro ao autenticar usuário:', error);
+            setErroAutenticacao('Erro ao autenticar usuário. Por favor, tente novamente mais tarde.');
+        }
     }
 
     function formatarCPF(cpf) {
         if (!cpf) return cpf;
-        // Remove todos os caracteres não numéricos
         cpf = cpf.replace(/\D/g, '');
-
-        // Aplica a máscara para CPF (xxx.xxx.xxx-xx)
+        cpf = cpf.substring(0, 11);
         cpf = cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
-
         return cpf;
     }
 
     function handleCpfChange(event) {
-        const cpfDigitado = event.target.value;
-        const cpfFormatado = formatarCPF(cpfDigitado);
-        setCpf(cpfFormatado);
+        const { name, value } = event.target;
+        const cpfFormatado = formatarCPF(value);
+        setCredenciais({ ...credenciais, [name]: cpfFormatado });
+    }
+
+    function handleInputChange(event) {
+        const { name, value } = event.target;
+        setCredenciais({ ...credenciais, [name]: value });
     }
 
     return (
-        <Container className="mt-5">
-            <Row className="justify-content-md-center">
-                <Col xs={12} md={6}>
-                    <h2 className="text-center mb-4">Login</h2>
-                    <Form>
-                        <Form.Group controlId="formBasicUsername">
-                            <Form.Label>Nome de Usuário</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Nome de Usuário"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                required
-                            />
-                        </Form.Group>
-
-                        <Form.Group controlId="formBasicPassword">
-                            <Form.Label>Senha</Form.Label>
-                            <Form.Control
-                                type="password"
-                                placeholder="Senha"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </Form.Group>
-                        <Form.Group>
-                            <Form.Label>CPF</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="999.999.999-99"
-                                id="cpf"
-                                name="cpf"
-                                value={cpf}
-                                onChange={handleCpfChange} // Utiliza a função handleCpfChange para formatar o CPF
-                                required
-                            />
-                        </Form.Group>
-                        <br />
-                        <Button
-                            variant="primary"
-                            type="button"
-                            onClick={handleLogin}
-                            className="w-auto mx-auto d-block mb-3"
-                        >
-                            Login
-                        </Button>
-
-                        {/* Redireciona para a página do menu se autenticado */}
-                        {autenticado && <Navigate to="/menu" />}
-
-                        <Link to="/esqueci-minha-senha" className="d-block text-center">
-                            Esqueci minha senha
-                        </Link>
-                    </Form>
+        <Container className="mt-5 tela-login">
+            <Row className="justify-content-center">
+                <Col md={6}>
+                    <div className="login-form">
+                        <h2 className="text-center mb-4">Login</h2>
+                        <Form onSubmit={handleLogin}>
+                            <Form.Group controlId="formNome">
+                                <Form.Label>Nome</Form.Label>
+                                <Form.Control type="text" name="nome" value={credenciais.nome} onChange={handleInputChange} className="form-control"/>
+                            </Form.Group>
+                            <Form.Group controlId="formSenha">
+                                <Form.Label>Senha</Form.Label>
+                                <Form.Control type="password" name="senha" value={credenciais.senha} onChange={handleInputChange} className="form-control"/>
+                            </Form.Group>
+                            <Form.Group controlId="formCpf">
+                                <Form.Label>CPF</Form.Label>
+                                <Form.Control type="text" name="cpf" value={credenciais.cpf} onChange={handleCpfChange} maxLength="14" className="form-control"/>
+                            </Form.Group>
+                            <br />
+                            <Button variant="primary" type="submit" className="btn-login">Login</Button>
+                            {autenticado && <Navigate to="/menu" />}
+                            {erroAutenticacao && <div className="text-danger mt-2">{erroAutenticacao}</div>}
+                            <Link to="/esqueci-senha" className="d-block text-center mt-2">
+                                Esqueci minha senha
+                            </Link>
+                        </Form>
+                    </div>
                 </Col>
             </Row>
         </Container>

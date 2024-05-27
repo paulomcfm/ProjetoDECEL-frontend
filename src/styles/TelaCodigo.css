@@ -1,0 +1,46 @@
+.custom-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.custom-form-wrapper {
+    width: 400px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.custom-heading {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.custom-form {
+    margin-bottom: 20px;
+}
+
+.custom-input {
+    border-radius: 5px;
+}
+
+.custom-button {
+    width: 100%;
+}
+
+.custom-alert {
+    margin-bottom: 10px;
+}
+
+.custom-link {
+    display: block;
+    text-align: center;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.custom-link:hover {
+    text-decoration: underline;
+}

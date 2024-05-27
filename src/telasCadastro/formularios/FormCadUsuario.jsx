@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Form, Button, Col, Row, InputGroup } from 'react-bootstrap';
+import { Form, Button, Col, Row, } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { adicionarUsuario, atualizarUsuario, buscarUsuarios } from '../../redux/usuarioReducer';
-import InputMask from 'react-input-mask';
 import validarCelular from '../../validacoes/validarCelular';
 import validarCPF from '../../validacoes/validarCpf';
 
@@ -18,10 +17,14 @@ export default function FormCadUsuario(props) {
     const estadoInicialUsuario = props.usuarioParaEdicao;
     const [usuario, setUsuario] = useState(estadoInicialUsuario);
     const [formValidado, setFormValidado] = useState(false);
-    const [erro, setErro] = useState(false);
     const { estadoUsu, mensagemUsu, usuarios} = useSelector((state) => state.usuario);
     const dispatch = useDispatch();
-    let usuarioExistente;
+    const [camposRepetidos, setCamposRepetidos] = useState({
+        nome: false,
+        cpf: false,
+        email: false,
+        celular: false,
+    });
 
     useEffect(() => {
         dispatch(buscarUsuarios());
@@ -56,6 +59,20 @@ export default function FormCadUsuario(props) {
             }));
         }
     }
+    
+    async function verificarCamposRepetidos() {
+        const camposRepetidosAtualizados = {
+                nome: !!usuarios.find(u => u.nome === usuario.nome && u.cpf !== usuario.cpf),
+                cpf: !!usuarios.find(u => u.cpf === usuario.cpf),
+                email: !!usuarios.find(u => u.email === usuario.email && u.cpf !== usuario.cpf),
+                celular: !!usuarios.find(u => u.celular === usuario.celular && u.cpf !== usuario.cpf),
+            };
+        setCamposRepetidos(camposRepetidosAtualizados);
+    }
+
+    useEffect(() => {
+        verificarCamposRepetidos();
+    }, [usuario.nome, usuario.cpf, usuario.email, usuario.celular]);
 
     function formatarCPF(cpf) {
         if (!cpf) return cpf;
@@ -79,19 +96,11 @@ export default function FormCadUsuario(props) {
         return celular;
     }
 
-    function manipularSubmissao(e) {
+    async function manipularSubmissao(e) {
         e.preventDefault();
         e.stopPropagation();
-
         const form = e.currentTarget;
-
         if (form.checkValidity() && validarCelular(usuario.celular) && validarCPF(usuario.cpf)) {
-            usuarioExistente = usuarios.find(u => u.nome === usuario.nome || u.cpf === usuario.cpf || u.email === usuario.email || 
-                u.celular === usuario.celular);
-            if (usuarioExistente && !props.modoEdicao) {
-                setErro(true);
-            }
-            else {
                 if (!props.modoEdicao) {
                     dispatch(adicionarUsuario(usuario)).then((retorno) => {
                         if (retorno.payload.status) {
@@ -119,9 +128,12 @@ export default function FormCadUsuario(props) {
                         }
                     });
                 }
-            }
             setUsuario(usuarioVazio);
             setFormValidado(false);
+        }
+        else if(!validarCelular(usuario.celular) || !validarCPF(usuario.cpf))
+        {
+            alert("Celular ou CPF inválidos");
         } else {
             setFormValidado(true);
         }
@@ -166,6 +178,7 @@ export default function FormCadUsuario(props) {
                         onChange={manipularMudancas}
                         required
                     />
+                    {camposRepetidos.nome && <Form.Text className="text-danger">Este nome já está em uso.</Form.Text>}
                 </Form.Group>
 
                 <Form.Group className="mb-3">
@@ -191,10 +204,12 @@ export default function FormCadUsuario(props) {
                         value={usuario.cpf}
                         onChange={handleInputChange}
                         maxLength="14"
-                        required />
+                        required 
+                        disabled={props.modoEdicao}/>
                     <Form.Control.Feedback type="invalid">
                         CPF inválido.
                     </Form.Control.Feedback>
+                    {!props.modoEdicao && camposRepetidos.cpf && <Form.Text className="text-danger">Este CPF já está em uso.</Form.Text>}
                 </Form.Group>
 
                 <Form.Group className="mb-3">
@@ -212,6 +227,7 @@ export default function FormCadUsuario(props) {
                     <Form.Control.Feedback type="invalid">
                         E-mail inválido.
                     </Form.Control.Feedback>
+                    {camposRepetidos.email && <Form.Text className="text-danger">Este e-mail já está em uso.</Form.Text>}
                 </Form.Group>
 
                 <Form.Group className="mb-3">
@@ -223,12 +239,13 @@ export default function FormCadUsuario(props) {
                         name="celular"
                         value={usuario.celular}
                         onChange={handleInputChange}
-                        maxLength="16"
+                        maxLength="15"
                         required 
                     />
                     <Form.Control.Feedback type="invalid">
                         Celular inválido.
                     </Form.Control.Feedback>
+                    {camposRepetidos.celular && <Form.Text className="text-danger">Este celular já está em uso.</Form.Text>}
                 </Form.Group>
 
                 <p>(*) Campos obrigatórios</p>
@@ -245,12 +262,6 @@ export default function FormCadUsuario(props) {
                         </Button>
                     </Col>
                 </Row>
-               {erro && <div>
-                    <Form.Label>
-                        <p> O campo {usuarioExistente.nome === usuario.nome ? 'Nome' : usuarioExistente.rg === usuario.rg ? 'RG' : usuarioExistente.cpf === usuario.cpf ? 'CPF' : 
-                    usuarioExistente.email === usuario.email ? 'E-mail' : 'Celular'} já está/estão em uso. </p>
-                    </Form.Label>
-                </div>}
             </Form>
         </>
     );

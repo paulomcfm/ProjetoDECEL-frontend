@@ -8,10 +8,12 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
     "date-fns": "^3.6.0",
     "docx": "^8.5.0",
     "file-saver": "^2.0.5",
+    "js-file-download": "^0.4.12",
     "nodemailer": "^6.9.13",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.2",
@@ -23,6 +25,8 @@
     "react-scripts": "5.0.1",
     "react-select": "^5.8.0",
     "react-toastify": "^10.0.5",
+    "react-transition-group": "^4.4.5",
+    "url": "^0.11.3",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
