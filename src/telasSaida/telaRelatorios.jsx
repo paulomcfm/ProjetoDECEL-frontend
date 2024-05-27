@@ -63,8 +63,8 @@ export default function Relatorios(props) {
                         />
                     </div>
                     <Container style={{ marginTop: '40px', display: 'flex', flexDirection: 'column', marginLeft: '4%', marginRight: '4%', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
-                        <div style={{ margin: '1%', fontSize: '25px', display: 'flex', flexDirection: 'row' }}>
-                            <TbReportAnalytics />
+                        <div style={{ margin: '1%', fontSize: '25px', display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                            <TbReportAnalytics style={{marginBottom: '1%'}}/>
                             <p><strong>Relatórios</strong></p>
                         </div>
                         <div className="mb-3" style={{ marginLeft: '1%', marginRight: '1%', gap: '1%', height: '15%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
