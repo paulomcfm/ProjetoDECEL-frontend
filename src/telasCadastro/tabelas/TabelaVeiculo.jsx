@@ -1,50 +1,62 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, Container, Table } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { buscarUsuarios, removerUsuario } from '../../redux/usuarioReducer.js';
+import { buscarVeiculos, removerVeiculo } from '../../redux/veiculoReducer.js';
+import { buscarRotas } from '../../redux/rotaReducer.js';
 
-export default function TabelaUsuarios(props) {
+export default function TabelaVeiculo(props) {
     const [termoBusca, setTermoBusca] = useState('');
-    const { mensagem, usuarios } = useSelector(state => state.usuario);
+    const { mensagem, veiculos } = useSelector(state => state.veiculo);
     const dispatch = useDispatch();
 
-    const usuarioVazio = {
-        nome: '',
-        senha: '',
-        cpf: '',
-        email: '',
-        celular: '',
-        nivel: ''
+    const veiculoVazio = {
+        codigo: '0',
+        renavam: '',
+        placa: '',
+        modelo: '',
+        capacidade: 0,
+        tipo: ''
     };
 
-    function excluirUsuario(usuario) {
-        const administradores = usuarios.filter(user => user.nivel === 'administrador');
-        if (usuario.nivel === 'administrador' && administradores.length <= 1) {
-            alert('Não é possível excluir o último administrador.');
-        }
-        if (window.confirm('Deseja realmente excluir esse usuário?')) {
-            dispatch(removerUsuario(usuario));
+    async function excluirVeiculo(veiculo) {
+        const { codigo } = veiculo; // Obtém o código do veículo
+        try {
+            // Busca as rotas associadas ao veículo
+            const response = await dispatch(buscarRotas(codigo));
+            const { status, listaRotas } = response.payload;
+            if (status && listaRotas.length > 0) {
+                // Se houver rotas associadas ao veículo, exibe mensagem e não exclui
+                alert('Não é possível excluir o veículo, pois está alocado em uma rota.');
+            } else {
+                // Se não houver rotas associadas ao veículo, confirma a exclusão
+                if (window.confirm('Deseja realmente excluir esse veículo?')) {
+                    dispatch(removerVeiculo(veiculo));
+                }
+            }
+        } catch (error) {
+            console.error('Erro ao buscar rotas do veículo:', error);
+            alert('Ocorreu um erro ao buscar as rotas do veículo.');
         }
     }
 
-    function editarUsuario(usuario) {
-        props.setUsuarioParaEdicao(usuario);
+    function editarVeiculo(veiculo) {
+        props.setVeiculoParaEdicao(veiculo);
         props.setModoEdicao(true);
         props.exibirFormulario(true);
     }
 
     useEffect(() => {
-        dispatch(buscarUsuarios());
+        dispatch(buscarVeiculos());
     }, [dispatch]);
 
     useEffect(() => {
-        if (mensagem === 'Usuário adicionado com sucesso' || mensagem === 'Usuário atualizado com sucesso') {
+        if (mensagem === 'Veículo adicionado com sucesso' || mensagem === 'Veículo atualizado com sucesso') {
             props.exibirFormulario(false);
         }
     }, [mensagem, props]);
 
-    const usuariosFiltrados = usuarios.filter(usuario =>
-        usuario.nome.toLowerCase().includes(termoBusca.toLowerCase())
+    const veiculosFiltrados = veiculos.filter(veiculo =>
+        veiculo.modelo.toLowerCase().includes(termoBusca.toLowerCase())
     );
 
     return (
@@ -54,12 +66,12 @@ export default function TabelaUsuarios(props) {
                 className="d-flex align-items-center mb-4 mt-2 mx-auto justify-content-center"
                 style={{ width: '142px' }}
                 onClick={() => {
-                    props.setUsuarioParaEdicao(usuarioVazio);
+                    props.setVeiculoParaEdicao(veiculoVazio);
                     props.setModoEdicao(false);
                     props.exibirFormulario(true);
                 }}
             >
-                Cadastrar Usuário
+                Cadastrar Veículo
             </Button>
             <div className="mb-5 d-flex justify-content-center align-items-center">
                 <input
@@ -73,7 +85,7 @@ export default function TabelaUsuarios(props) {
                         transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
                         width: '750px',
                     }}
-                    placeholder="Buscar usuários..."
+                    placeholder="Buscar veículos..."
                     value={termoBusca}
                     onChange={e => setTermoBusca(e.target.value)}
                 />
@@ -81,25 +93,25 @@ export default function TabelaUsuarios(props) {
             <Table striped bordered hover>
                 <thead>
                     <tr>
-                        <th>Nome</th>
-                        <th>CPF</th>
-                        <th>Email</th>
-                        <th>Celular</th>
-                        <th>Nivel</th>
+                        <th>Renavam</th>
+                        <th>Placa</th>
+                        <th>Modelo</th>
+                        <th>Capacidade</th>
+                        <th>Tipo</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {usuariosFiltrados && usuariosFiltrados.map(usuario => (
-                        <tr key={usuario.cpf}>
-                            <td>{usuario.nome}</td>
-                            <td>{usuario.cpf}</td>
-                            <td>{usuario.email}</td>
-                            <td>{usuario.celular}</td>
-                            <td>{usuario.nivel}</td>
+                    {veiculosFiltrados && veiculosFiltrados.map(veiculo => (
+                        <tr key={veiculo.codigo}>
+                            <td>{veiculo.renavam}</td>
+                            <td>{veiculo.placa}</td>
+                            <td>{veiculo.modelo}</td>
+                            <td>{veiculo.capacidade}</td>
+                            <td>{veiculo.tipo}</td>
                             <td>
                                 <Button variant="danger" onClick={() => {
-                                    excluirUsuario(usuario);
+                                    excluirVeiculo(veiculo);
                                 }}>
                                     <svg xmlns="http://www.w3.org/2000/svg"
                                         width="16"
@@ -112,7 +124,7 @@ export default function TabelaUsuarios(props) {
                                     </svg>
                                 </Button> {' '}
                                 <Button onClick={() => {
-                                    editarUsuario(usuario);
+                                    editarVeiculo(veiculo);
                                 }
                                 } variant="warning">
                                     <svg xmlns="http://www.w3.org/2000/svg"

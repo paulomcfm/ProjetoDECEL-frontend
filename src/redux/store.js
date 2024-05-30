@@ -9,6 +9,7 @@ import usuarioSlice from './usuarioReducer.js'
 import rotaSlice from './rotaReducer.js'
 import inscricaoSlice from './inscricaoReducer.js'
 import monitorReducer from './monitorReducer.js';
+import veiculoSlice from './veiculoReducer.js'
 
 const store = configureStore({
     reducer: {
@@ -21,7 +22,8 @@ const store = configureStore({
         usuario: usuarioSlice,
         inscricao: inscricaoSlice,
         rota: rotaSlice,
-        monitor:monitorReducer
+        monitor:monitorReducer,
+        veiculo: veiculoSlice
     }
 });
 
