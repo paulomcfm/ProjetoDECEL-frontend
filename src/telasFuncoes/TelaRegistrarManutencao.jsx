@@ -1,49 +1,54 @@
-import React from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
-import Pagina from '../templates/Pagina';
-import { Link } from 'react-router-dom';
-import { NavLink } from 'react-router-dom';
-import imagemDefinirRota from '../recursos/cinza.png';
-import imagemAlocarAluno from '../recursos/preto.png';
-import imagemInscreverAluno from '../recursos/rosa.jpg';
-import imagemRegistrarManutencao from '../recursos/verde.jpg';
-import '../templates/style.css';
+import { Container, Row } from "react-bootstrap";
+import Pagina from "../templates/Pagina";
+import TelaMensagem from "./TelaMensagem";
+import FormCadManutencao from "./formularios/FormCadManutencao";
+import { useState } from "react";
+import TabelaManutencoes from "./tabelas/TabelaManutencoes";
 
-export default function TelaRegistrarManutencao(props) {
-    return (
-        <Pagina>
-            <Container fluid className="mt-4">
-                <Row className="justify-content-center">
-                    <Col xs={12} className="mb-4 text-center">
-                        <h2>Bem-vindo ao Sistema de Gerenciamento</h2>
-                        <p>
-                            Este sistema permite que você faça várias operações importantes, como definir rotas, inscrever alunos, alocar alunos e registrar manutenções.
-                        </p>
-                    </Col>
-                </Row>
-                <Row className="justify-content-center">
-                    <Col xs={6} md={3} lg={3} className="mb-3 p-0">
-                        <NavLink to="/definir-rota" className="nav-link">
-                            <img src={imagemDefinirRota} alt="Definir Rota" className="imagem-botao w-100 hover-scale" />
-                        </NavLink>
-                    </Col>
-                    <Col xs={6} md={3} lg={3} className="mb-3 p-0">
-                        <NavLink to="/inscrever-aluno" className="nav-link">
-                            <img src={imagemRegistrarManutencao} alt="Inscrever Aluno" className="imagem-botao w-100 hover-scale" />
-                        </NavLink>
-                    </Col>
-                    <Col xs={6} md={3} lg={3} className="mb-3 p-0">
-                        <NavLink to="/alocar-aluno" className="nav-link">
-                            <img src={imagemDefinirRota} alt="Alocar Aluno" className="imagem-botao w-100 hover-scale" />
-                        </NavLink>
-                    </Col>
-                    <Col xs={6} md={3} lg={3} className="mb-3 p-0">
-                        <NavLink to="/registrar-manutencao" className="nav-link">
-                            <img src={imagemRegistrarManutencao} alt="Registrar Manutenção" className="imagem-botao w-100 hover-scale" />
-                        </NavLink>
-                    </Col>
-                </Row>
-            </Container>
-        </Pagina>
-    );
+export default function TelaCadastroManutencao(props) {
+    const [exibirFormulario, setExibirFormulario] = useState(false);
+    const [mostrarMensagem, setMostrarMensagem] = useState(false);
+    const [mensagem, setMensagem] = useState("");
+    const [tipoMensagem, setTipoMensagem] = useState("");
+    const [manutencaoParaEdicao, setManutencaoParaEdicao] = useState({
+        placa: '',
+        tipo: '',
+        data: '',
+        descricao: ''
+    });
+    const [modoEdicao, setModoEdicao] = useState(false);
+
+    if (mostrarMensagem) {
+        return (
+            <TelaMensagem mensagem={mensagem} tipo={tipoMensagem} setMostrarMensagem={setMostrarMensagem} />
+        );
+    } else {
+        return (
+            <Pagina>
+                <Container className="mt-4">
+                    <Row className="justify-content-center">
+                        {
+                            exibirFormulario ?
+                                <FormCadManutencao
+                                    exibirFormulario={setExibirFormulario}
+                                    manutencaoParaEdicao={manutencaoParaEdicao}
+                                    setManutencaoParaEdicao={setManutencaoParaEdicao}
+                                    modoEdicao={modoEdicao}
+                                    setModoEdicao={setModoEdicao}
+                                    setMostrarMensagem={setMostrarMensagem}
+                                    setMensagem={setMensagem}
+                                    setTipoMensagem={setTipoMensagem}
+                                />
+                                :
+                                <TabelaManutencoes
+                                    exibirFormulario={setExibirFormulario}
+                                    setManutencaoParaEdicao={setManutencaoParaEdicao}
+                                    setModoEdicao={setModoEdicao}
+                                />
+                        }
+                    </Row>
+                </Container>
+            </Pagina>
+        );
+    }
 }

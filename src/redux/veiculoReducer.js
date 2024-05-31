@@ -29,33 +29,6 @@ export const buscarVeiculos = createAsyncThunk('veiculo/buscar', async () => {
     }
 });
 
-export const buscarVeiculoRotas = createAsyncThunk('VeiculoRotas/buscar', async (codigoVeiculo) => {
-        try {
-            let url = `http://localhost:8080/definir-rota/${codigoVeiculo}`;
-            const resposta = await fetch(url, { method: 'GET' });
-            const dados = await resposta.json();
-            if (dados.status) {
-                return {
-                    status: true,
-                    listaRotas: dados.listaRotas,
-                    mensagem: ''
-                };
-            } else {
-                return {
-                    status: false,
-                    listaRotas: [],
-                    mensagem: 'Ocorreu um erro ao recuperar as rotas da base de dados.'
-                };
-            }
-        } catch (erro) {
-            return {
-                status: false,
-                listaRotas: [],
-                mensagem: 'Ocorreu um erro ao recuperar as rotas da base de dados: ' + erro.message
-            };
-        }
-    }
-);
 
 export const adicionarVeiculo = createAsyncThunk('veiculo/adicionar', async (veiculo) => {
     const resposta = await fetch(urlBase, {
