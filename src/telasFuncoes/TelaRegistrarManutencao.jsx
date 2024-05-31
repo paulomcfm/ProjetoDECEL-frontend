@@ -1,9 +1,9 @@
 import { Container, Row } from "react-bootstrap";
 import Pagina from "../templates/Pagina";
-import TelaMensagem from "./TelaMensagem";
+import TelaMensagem from "../telasCadastro/TelaMensagem";
 import FormCadManutencao from "./formularios/FormCadManutencao";
 import { useState } from "react";
-import TabelaManutencoes from "./tabelas/TabelaManutencoes";
+import TabelaManutencao from "./tabelas/TabelaManutencao"
 
 export default function TelaCadastroManutencao(props) {
     const [exibirFormulario, setExibirFormulario] = useState(false);
@@ -40,7 +40,7 @@ export default function TelaCadastroManutencao(props) {
                                     setTipoMensagem={setTipoMensagem}
                                 />
                                 :
-                                <TabelaManutencoes
+                                <TabelaManutencao
                                     exibirFormulario={setExibirFormulario}
                                     setManutencaoParaEdicao={setManutencaoParaEdicao}
                                     setModoEdicao={setModoEdicao}

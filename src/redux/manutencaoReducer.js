@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ESTADO from '../recursos/estado.js';
 
-const urlBase = 'http://localhost:8080/manutencao';
+const urlBase = 'http://localhost:8080/manutencoes';
 
 // Função para salvar a data da última manutenção preventiva no localStorage
 const savePreventivaToLocalStorage = (periodo) => {
