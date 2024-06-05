@@ -173,7 +173,7 @@ export default function RelatorioRotasDiferentes(props) {
                                 <th className='linhas-titulo-tabela' >
                                     <div className='div-linhas-titulo-tabela'>Endereço</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByPontoEmbarque}>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer', width: '15%' }} onClick={handleOrderByPontoEmbarque}>
                                     <div className='div-linhas-titulo-tabela'>Ponto de Embarque {!orderByPontoEmbarque ? <FaAngleUp /> : <FaAngleDown />}</div>
                                 </th>
                                 <th className='linhas-titulo-tabela' >
@@ -182,7 +182,7 @@ export default function RelatorioRotasDiferentes(props) {
                                 <th className='linhas-titulo-tabela' >
                                     <div className='div-linhas-titulo-tabela'>Turma, etapa e período</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByRoute}>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' ,width: '8%'}} onClick={handleOrderByRoute}>
                                     <div className='div-linhas-titulo-tabela'>Rota {!orderByRoute ? <FaAngleUp /> : <FaAngleDown />}</div>
                                 </th>
                                 <th className='linhas-titulo-tabela' style={{ width: '10%' }}>
