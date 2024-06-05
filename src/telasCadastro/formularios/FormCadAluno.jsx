@@ -84,7 +84,7 @@ export default function FormCadAlunos(props) {
         }
         aluno.rg = limparString(aluno.rg);
         let motivoValidado = aluno.status === 'I' && aluno.motivoInativo;
-        if (aluno.status === 'A') {
+        if (aluno.status === 'A' || !props.modoEdicao) {
             motivoValidado = true;
         }
         if (form.checkValidity() && celularValidado && motivoValidado) {
