@@ -47,7 +47,7 @@ export default function Cabecalho(props) {
                     <NavLink to="/pontos-embarque" className="nav-link">Pontos de Embarque</NavLink>
                     <NavLink to="/motorista" className="nav-link">Motoristas</NavLink>
                     <NavLink to="/monitor" className="nav-link">Monitores</NavLink>
-                    {nivelAcesso === 'admin' && <NavLink to="/cadastro-user" className="nav-link">Usuários</NavLink>}
+                    {nivelAcesso === 'administrador' && <NavLink to="/cadastro-user" className="nav-link">Usuários</NavLink>}
                 </Nav>
             </Navbar.Collapse>
             <Dropdown>

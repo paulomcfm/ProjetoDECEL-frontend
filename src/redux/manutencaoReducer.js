@@ -39,7 +39,7 @@ export const buscarManutencoes = createAsyncThunk('manutencao/buscar', async () 
     }
 });
 
-export const adicionarManutencao = createAsyncThunk('manutencao/adicionar', async (manutencao) => {
+export const adicionarManutencao = createAsyncThunk('manutencoes/adicionar', async (manutencao) => {
     const resposta = await fetch(urlBase, {
         method: 'POST',
         headers: {
@@ -71,7 +71,7 @@ export const adicionarManutencao = createAsyncThunk('manutencao/adicionar', asyn
     }
 });
 
-export const atualizarManutencao = createAsyncThunk('manutencao/atualizar', async (manutencao) => {
+export const atualizarManutencao = createAsyncThunk('manutencoes/atualizar', async (manutencao) => {
     const resposta = await fetch(urlBase, {
         method: 'PUT',
         headers: {
@@ -100,7 +100,7 @@ export const atualizarManutencao = createAsyncThunk('manutencao/atualizar', asyn
     }
 });
 
-export const removerManutencao = createAsyncThunk('manutencao/remover', async (manutencao) => {
+export const removerManutencao = createAsyncThunk('manutencoes/remover', async (manutencao) => {
     const resposta = await fetch(urlBase, {
         method: 'DELETE',
         headers: {

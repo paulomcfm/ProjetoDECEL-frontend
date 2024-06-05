@@ -5,7 +5,7 @@ import FormCadManutencao from "./formularios/FormCadManutencao";
 import { useState } from "react";
 import TabelaManutencao from "./tabelas/TabelaManutencao"
 
-export default function TelaCadastroManutencao(props) {
+export default function TelaRegistrarManutencao(props) {
     const [exibirFormulario, setExibirFormulario] = useState(false);
     const [mostrarMensagem, setMostrarMensagem] = useState(false);
     const [mensagem, setMensagem] = useState("");
@@ -14,7 +14,7 @@ export default function TelaCadastroManutencao(props) {
         placa: '',
         tipo: '',
         data: '',
-        descricao: ''
+        observacoes: ''
     });
     const [modoEdicao, setModoEdicao] = useState(false);
 
