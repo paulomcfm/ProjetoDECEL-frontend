@@ -21,7 +21,6 @@ export default function FormCadAlunos(props) {
         status: '',
         motivoInativo: ''
     }
-
     const estadoInicialAluno = props.alunoParaEdicao;
     const [aluno, setAluno] = useState(estadoInicialAluno);
     const [formValidado, setFormValidado] = useState(false);

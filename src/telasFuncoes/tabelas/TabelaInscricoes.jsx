@@ -111,8 +111,6 @@ export default function TabelaInscricoes(props) {
         setInscricoesFiltradas(inscricoesFiltradasPeloTermo);
     }, [inscricoes, termoBusca, anosSelecionados]);
 
-
-
     const { pontosEmbarque } = useSelector(state => state.pontoEmbarque);
     const { escolas } = useSelector(state => state.escola);
     const { alunos } = useSelector(state => state.aluno);

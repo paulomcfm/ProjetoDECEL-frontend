@@ -11,8 +11,8 @@ export default function Pagina(props) {
             <div className="pagina-content" style={{ marginBottom: '50px' }}>
                 {props.children}
             </div>
-            <div style={{ position: 'fixed', bottom: 0, width: '100%', height: '8%', backgroundColor: '#f8f9fa' }}>
-                <Rodape conteudo="Rua Vicente Dias Garcia, nº 222, Álvares Machado - CNPJ: 31.048.096/0001-91" />
+            <div style={{ position: 'fixed', bottom: 0, width: '100%', height: '6%', backgroundColor: '#f8f9fa', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <Rodape />
             </div>
         </div>
     );
