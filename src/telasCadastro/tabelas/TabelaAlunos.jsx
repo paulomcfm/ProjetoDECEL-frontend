@@ -68,7 +68,7 @@ export default function TabelaAlunos(props) {
             if (retorno.payload.status) {
                 const parentescos = retorno.payload.listaParentescos;
                 const responsaveis = parentescos.map(parentesco => ({
-                    codigoResponsavel: parentesco.codigoResponsavel,
+                    codigoResponsavel: parentesco.responsavel.codigo,
                     parentesco: parentesco.parentesco
                 }));
                 const alunoComResponsaveis = {

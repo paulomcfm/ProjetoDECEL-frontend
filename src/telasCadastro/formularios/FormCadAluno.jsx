@@ -83,7 +83,7 @@ export default function FormCadAlunos(props) {
         }
         aluno.rg = limparString(aluno.rg);
         let motivoValidado = aluno.status === 'I' && aluno.motivoInativo;
-        if(aluno.status === 'A'){
+        if (aluno.status === 'A' || !props.modoEdicao) {
             motivoValidado = true;
         }
         if (form.checkValidity() && celularValidado && motivoValidado) {
@@ -153,9 +153,9 @@ export default function FormCadAlunos(props) {
             setFormValidado(false);
             props.exibirFormulario(false);
         }
-        // else {
-        //     setFormValidado(true);
-        // }
+        else {
+            setFormValidado(true);
+        }
 
         e.stopPropagation();
         e.preventDefault();
@@ -373,7 +373,7 @@ export default function FormCadAlunos(props) {
                                 </Form.Select>
                                 <Button
                                     variant="danger"
-                                    className="mb-2 mt-3"
+                                    className="ms-2 mb-2 mt-3"
                                     onClick={() => removerResponsavel(index)}
                                 >
                                     Remover
@@ -432,28 +432,35 @@ export default function FormCadAlunos(props) {
                             </Col>
                             {!statusStudent && (
                                 <Col md={10}>
-                                    <Form.Label>Motivo:</Form.Label>
-                                    <Form.Select
-                                        aria-label="Selecione o motivo da inatividade"
-                                        onChange={(e) => {
-                                            if (e.target.value === 'Outro') {
-                                                setAluno({ ...aluno, motivoInativo: '' });
-                                                setAnotherMotive(true);
-                                            } else {
-                                                setAluno({ ...aluno, motivoInativo: e.target.value });
-                                                setAnotherMotive(false);
-                                            }
-                                            setOlderMotive('');
-                                        }}
-                                        id='motiveSelect'
-                                        value={aluno.motivoInativo}
-                                    >
-                                        <option>Selecione o motivo</option>
-                                        <option value="Ensino Médio Completo">Ensino Médio Completo</option>
-                                        <option value="Mudou-se de Álvares Machado">Mudou-se de Álvares Machado</option>
-                                        <option value="Deixou de utilizar rede pública">Deixou de utilizar rede pública</option>
-                                        <option value="Outro">Outro...</option>
-                                    </Form.Select>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Motivo:</Form.Label>
+                                        <Form.Select
+                                            aria-label="Selecione o motivo da inatividade"
+                                            onChange={(e) => {
+                                                if (e.target.value === 'Outro') {
+                                                    setAluno({ ...aluno, motivoInativo: '' });
+                                                    setAnotherMotive(true);
+                                                } else {
+                                                    setAluno({ ...aluno, motivoInativo: e.target.value });
+                                                    setAnotherMotive(false);
+                                                }
+                                                setOlderMotive('');
+                                            }}
+                                            id='motiveSelect'
+                                            value={aluno.motivoInativo}
+                                            isInvalid={formValidado && !aluno.motivoInativo}
+                                            required
+                                        >
+                                            <option>Selecione o motivo</option>
+                                            <option value="Ensino Médio Completo">Ensino Médio Completo</option>
+                                            <option value="Mudou-se de Álvares Machado">Mudou-se de Álvares Machado</option>
+                                            <option value="Deixou de utilizar rede pública">Deixou de utilizar rede pública</option>
+                                            <option value="Outro">Outro...</option>
+                                        </Form.Select>
+                                        <Form.Control.Feedback type="invalid">
+                                            Selecione o motivo.
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
                                 </Col>
                             )}
                             {anotherMotive && !statusStudent && (
