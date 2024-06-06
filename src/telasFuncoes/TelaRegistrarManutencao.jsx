@@ -1,9 +1,9 @@
 import { Container, Row } from "react-bootstrap";
 import Pagina from "../templates/Pagina";
 import TelaMensagem from "../telasCadastro/TelaMensagem";
-import FormCadManutencao from "./formularios/FormCadManutencao";
 import { useState } from "react";
 import TabelaManutencao from "./tabelas/TabelaManutencao"
+import CadastroManutencao from "./formularios/CadManutencao.jsx";
 
 export default function TelaRegistrarManutencao(props) {
     const [exibirFormulario, setExibirFormulario] = useState(false);
@@ -29,7 +29,7 @@ export default function TelaRegistrarManutencao(props) {
                     <Row className="justify-content-center">
                         {
                             exibirFormulario ?
-                                <FormCadManutencao
+                                <CadastroManutencao
                                     exibirFormulario={setExibirFormulario}
                                     manutencaoParaEdicao={manutencaoParaEdicao}
                                     setManutencaoParaEdicao={setManutencaoParaEdicao}

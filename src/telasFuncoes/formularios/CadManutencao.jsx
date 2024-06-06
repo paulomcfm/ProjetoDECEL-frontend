@@ -3,10 +3,10 @@ import { Form, Button, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { adicionarManutencao, atualizarManutencao, buscarManutencoes } from '../../redux/manutencaoReducer';
 
-export default function FormCadManutencao(props) {
+const CadastroManutencao = (props) =>{
     const manutencaoVazia = {
         placa: '',
-        tipo: 'Preventiva',
+        tipo: 'preventiva',
         data: '',
         observacoes: ''
     };
@@ -148,3 +148,5 @@ export default function FormCadManutencao(props) {
         </>
     );
 }
+
+export default CadastroManutencao;

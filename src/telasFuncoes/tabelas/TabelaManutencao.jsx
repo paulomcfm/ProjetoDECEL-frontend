@@ -19,7 +19,7 @@ export default function TabelaManutencao(props) {
     }, [dispatch]);
 
     const manutencoesFiltradas = manutencoes.filter(manutencao =>
-        manutencao.placa.includes(termoBusca)
+        manutencao.placa.toLowerCase().includes(termoBusca.toLowerCase())
     );
     
     function excluirManutencao(manutencao) {
@@ -50,24 +50,30 @@ export default function TabelaManutencao(props) {
                 className="d-flex align-items-center mb-4 mt-2 mx-auto justify-content-center"
                 style={{ width: '142px' }}
                 onClick={() => {
+                    props.exibirFormulario(true);
                     props.setManutencaoParaEdicao(manutencaoVazia);
                     props.setModoEdicao(false);
-                    props.exibirFormulario(true);
                 }}
             >
                 Cadastrar Manutenção
             </Button>
-            <Form>
-                <Form.Group controlId="buscarManutencao">
-                    <Form.Label>Buscar Manutenção por Placa:</Form.Label>
-                    <Form.Control
-                        type="text"
-                        placeholder="Digite a placa do veículo"
-                        value={termoBusca}
-                        onChange={(e) => setTermoBusca(e.target.value)}
-                    />
-                </Form.Group>
-            </Form>
+            <div className="mb-5 d-flex justify-content-center align-items-center">
+                <input
+                    type="text"
+                    className="form-control"
+                    style={{
+                        borderRadius: '8px',
+                        padding: '12px 16px',
+                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                        border: '1px solid #ced4da',
+                        transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
+                        width: '750px',
+                    }}
+                    placeholder="Buscar Manutenção por Placa"
+                    value={termoBusca}
+                    onChange={e => setTermoBusca(e.target.value)}
+                />
+            </div>
             <Table striped bordered hover className="mt-3">
                 <thead>
                     <tr>
