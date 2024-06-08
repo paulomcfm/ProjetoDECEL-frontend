@@ -37,11 +37,11 @@ export default function TabelaUsuarios(props) {
         dispatch(buscarUsuarios());
     }, [dispatch]);
 
-    useEffect(() => {
-        if (mensagem === 'Usuário adicionado com sucesso' || mensagem === 'Usuário atualizado com sucesso') {
-            props.exibirFormulario(false);
-        }
-    }, [mensagem, props]);
+ //   useEffect(() => {
+ //       if (mensagem === 'Usuário adicionado com sucesso' || mensagem === 'Usuário atualizado com sucesso') {
+  //          props.exibirFormulario(false);
+ //       }
+ //  }, [mensagem, props]);
 
     const usuariosFiltrados = usuarios.filter(usuario =>
         usuario.nome.toLowerCase().includes(termoBusca.toLowerCase())

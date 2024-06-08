@@ -3,7 +3,7 @@ import Pagina from "../templates/Pagina";
 import TelaMensagem from "../telasCadastro/TelaMensagem";
 import { useState } from "react";
 import TabelaManutencao from "./tabelas/TabelaManutencao"
-import CadastroManutencao from "./formularios/CadManutencao.jsx";
+import CadastroManutencao from "./formularios/CadManutencao";
 
 export default function TelaRegistrarManutencao(props) {
     const [exibirFormulario, setExibirFormulario] = useState(false);
@@ -12,7 +12,7 @@ export default function TelaRegistrarManutencao(props) {
     const [tipoMensagem, setTipoMensagem] = useState("");
     const [manutencaoParaEdicao, setManutencaoParaEdicao] = useState({
         placa: '',
-        tipo: '',
+        tipo: 'preventiva',
         data: '',
         observacoes: ''
     });

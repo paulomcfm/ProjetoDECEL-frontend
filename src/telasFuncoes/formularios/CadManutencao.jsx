@@ -3,13 +3,13 @@ import { Form, Button, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { adicionarManutencao, atualizarManutencao, buscarManutencoes } from '../../redux/manutencaoReducer';
 
-const CadastroManutencao = (props) =>{
+const CadastroManutencao = (props) => {
     const manutencaoVazia = {
         placa: '',
         tipo: 'preventiva',
         data: '',
         observacoes: ''
-    };
+    };//descricao
 
     const estadoInicialManutencao = props.manutencaoParaEdicao || manutencaoVazia;
     const { setMostrarMensagem, setMensagem, setTipoMensagem } = props;
@@ -22,13 +22,12 @@ const CadastroManutencao = (props) =>{
     const { manutencoes } = useSelector((state) => state.manutencao);
     const dispatch = useDispatch();
 
-    useEffect(()=>{
+    useEffect(() => {
         dispatch(buscarManutencoes());
-    }, [dispatch])
+    }, [dispatch]);
 
     function manipularMudancas(e) {
-        const componente = e.currentTarget;
-        const { name, value } = componente;
+        const { name, value } = e.currentTarget;
         setManutencao({ ...manutencao, [name]: value });
     }
 
@@ -41,7 +40,7 @@ const CadastroManutencao = (props) =>{
 
     useEffect(() => {
         verificarCamposRepetidos();
-    },[manutencao.placa])
+    }, [manutencao.placa, manutencoes]);
 
     async function manipularSubmissao(e) {
         e.preventDefault();
@@ -56,6 +55,7 @@ const CadastroManutencao = (props) =>{
                 });
             } else {
                 dispatch(adicionarManutencao(manutencao)).then((retorno) => {
+                    console.log(manutencao);
                     setMostrarMensagem(true);
                     setMensagem(retorno.payload.mensagem);
                     setTipoMensagem(retorno.payload.status ? "success" : "danger");
@@ -72,7 +72,7 @@ const CadastroManutencao = (props) =>{
             <h2 className="text-center">{props.modoEdicao ? 'Alterar Manutenção' : 'Cadastrar Manutenção'}</h2>
 
             <Form noValidate validated={formValidado} onSubmit={manipularSubmissao} id='formManutencao'>
-                <Form.Row>
+                <Row>
                     <Form.Group as={Col} className="mb-3">
                         <Form.Label>Placa(*):</Form.Label>
                         <Form.Control
@@ -97,13 +97,13 @@ const CadastroManutencao = (props) =>{
                             onChange={manipularMudancas}
                             required
                         >
-                            <option>Preventiva</option>
-                            <option>Corretiva</option>
+                            <option value="preventiva">Preventiva</option>
+                            <option value="corretiva">Corretiva</option>
                         </Form.Control>
                     </Form.Group>
-                </Form.Row>
+                </Row>
 
-                <Form.Row>
+                <Row>
                     <Form.Group as={Col} className="mb-3">
                         <Form.Label>Data(*):</Form.Label>
                         <Form.Control
@@ -115,18 +115,18 @@ const CadastroManutencao = (props) =>{
                             required
                         />
                     </Form.Group>
-                </Form.Row>
+                </Row>
 
                 <Form.Group className="mb-3">
                     <Form.Label>Descrição:</Form.Label>
                     <Form.Control
                         as="textarea"
                         rows={3}
-                        id="descricao"
-                        name="descricao"
-                        value={manutencao.descricao}
+                        id="observacoes"
+                        name="observacoes"
+                        value={manutencao.observacoes}
                         onChange={manipularMudancas}
-                        required={manutencao.tipo === 'Corretiva'}
+                        required={manutencao.tipo === 'corretiva'}
                     />
                 </Form.Group>
 

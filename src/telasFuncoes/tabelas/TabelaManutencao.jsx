@@ -6,10 +6,12 @@ import { buscarManutencoes, removerManutencao } from '../../redux/manutencaoRedu
 export default function TabelaManutencao(props) {
     const { mensagem, manutencoes } = useSelector(state => state.manutencao);
     const [termoBusca, setTermoBusca] = useState('');
+    const [dataInicio, setDataInicio] = useState('');
+    const [dataFim, setDataFim] = useState('');
     const dispatch = useDispatch();
     const manutencaoVazia = {
         placa: '',
-        tipo: '',
+        tipo: 'preventiva',
         data: '',
         observacoes: ''
     };
@@ -18,9 +20,12 @@ export default function TabelaManutencao(props) {
         dispatch(buscarManutencoes());
     }, [dispatch]);
 
-    const manutencoesFiltradas = manutencoes.filter(manutencao =>
-        manutencao.placa.toLowerCase().includes(termoBusca.toLowerCase())
-    );
+    const manutencoesFiltradas = manutencoes.filter(manutencao => {
+        const dataManutencao = new Date(manutencao.data);
+        const inicioMatches = dataInicio ? dataManutencao >= new Date(dataInicio) : true;
+        const fimMatches = dataFim ? dataManutencao <= new Date(dataFim) : true;
+        return inicioMatches && fimMatches;
+    });
     
     function excluirManutencao(manutencao) {
         if (window.confirm('Deseja realmente excluir a manutenção?')) {
@@ -58,8 +63,9 @@ export default function TabelaManutencao(props) {
                 Cadastrar Manutenção
             </Button>
             <div className="mb-5 d-flex justify-content-center align-items-center">
+                <h4 style={{ marginRight: '10px' }}>Buscar pela Data</h4>
                 <input
-                    type="text"
+                    type="date"
                     className="form-control"
                     style={{
                         borderRadius: '8px',
@@ -67,11 +73,25 @@ export default function TabelaManutencao(props) {
                         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                         border: '1px solid #ced4da',
                         transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
-                        width: '750px',
+                        width: '200px',
+                        marginRight: '10px',
                     }}
-                    placeholder="Buscar Manutenção por Placa"
-                    value={termoBusca}
-                    onChange={e => setTermoBusca(e.target.value)}
+                    value={dataInicio}
+                    onChange={e => setDataInicio(e.target.value)}
+                />
+                <input
+                    type="date"
+                    className="form-control"
+                    style={{
+                        borderRadius: '8px',
+                        padding: '12px 16px',
+                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                        border: '1px solid #ced4da',
+                        transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
+                        width: '200px',
+                    }}
+                    value={dataFim}
+                    onChange={e => setDataFim(e.target.value)}
                 />
             </div>
             <Table striped bordered hover className="mt-3">
