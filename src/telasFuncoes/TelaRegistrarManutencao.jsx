@@ -1,9 +1,11 @@
 import { Container, Row } from "react-bootstrap";
 import Pagina from "../templates/Pagina";
 import TelaMensagem from "../telasCadastro/TelaMensagem";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TabelaManutencao from "./tabelas/TabelaManutencao"
 import CadastroManutencao from "./formularios/CadManutencao";
+import { useDispatch } from "react-redux";
+import { buscarVeiculos } from "../redux/veiculoReducer";
 
 export default function TelaRegistrarManutencao(props) {
     const [exibirFormulario, setExibirFormulario] = useState(false);
@@ -17,6 +19,11 @@ export default function TelaRegistrarManutencao(props) {
         observacoes: ''
     });
     const [modoEdicao, setModoEdicao] = useState(false);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(buscarVeiculos());
+    }, [dispatch]);
 
     if (mostrarMensagem) {
         return (

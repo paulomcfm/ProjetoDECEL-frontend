@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Form, Table, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarManutencoes, removerManutencao } from '../../redux/manutencaoReducer';
@@ -14,6 +14,12 @@ export default function TabelaManutencao(props) {
         tipo: 'preventiva',
         data: '',
         observacoes: ''
+    };
+    const veiculos = useSelector((state) => state.veiculo.veiculos);
+
+    const encontrarPlaca = (vei_codigo) => {
+        const veiculo = veiculos.find(v => v.codigo === vei_codigo);
+        return veiculo ? veiculo.placa : "Desconhecida";
     };
 
     useEffect(() => {
@@ -107,7 +113,7 @@ export default function TabelaManutencao(props) {
                 <tbody>
                     {manutencoesFiltradas.map((manutencao, index) => (
                         <tr key={index}>
-                            <td>{manutencao.placa}</td>
+                            <td>{encontrarPlaca(manutencao.id)}</td>
                             <td>{manutencao.tipo}</td>
                             <td>{formatarData(manutencao.data)}</td>
                             <td>{manutencao.observacoes}</td>
