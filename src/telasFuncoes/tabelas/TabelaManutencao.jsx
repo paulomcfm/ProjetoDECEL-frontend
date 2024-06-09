@@ -58,6 +58,7 @@ export default function TabelaManutencao(props) {
             year: '2-digit'
         });
     };
+
     return (
         <Container className="mt-4">
             <Button
@@ -73,7 +74,7 @@ export default function TabelaManutencao(props) {
                 Cadastrar Manutenção
             </Button>
             <div className="mb-5 d-flex justify-content-center align-items-center">
-                <h4 style={{ marginRight: '10px' }}>Buscar pela Data</h4>
+                <h4 style={{ marginRight: '10px' }}>Buscar pela data</h4>
                 <input
                     type="date"
                     className="form-control"
