@@ -169,10 +169,10 @@ export default function RelatorioRotasDiferentes(props) {
                     <table className='tabela'>
                         <thead className='head-tabela'>
                             <tr>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByAnoInscricao}>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer', width: '10%' }} onClick={handleOrderByAnoInscricao}>
                                     <div className='div-linhas-titulo-tabela'>Ano Inscrição {!orderByAnoInscricao ? <FaAngleUp /> : <FaAngleDown />}</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByNome}>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' ,  width: '15%'}} onClick={handleOrderByNome}>
                                     <div className='div-linhas-titulo-tabela'>Aluno {!orderByNome ? <FaAngleUp /> : <FaAngleDown />}</div>
                                 </th>
                                 <th className='linhas-titulo-tabela' >
@@ -187,7 +187,7 @@ export default function RelatorioRotasDiferentes(props) {
                                 <th className='linhas-titulo-tabela' >
                                     <div className='div-linhas-titulo-tabela'>Turma, etapa e período</div>
                                 </th>
-                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} onClick={handleOrderByRoute}>
+                                <th className='linhas-titulo-tabela' style={{ cursor: 'pointer',  width: '8%' }} onClick={handleOrderByRoute}>
                                     <div className='div-linhas-titulo-tabela'>Rota {!orderByRoute ? <FaAngleUp /> : <FaAngleDown />}</div>
                                 </th>
                             </tr>
