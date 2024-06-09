@@ -1,15 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from '../recursos/logodecel.png';
 import user from '../recursos/avatarPadrao.png';
 import { Navbar, Nav, Dropdown } from 'react-bootstrap';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logoutUsuario } from '../redux/usuarioReducer';
 import './style.css';
 
 export default function Cabecalho(props) {
+    const [nomeUsuario, setNomeUsuario] = useState('');
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { nivelAcesso } = useSelector(state => state.usuario);
+
+    useEffect(() => {
+        const usuarioLogado = localStorage.getItem('usuario');
+        if (usuarioLogado) {
+            const usuario = JSON.parse(usuarioLogado);
+            setNomeUsuario(usuario.nome);
+        }
+    }, []);
 
     const handleLogout = () => {
         dispatch(logoutUsuario());
@@ -37,16 +47,17 @@ export default function Cabecalho(props) {
                     <NavLink to="/pontos-embarque" className="nav-link">Pontos de Embarque</NavLink>
                     <NavLink to="/motorista" className="nav-link">Motoristas</NavLink>
                     <NavLink to="/monitor" className="nav-link">Monitores</NavLink>
-                    <NavLink to="/cadastro-user" className="nav-link">Usuarios</NavLink>
+                    {nivelAcesso === 'administrador' && <NavLink to="/cadastro-user" className="nav-link">Usuários</NavLink>}
                 </Nav>
             </Navbar.Collapse>
             <Dropdown>
                 <Dropdown.Toggle variant="light" id="dropdown-basic">
+                    <span>{nomeUsuario}</span>
                     <img
                         src={user}
                         alt="Imagem Usuário"
                         className="img-fluid"
-                        style={{ maxHeight: '40px', cursor: 'pointer', marginRight: '83px' }}
+                        style={{ maxHeight: '40px', cursor: 'pointer', marginLeft: '10px', marginRight: '83px' }}
                     />
                 </Dropdown.Toggle>
 

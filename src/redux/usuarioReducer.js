@@ -21,6 +21,8 @@ const loadAuthFromLocalStorage = () => {
 
 export const logoutUsuario = createAsyncThunk('usuario/logout', async () => {
     localStorage.removeItem('autenticado'); // Remove a autenticação do localStorage
+    localStorage.removeItem('nivelAcesso');
+    localStorage.removeItem('usuario');
     return {};
 });
 
@@ -76,7 +78,8 @@ export const adicionarUsuario = createAsyncThunk('usuario/adicionar', async (usu
                 senha: usuario.senha,
                 cpf: usuario.cpf,
                 email: usuario.email,
-                celular: usuario.celular
+                celular: usuario.celular,
+                nivel: usuario.nivel
             }
         }
     }
@@ -101,6 +104,8 @@ export const autenticarUsuario = createAsyncThunk('/autenticar', async (credenci
         const dados = await resposta.json();
         if (dados.status) {
             localStorage.setItem('autenticado', 'true'); // Armazena a autenticação no localStorage
+            localStorage.setItem('nivelAcesso', dados.usuario.nivel); // Armazena o nível de acesso no localStorage
+            localStorage.setItem('usuario', JSON.stringify(dados.usuario)); // Armazena o usuário no localStorage
             return {
                 autenticado: true,
                 usuario: dados.usuario
@@ -143,7 +148,8 @@ export const atualizarUsuario = createAsyncThunk('usuario/atualizar', async (usu
                 senha: usuario.senha,
                 cpf: usuario.cpf,
                 email: usuario.email,
-                celular: usuario.celular
+                celular: usuario.celular, 
+                nivel: usuario.nivel
             }
         }
     }
@@ -275,7 +281,7 @@ const usuarioSlice = createSlice({
             if (action.payload.autenticado) {
                 state.autenticado = true;
                 state.mensagem = action.payload.mensagem;
-                state.nivelAcesso = action.payload.usuario.nome === 'admin' ? 'admin' : 'normal';
+                state.nivelAcesso = action.payload.usuario.nivel;
                 state.usuario = action.payload.usuario;
                 saveAuthToLocalStorage(state);
             } else {
