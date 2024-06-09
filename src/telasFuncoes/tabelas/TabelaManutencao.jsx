@@ -2,29 +2,33 @@ import { useState, useEffect } from 'react';
 import { Container, Form, Table, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarManutencoes, removerManutencao } from '../../redux/manutencaoReducer';
+import { buscarVeiculos } from '../../redux/veiculoReducer';
 
 export default function TabelaManutencao(props) {
     const { mensagem, manutencoes } = useSelector(state => state.manutencao);
-    const [termoBusca, setTermoBusca] = useState('');
     const [dataInicio, setDataInicio] = useState('');
     const [dataFim, setDataFim] = useState('');
     const dispatch = useDispatch();
     const manutencaoVazia = {
-        placa: '',
+        codigo: '0',
         tipo: 'preventiva',
         data: '',
-        observacoes: ''
-    };
-    const veiculos = useSelector((state) => state.veiculo.veiculos);
-
-    const encontrarPlaca = (vei_codigo) => {
-        const veiculo = veiculos.find(v => v.codigo === vei_codigo);
-        return veiculo ? veiculo.placa : "Desconhecida";
+        observacoes: '',
+        veiculoCodigo: ''
     };
 
     useEffect(() => {
         dispatch(buscarManutencoes());
+        dispatch(buscarVeiculos());
     }, [dispatch]);
+
+    const veiculosState = useSelector(state => state.veiculo);
+    const veiculos = veiculosState.veiculos;
+
+    function encontrarPlaca(veiCodigo){
+        const veiculo = veiculos.find(vei => vei.codigo === veiCodigo);
+        return veiculo ? veiculo.placa : 'N/A';
+    };
 
     const manutencoesFiltradas = manutencoes.filter(manutencao => {
         const dataManutencao = new Date(manutencao.data);
@@ -53,7 +57,6 @@ export default function TabelaManutencao(props) {
             year: '2-digit'
         });
     };
-
     return (
         <Container className="mt-4">
             <Button
@@ -113,7 +116,7 @@ export default function TabelaManutencao(props) {
                 <tbody>
                     {manutencoesFiltradas.map((manutencao, index) => (
                         <tr key={index}>
-                            <td>{encontrarPlaca(manutencao.id)}</td>
+                            <td>{encontrarPlaca(manutencao.veiculoCodigo)}</td>
                             <td>{manutencao.tipo}</td>
                             <td>{formatarData(manutencao.data)}</td>
                             <td>{manutencao.observacoes}</td>

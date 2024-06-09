@@ -13,10 +13,10 @@ export default function TelaRegistrarManutencao(props) {
     const [mensagem, setMensagem] = useState("");
     const [tipoMensagem, setTipoMensagem] = useState("");
     const [manutencaoParaEdicao, setManutencaoParaEdicao] = useState({
-        placa: '',
         tipo: 'preventiva',
         data: '',
-        observacoes: ''
+        observacoes: '',
+        veiculoCodigo: ''
     });
     const [modoEdicao, setModoEdicao] = useState(false);
     const dispatch = useDispatch();

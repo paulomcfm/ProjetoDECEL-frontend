@@ -1,61 +1,84 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Form, Button, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { adicionarManutencao, atualizarManutencao, buscarManutencoes } from '../../redux/manutencaoReducer';
+import { buscarVeiculos } from '../../redux/veiculoReducer';
 
 const CadastroManutencao = (props) => {
     const manutencaoVazia = {
-        placa: '',
         tipo: 'preventiva',
         data: '',
-        observacoes: ''
-    };//descricao
+        observacoes: '',
+        veiculoCodigo: ''
+    };
 
     const estadoInicialManutencao = props.manutencaoParaEdicao || manutencaoVazia;
     const { setMostrarMensagem, setMensagem, setTipoMensagem } = props;
     const [manutencao, setManutencao] = useState(estadoInicialManutencao);
     const [formValidado, setFormValidado] = useState(false);
-    const [camposRepetidos, setCamposRepetidos] = useState({
-        placa: false
-    });
+    const [erroPlaca, setErroPlaca] = useState(false);
+    const [placa, setPlaca] = useState('');
+    const [observacoesDesabilitado, setObservacoesDesabilitado] = useState(estadoInicialManutencao.tipo === 'preventiva');
 
     const { manutencoes } = useSelector((state) => state.manutencao);
+    const { veiculos } = useSelector((state) => state.veiculo);
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch(buscarManutencoes());
+        dispatch(buscarVeiculos());
     }, [dispatch]);
+
+    useEffect(() => {
+        if (props.manutencaoParaEdicao) {
+            const veiculo = veiculos.find(v => v.codigo === props.manutencaoParaEdicao.veiculoCodigo);
+            if (veiculo) {
+                setPlaca(veiculo.placa);
+            }
+            const dataFormatada = props.manutencaoParaEdicao.data.split('T')[0]; // Garantir que apenas a data no formato YYYY-MM-DD seja usada
+            setManutencao({ ...props.manutencaoParaEdicao, data: dataFormatada });
+        }
+    }, [props.manutencaoParaEdicao, veiculos]);
+
+    useEffect(() => {
+        if (placa) {
+            const veiculo = veiculos.find(v => v.placa === placa);
+            if (veiculo) {
+                setManutencao({ ...manutencao, veiculoCodigo: veiculo.codigo });
+                const jaEmManutencao = manutencoes.some(m => m.veiculoCodigo === veiculo.codigo && m.codigo !== manutencao.codigo);
+                setErroPlaca(jaEmManutencao);
+            } else {
+                setManutencao({ ...manutencao, veiculoCodigo: '' });
+                setErroPlaca(false);
+            }
+        }
+    }, [placa, veiculos, manutencoes]);
 
     function manipularMudancas(e) {
         const { name, value } = e.currentTarget;
-        setManutencao({ ...manutencao, [name]: value });
+        if (name === 'placa') {
+            setPlaca(value);
+        } else if (name === 'tipo') {
+            setManutencao({ ...manutencao, [name]: value });
+            setObservacoesDesabilitado(value === 'preventiva');
+        } else {
+            setManutencao({ ...manutencao, [name]: value });
+        }
     }
-
-    async function verificarCamposRepetidos() {
-        const camposRepetidosAtualizados = {
-            placa: !!manutencoes.find(m => m.placa === manutencao.placa && m.id !== manutencao.id)
-        };
-        setCamposRepetidos(camposRepetidosAtualizados);
-    }
-
-    useEffect(() => {
-        verificarCamposRepetidos();
-    }, [manutencao.placa, manutencoes]);
 
     async function manipularSubmissao(e) {
         e.preventDefault();
         e.stopPropagation();
         const form = e.currentTarget;
-        if (form.checkValidity()) {
+        if (form.checkValidity() && !erroPlaca) {
             if (props.modoEdicao) {
-                dispatch(atualizarManutencao(manutencao)).then((retorno) => {
+                dispatch(atualizarManutencao(formatarManutencaoParaEnvio(manutencao))).then((retorno) => {
                     setMostrarMensagem(true);
                     setMensagem(retorno.payload.mensagem);
                     setTipoMensagem(retorno.payload.status ? "success" : "danger");
                 });
             } else {
-                dispatch(adicionarManutencao(manutencao)).then((retorno) => {
-                    console.log(manutencao);
+                dispatch(adicionarManutencao(formatarManutencaoParaEnvio(manutencao))).then((retorno) => {
                     setMostrarMensagem(true);
                     setMensagem(retorno.payload.mensagem);
                     setTipoMensagem(retorno.payload.status ? "success" : "danger");
@@ -65,6 +88,13 @@ const CadastroManutencao = (props) => {
         } else {
             setFormValidado(true);
         }
+    }
+
+    function formatarManutencaoParaEnvio(manutencao) {
+        return {
+            ...manutencao,
+            data: manutencao.data.split('T')[0] // Garantir que apenas a data no formato YYYY-MM-DD seja enviada
+        };
     }
 
     return (
@@ -80,11 +110,12 @@ const CadastroManutencao = (props) => {
                             placeholder="Placa"
                             id="placa"
                             name="placa"
-                            value={manutencao.placa}
+                            value={placa}
                             onChange={manipularMudancas}
                             required
+                            isInvalid={erroPlaca}
                         />
-                        {camposRepetidos.placa && <Form.Text className="text-danger">Esta placa já está em outra manutenção.</Form.Text>}
+                        {erroPlaca && <Form.Text className="text-danger">Este veículo já está em manutenção.</Form.Text>}
                     </Form.Group>
 
                     <Form.Group as={Col} className="mb-3">
@@ -118,7 +149,7 @@ const CadastroManutencao = (props) => {
                 </Row>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>Descrição:</Form.Label>
+                    <Form.Label>Observações:</Form.Label>
                     <Form.Control
                         as="textarea"
                         rows={3}
@@ -126,7 +157,7 @@ const CadastroManutencao = (props) => {
                         name="observacoes"
                         value={manutencao.observacoes}
                         onChange={manipularMudancas}
-                        required={manutencao.tipo === 'corretiva'}
+                        disabled={observacoesDesabilitado}
                     />
                 </Form.Group>
 
@@ -134,7 +165,7 @@ const CadastroManutencao = (props) => {
 
                 <Row>
                     <Col md={6} className="d-flex justify-content-end">
-                        <Button type="submit" variant="primary">
+                        <Button type="submit" variant="primary" disabled={erroPlaca}>
                             {props.modoEdicao ? "Alterar" : "Cadastrar"}
                         </Button>
                     </Col>
