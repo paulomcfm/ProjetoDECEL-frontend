@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Form, Button, Col, Row } from 'react-bootstrap';
+import { Form, Button, Col, Row, Alert } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { adicionarManutencao, atualizarManutencao, buscarManutencoes } from '../../redux/manutencaoReducer';
 import { buscarVeiculos } from '../../redux/veiculoReducer';
@@ -19,6 +19,8 @@ const CadastroManutencao = (props) => {
     const [erroPlaca, setErroPlaca] = useState(false);
     const [placa, setPlaca] = useState('');
     const [observacoesDesabilitado, setObservacoesDesabilitado] = useState(estadoInicialManutencao.tipo === 'preventiva');
+    const [placaInexistente, setPlacaInexistente] = useState(false);
+    const [erroGeral, setErroGeral] = useState('');
 
     const { manutencoes } = useSelector((state) => state.manutencao);
     const { veiculos } = useSelector((state) => state.veiculo);
@@ -47,9 +49,11 @@ const CadastroManutencao = (props) => {
                 setManutencao({ ...manutencao, veiculoCodigo: veiculo.codigo });
                 const jaEmManutencao = manutencoes.some(m => m.veiculoCodigo === veiculo.codigo && m.codigo !== manutencao.codigo);
                 setErroPlaca(jaEmManutencao);
+                setPlacaInexistente(false);
             } else {
                 setManutencao({ ...manutencao, veiculoCodigo: '' });
                 setErroPlaca(false);
+                setPlacaInexistente(true);
             }
         }
     }, [placa, veiculos, manutencoes]);
@@ -59,7 +63,8 @@ const CadastroManutencao = (props) => {
         if (name === 'placa') {
             setPlaca(value);
         } else if (name === 'tipo') {
-            setManutencao({ ...manutencao, [name]: value });
+            const novasObservacoes = value === 'preventiva' ? '' : manutencao.observacoes;
+            setManutencao({ ...manutencao, [name]: value, observacoes: novasObservacoes });
             setObservacoesDesabilitado(value === 'preventiva');
         } else {
             setManutencao({ ...manutencao, [name]: value });
@@ -70,18 +75,28 @@ const CadastroManutencao = (props) => {
         e.preventDefault();
         e.stopPropagation();
         const form = e.currentTarget;
-        if (form.checkValidity() && !erroPlaca) {
+        if (form.checkValidity() && !erroPlaca && !placaInexistente) {
             if (props.modoEdicao) {
                 dispatch(atualizarManutencao(formatarManutencaoParaEnvio(manutencao))).then((retorno) => {
                     setMostrarMensagem(true);
                     setMensagem(retorno.payload.mensagem);
                     setTipoMensagem(retorno.payload.status ? "success" : "danger");
+                    if (retorno.payload.status) {
+                        limparFormulario();
+                    } else {
+                        setErroGeral(retorno.payload.mensagem);
+                    }
                 });
             } else {
                 dispatch(adicionarManutencao(formatarManutencaoParaEnvio(manutencao))).then((retorno) => {
                     setMostrarMensagem(true);
                     setMensagem(retorno.payload.mensagem);
                     setTipoMensagem(retorno.payload.status ? "success" : "danger");
+                    if (retorno.payload.status) {
+                        limparFormulario();
+                    } else {
+                        setErroGeral(retorno.payload.mensagem);
+                    }
                 });
             }
             setFormValidado(false);
@@ -97,10 +112,16 @@ const CadastroManutencao = (props) => {
         };
     }
 
+    function limparFormulario() {
+        setManutencao(manutencaoVazia);
+        setPlaca('');
+        setFormValidado(false);
+    }
+
     return (
         <>
             <h2 className="text-center">{props.modoEdicao ? 'Alterar Manutenção' : 'Cadastrar Manutenção'}</h2>
-
+            {erroGeral && <Alert variant="danger">{erroGeral}</Alert>}
             <Form noValidate validated={formValidado} onSubmit={manipularSubmissao} id='formManutencao'>
                 <Row>
                     <Form.Group as={Col} className="mb-3">
@@ -113,9 +134,10 @@ const CadastroManutencao = (props) => {
                             value={placa}
                             onChange={manipularMudancas}
                             required
-                            isInvalid={erroPlaca}
+                            isInvalid={erroPlaca || placaInexistente}
                         />
                         {erroPlaca && <Form.Text className="text-danger">Este veículo já está em manutenção.</Form.Text>}
+                        {placaInexistente && <Form.Text className="text-danger">Este veículo não existe.</Form.Text>}
                     </Form.Group>
 
                     <Form.Group as={Col} className="mb-3">
@@ -157,6 +179,7 @@ const CadastroManutencao = (props) => {
                         name="observacoes"
                         value={manutencao.observacoes}
                         onChange={manipularMudancas}
+                        required={manutencao.tipo === 'corretiva'}
                         disabled={observacoesDesabilitado}
                     />
                 </Form.Group>
@@ -165,7 +188,7 @@ const CadastroManutencao = (props) => {
 
                 <Row>
                     <Col md={6} className="d-flex justify-content-end">
-                        <Button type="submit" variant="primary" disabled={erroPlaca}>
+                        <Button type="submit" variant="primary" disabled={erroPlaca || placaInexistente}>
                             {props.modoEdicao ? "Alterar" : "Cadastrar"}
                         </Button>
                     </Col>

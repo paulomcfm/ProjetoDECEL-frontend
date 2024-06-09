@@ -40,6 +40,7 @@ export default function TabelaManutencao(props) {
     function excluirManutencao(manutencao) {
         if (window.confirm('Deseja realmente excluir a manutenção?')) {
             dispatch(removerManutencao(manutencao));
+            window.location.reload();
         }
     }
 

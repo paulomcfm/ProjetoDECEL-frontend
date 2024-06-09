@@ -3,16 +3,6 @@ import ESTADO from '../recursos/estado.js';
 
 const urlBase = 'http://localhost:8080/manutencoes';
 
-// Função para salvar a data da última manutenção preventiva no localStorage
-const savePreventivaToLocalStorage = (periodo) => {
-    localStorage.setItem('periodoManutencao', JSON.stringify(periodo));
-};
-
-// Função para carregar a data da última manutenção preventiva do localStorage
-const loadPreventivaFromLocalStorage = () => {
-    return JSON.parse(localStorage.getItem('periodoManutencao'));
-};
-
 export const buscarManutencoes = createAsyncThunk('manutencao/buscar', async () => {
     try {
         const resposta = await fetch(urlBase, { method: 'GET' });
@@ -39,35 +29,33 @@ export const buscarManutencoes = createAsyncThunk('manutencao/buscar', async () 
     }
 });
 
-export const adicionarManutencao = createAsyncThunk('manutencoes/adicionar', async (manutencao) => {
-    const resposta = await fetch(urlBase, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(manutencao)
-    }).catch(erro => {
-        return {
-            status: false,
-            mensagem: 'Ocorreu um erro ao adicionar a manutenção:' + erro.message
+export const adicionarManutencao = createAsyncThunk('manutencoes/adicionar', async (manutencao, { rejectWithValue }) => {
+    try {
+        const resposta = await fetch(urlBase, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(manutencao)
+        });
+
+        if (!resposta.ok) {
+            const dados = await resposta.json();
+            return rejectWithValue(dados);
         }
-    });
-    if (resposta.ok) {
+
         const dados = await resposta.json();
-        if (manutencao.tipo === 'preventiva') {
-            savePreventivaToLocalStorage({ vei_placa: manutencao.placa, data: manutencao.data });
-        }
         return {
             status: dados.status,
             mensagem: dados.mensagem,
             manutencao
-        }
-    } else {
-        return {
+        };
+    } catch (erro) {
+        return rejectWithValue({
             status: false,
-            mensagem: 'Ocorreu um erro ao adicionar a manutenção.',
+            mensagem: 'Ocorreu um erro ao adicionar a manutenção: ' + erro.message,
             manutencao
-        }
+        });
     }
 });
 
@@ -133,8 +121,7 @@ export const removerManutencao = createAsyncThunk('manutencoes/remover', async (
 const initialState = {
     estado: ESTADO.OCIOSO,
     mensagem: "",
-    manutencoes: [],
-    periodoManutencao: loadPreventivaFromLocalStorage()
+    manutencoes: []
 };
 
 const manutencaoSlice = createSlice({
@@ -164,12 +151,9 @@ const manutencaoSlice = createSlice({
             state.estado = ESTADO.OCIOSO;
             state.manutencoes.push(action.payload.manutencao);
             state.mensagem = action.payload.mensagem;
-            if (action.payload.manutencao.tipo === 'preventiva') {
-                state.periodoManutencao = { vei_placa: action.payload.manutencao.placa, data: action.payload.manutencao.data };
-            }
         }).addCase(adicionarManutencao.rejected, (state, action) => {
             state.estado = ESTADO.ERRO;
-            state.mensagem = "Erro ao adicionar a manutenção: " + action.error.message;
+            state.mensagem = action.payload.mensagem;
         }).addCase(atualizarManutencao.pending, (state) => {
             state.estado = ESTADO.PENDENTE;
             state.mensagem = "Atualizando manutenção...";
