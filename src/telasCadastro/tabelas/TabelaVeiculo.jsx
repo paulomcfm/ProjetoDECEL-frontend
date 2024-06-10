@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button, Container, Table } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { buscarVeiculos, removerVeiculo } from '../../redux/veiculoReducer.js';
-import { buscarRotas } from '../../redux/rotaReducer.js';
+import { buscarVeiculos, removerVeiculo, consultarRotaVeiculo } from '../../redux/veiculoReducer.js';
 
 export default function TabelaVeiculo(props) {
     const [termoBusca, setTermoBusca] = useState('');
@@ -19,23 +18,24 @@ export default function TabelaVeiculo(props) {
     };
 
     async function excluirVeiculo(veiculo) {
-        const { codigo } = veiculo; // Obtém o código do veículo
+        const codigo = veiculo.codigo; // Obtém o código do veículo
+        console.log(codigo);
         try {
-            // Busca as rotas associadas ao veículo
-            const response = await dispatch(buscarRotas(codigo));
-            const { status, listaRotas } = response.payload;
-            if (status && listaRotas.length > 0) {
-                // Se houver rotas associadas ao veículo, exibe mensagem e não exclui
-                alert('Não é possível excluir o veículo, pois está alocado em uma rota.');
+            // Verifica o status da rota do veículo
+            const response = await dispatch(consultarRotaVeiculo(codigo));
+            const { status, rotaAtiva } = response.payload;
+            if (status && rotaAtiva) {
+                // Se a rota estiver ativa, exibe mensagem e não exclui
+                alert('Não é possível excluir o veículo, pois está alocado em uma rota ativa.');
             } else {
-                // Se não houver rotas associadas ao veículo, confirma a exclusão
+                // Se a rota não estiver ativa, confirma a exclusão
                 if (window.confirm('Deseja realmente excluir esse veículo?')) {
                     dispatch(removerVeiculo(veiculo));
                 }
             }
         } catch (error) {
-            console.error('Erro ao buscar rotas do veículo:', error);
-            alert('Ocorreu um erro ao buscar as rotas do veículo.');
+            console.error('Erro ao consultar a rota do veículo:', error);
+            alert('Ocorreu um erro ao consultar a rota do veículo.');
         }
     }
 
@@ -56,7 +56,7 @@ export default function TabelaVeiculo(props) {
     }, [mensagem, props]);
 
     const veiculosFiltrados = veiculos.filter(veiculo =>
-        veiculo.modelo.toLowerCase().includes(termoBusca.toLowerCase())
+        veiculo.placa.toLowerCase().includes(termoBusca.toLowerCase())
     );
 
     return (
