@@ -14,7 +14,11 @@ export default function Menu(props) {
                     marginTop: '40px',
                     display: 'flex',
                     flexDirection: 'column',
-                    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)'
+                    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+                    backgroundColor: 'white', // Adiciona a cor de fundo branca
+                    opacity: 1, // Assegura que a opacidade esteja em 100%
+                    borderRadius: '10px',
+                    padding: '2%',
                 }}>
                     <Row className="justify-content-center">
                         <Col xs={12} className="mb-4 text-center">

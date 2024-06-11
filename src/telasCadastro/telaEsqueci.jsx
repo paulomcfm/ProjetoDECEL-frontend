@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux';
 import { solicitarCodigoRedefinicao } from '../redux/usuarioReducer.js';
 import { Container, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import '../styles/TelaEsqueci.css';
 
 export default function TelaEsqueci() {
     const [email, setEmail] = useState('');
