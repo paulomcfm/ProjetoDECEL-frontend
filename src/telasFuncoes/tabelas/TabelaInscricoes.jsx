@@ -232,23 +232,23 @@ export default function TabelaInscricoes(props) {
                                     ? 'Pré 1' :
                                     inscricao.anoLetivo === '2I'
                                         ? 'Pré 2' :
-                                        inscricao.anoLetivo.includes('1')
+                                        inscricao.anoLetivo?.includes('1')
                                             ? '1º Ano' :
-                                            inscricao.anoLetivo.includes('2')
+                                            inscricao.anoLetivo?.includes('2')
                                                 ? '2º Ano'
-                                                : inscricao.anoLetivo.includes('3')
+                                                : inscricao.anoLetivo?.includes('3')
                                                     ? '3º Ano'
-                                                    : inscricao.anoLetivo.includes('4')
+                                                    : inscricao.anoLetivo?.includes('4')
                                                         ? '4º Ano'
-                                                        : inscricao.anoLetivo.includes('5')
+                                                        : inscricao.anoLetivo?.includes('5')
                                                             ? '5º Ano'
-                                                            : inscricao.anoLetivo.includes('6')
+                                                            : inscricao.anoLetivo?.includes('6')
                                                                 ? '6º Ano'
-                                                                : inscricao.anoLetivo.includes('7')
+                                                                : inscricao.anoLetivo?.includes('7')
                                                                     ? '7º Ano'
-                                                                    : inscricao.anoLetivo.includes('8')
+                                                                    : inscricao.anoLetivo?.includes('8')
                                                                         ? '8º Ano'
-                                                                        : inscricao.anoLetivo.includes('9')
+                                                                        : inscricao.anoLetivo?.includes('9')
                                                                             ? '9º Ano'
                                                                             : ''} {inscricao.turma}
                             </td>
@@ -259,12 +259,12 @@ export default function TabelaInscricoes(props) {
                                     : inscricao.etapa === 'M'
                                         ? 'Ensino Médio'
                                         : ''} {inscricao.etapa === 'F' ?
-                                            (inscricao.anoLetivo.includes('1') ||
-                                                inscricao.anoLetivo.includes('2') ||
-                                                inscricao.anoLetivo.includes('3') ||
-                                                inscricao.anoLetivo.includes('4') ||
-                                                inscricao.anoLetivo.includes('5') ||
-                                                inscricao.anoLetivo.includes('6'))
+                                            (inscricao.anoLetivo?.includes('1') ||
+                                                inscricao.anoLetivo?.includes('2') ||
+                                                inscricao.anoLetivo?.includes('3') ||
+                                                inscricao.anoLetivo?.includes('4') ||
+                                                inscricao.anoLetivo?.includes('5') ||
+                                                inscricao.anoLetivo?.includes('6'))
                                                 ? 'I'
                                                 : 'II'
                                             : ''}

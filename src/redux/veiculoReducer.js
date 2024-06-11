@@ -29,6 +29,31 @@ export const buscarVeiculos = createAsyncThunk('veiculo/buscar', async () => {
     }
 });
 
+export const consultarRotaVeiculo = createAsyncThunk('veiculo/consultarRota', async (veiCodigo) => {
+    try {
+        const resposta = await fetch(`${urlBase}/rota/${veiCodigo}`, { method: 'GET' });
+        const dados = await resposta.json();
+        if (dados.status) {
+            return {
+                status: true,
+                rotaAtiva: dados.rotaAtiva,
+                mensagem: ''
+            }
+        } else {
+            return {
+                status: false,
+                rotaAtiva: null,
+                mensagem: 'Ocorreu um erro ao recuperar o status da rota.'
+            }
+        }
+    } catch (erro) {
+        return {
+            status: false,
+            rotaAtiva: null,
+            mensagem: 'Ocorreu um erro ao recuperar o status da rota: ' + erro.message
+        }
+    }
+});
 
 export const adicionarVeiculo = createAsyncThunk('veiculo/adicionar', async (veiculo) => {
     const resposta = await fetch(urlBase, {

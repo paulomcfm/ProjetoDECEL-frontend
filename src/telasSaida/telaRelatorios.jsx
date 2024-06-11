@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom';
 import { TbReportAnalytics } from "react-icons/tb";
 import { PiStudentFill } from "react-icons/pi";
 import { MdUpdate } from "react-icons/md";
-import { TbRouteSquare, TbRouteX  } from "react-icons/tb";
+import { TbRouteX  } from "react-icons/tb";
 import '../templates/style.css';
 
 export default function Relatorios(props) {
@@ -19,21 +19,15 @@ export default function Relatorios(props) {
             icon: <PiStudentFill style={{ width: '10%', height: '10%' }} />
         },
         {
-            path: "/relatorios/inscricoes",
+            path: "/relatorios/alunos-nao-inscritos",
             title: "Inscrições",
-            description: "Alunos desatualizados",
+            description: "Alunos não inscritos e desatualizados",
             icon: <MdUpdate style={{ width: '10%', height: '10%' }} />
-        },
-        {
-            path: "/relatorios/rotas-desatualizadas",
-            title: "Rotas",
-            description: "Rotas desatualizadas",
-            icon: <TbRouteSquare style={{ width: '10%', height: '10%' }} />
         },
         {
             path: "/relatorios/rotas-diferentes",
             title: "Rotas",
-            description: "Rotas diferentes",
+            description: "Ponto de embarque fora dos pontos de sua rota",
             icon: <TbRouteX  style={{ width: '10%', height: '10%' }} />
         }
     ];
