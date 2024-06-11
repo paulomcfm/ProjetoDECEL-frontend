@@ -280,7 +280,7 @@ export default function RelatorioRotasDiferentes(props) {
                                     </thead>
                                     <tbody className='body-tabela'>
                                         {inscricoes.map((inscricao) => (
-                                            <tr key={inscricao.codigo}>
+                                            <tr key={inscricao?.codigo}>
                                                 <td className="linhas-tabela"><OverlayTrigger
                                                     trigger="hover"
                                                     key="bottom"
@@ -289,22 +289,22 @@ export default function RelatorioRotasDiferentes(props) {
                                                         <Popover id="popover-positioned-bottom">
                                                             <Popover.Header as="h3"></Popover.Header>
                                                             <Popover.Body>
-                                                                <p>RG: {inscricao.aluno.rg}</p>
-                                                                <p>Data de Nascimento: {format(new Date(inscricao.aluno.dataNasc), 'dd/MM/yyyy')}</p>
-                                                                <p>Celular: {inscricao.aluno.celular}</p>
-                                                                <p>Observações: {inscricao.aluno.observacoes}</p>
+                                                                <p>RG: {inscricao?.aluno?.rg}</p>
+                                                                <p>Data de Nascimento: {format(new Date(inscricao?.aluno?.dataNasc), 'dd/MM/yyyy')}</p>
+                                                                <p>Celular: {inscricao?.aluno?.celular}</p>
+                                                                <p>Observações: {inscricao?.aluno?.observacoes}</p>
                                                             </Popover.Body>
                                                         </Popover>
                                                     }
                                                 >
                                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                        {inscricao.aluno.nome}
+                                                        {inscricao?.aluno?.nome}
                                                         <div style={{ width: '15%', marginLeft: '2%', textAlign: 'center' }}>
                                                             <IoInformationCircleSharp />
                                                         </div>
                                                     </div></OverlayTrigger></td>
-                                                <td className="linhas-tabela">{inscricao.bairro}. {inscricao.rua}, {inscricao.numero}</td>
-                                                <td className="linhas-tabela">{inscricao.pontoEmbarque.bairro}. {inscricao.pontoEmbarque.rua}, {inscricao.pontoEmbarque.numero}</td>
+                                                <td className="linhas-tabela">{inscricao?.bairro}. {inscricao?.rua}, {inscricao?.numero}</td>
+                                                <td className="linhas-tabela">{inscricao?.pontoEmbarque?.bairro}. {inscricao?.pontoEmbarque?.rua}, {inscricao?.pontoEmbarque?.numero}</td>
                                                 <td className='linhas-tabela'><OverlayTrigger
                                                     trigger="hover"
                                                     key="bottom"
@@ -315,21 +315,21 @@ export default function RelatorioRotasDiferentes(props) {
                                                                 <p>
                                                                     Tipo: {inscricao && (
                                                                         <>
-                                                                            {inscricao.escola.tipo === 'I' && 'Educação Infantil '}
-                                                                            {inscricao.escola.tipo === 'F' && 'Ensino Fundamental '}
-                                                                            {inscricao.escola.tipo === 'A' && 'Educação Infantil e Ensino Fundamental '}
-                                                                            {inscricao.escola.tipo === 'M' && 'Ensino Médio '}
+                                                                            {inscricao?.escola?.tipo === 'I' && 'Educação Infantil '}
+                                                                            {inscricao?.escola?.tipo === 'F' && 'Ensino Fundamental '}
+                                                                            {inscricao?.escola?.tipo === 'A' && 'Educação Infantil e Ensino Fundamental '}
+                                                                            {inscricao?.escola?.tipo === 'M' && 'Ensino Médio '}
                                                                         </>
                                                                     )}
                                                                 </p>
-                                                                <p>Email: {inscricao.escola.email}</p>
-                                                                <p>Telefone: {inscricao.escola.telefone}</p>
+                                                                <p>Email: {inscricao?.escola?.email}</p>
+                                                                <p>Telefone: {inscricao?.escola?.telefone}</p>
                                                             </Popover.Body>
                                                         </Popover>
                                                     }
                                                 >
                                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                        {inscricao.escola.nome}
+                                                        {inscricao?.escola?.nome}
                                                         <div style={{ width: '15%', marginLeft: '2%', textAlign: 'center' }}>
                                                             <IoInformationCircleSharp />
                                                         </div>
@@ -337,50 +337,50 @@ export default function RelatorioRotasDiferentes(props) {
                                                 </OverlayTrigger>
                                                 </td>
                                                 <td className="linhas-tabela">
-                                                    {inscricao.anoLetivo === '1I'
+                                                    {inscricao?.anoLetivo === '1I'
                                                         ? 'Pré 1' :
-                                                        inscricao.anoLetivo === '2I'
+                                                        inscricao?.anoLetivo === '2I'
                                                             ? 'Pré 2' :
-                                                            inscricao.anoLetivo.includes('1')
+                                                            inscricao?.anoLetivo?.includes('1')
                                                                 ? '1º Ano' :
-                                                                inscricao.anoLetivo.includes('2')
+                                                                inscricao?.anoLetivo?.includes('2')
                                                                     ? '2º Ano'
-                                                                    : inscricao.anoLetivo.includes('3')
+                                                                    : inscricao?.anoLetivo?.includes('3')
                                                                         ? '3º Ano'
-                                                                        : inscricao.anoLetivo.includes('4')
+                                                                        : inscricao?.anoLetivo?.includes('4')
                                                                             ? '4º Ano'
-                                                                            : inscricao.anoLetivo.includes('5')
+                                                                            : inscricao?.anoLetivo?.includes('5')
                                                                                 ? '5º Ano'
-                                                                                : inscricao.anoLetivo.includes('6')
+                                                                                : inscricao?.anoLetivo?.includes('6')
                                                                                     ? '6º Ano'
-                                                                                    : inscricao.anoLetivo.includes('7')
+                                                                                    : inscricao?.anoLetivo?.includes('7')
                                                                                         ? '7º Ano'
-                                                                                        : inscricao.anoLetivo.includes('8')
+                                                                                        : inscricao?.anoLetivo?.includes('8')
                                                                                             ? '8º Ano'
-                                                                                            : inscricao.anoLetivo.includes('9')
+                                                                                            : inscricao?.anoLetivo?.includes('9')
                                                                                                 ? '9º Ano'
                                                                                                 : ''}
-                                                    {' ' + inscricao.turma}. {inscricao.etapa === 'I'
+                                                    {' ' + inscricao?.turma}. {inscricao?.etapa === 'I'
                                                         ? 'Educação Infantil'
-                                                        : inscricao.etapa === 'F'
+                                                        : inscricao?.etapa === 'F'
                                                             ? 'Ensino Fundamental'
-                                                            : inscricao.etapa === 'M'
+                                                            : inscricao?.etapa === 'M'
                                                                 ? 'Ensino Médio'
                                                                 : ''}
-                                                    {inscricao.etapa === 'F' ?
-                                                        (inscricao.anoLetivo.includes('1') ||
-                                                            inscricao.anoLetivo.includes('2') ||
-                                                            inscricao.anoLetivo.includes('3') ||
-                                                            inscricao.anoLetivo.includes('4') ||
-                                                            inscricao.anoLetivo.includes('5') ||
-                                                            inscricao.anoLetivo.includes('6'))
+                                                    {inscricao?.etapa === 'F' ?
+                                                        (inscricao?.anoLetivo?.includes('1') ||
+                                                            inscricao?.anoLetivo?.includes('2') ||
+                                                            inscricao?.anoLetivo?.includes('3') ||
+                                                            inscricao?.anoLetivo?.includes('4') ||
+                                                            inscricao?.anoLetivo?.includes('5') ||
+                                                            inscricao?.anoLetivo?.includes('6'))
                                                             ? ' I'
                                                             : ' II'
-                                                        : ''}, {inscricao.periodo === 'M'
+                                                        : ''}, {inscricao?.periodo === 'M'
                                                             ? 'Matutino'
-                                                            : inscricao.periodo === 'V'
+                                                            : inscricao?.periodo === 'V'
                                                                 ? 'Vespertino'
-                                                                : inscricao.periodo === 'I'
+                                                                : inscricao?.periodo === 'I'
                                                                     ? 'Integral'
                                                                     : ''}
                                                 </td>
@@ -393,16 +393,16 @@ export default function RelatorioRotasDiferentes(props) {
                                                             <Popover.Header as="h3"></Popover.Header>
                                                             <Popover.Body>
                                                                 <p>Motoristas:</p>
-                                                                {inscricao.rota.motoristas.map((motorista) => (
+                                                                {inscricao?.rota?.motoristas.map((motorista) => (
                                                                     <p>{motorista.nome}</p>
                                                                 ))}
-                                                                <p>Monitor: {inscricao.rota.monitor[0].mon_nome}</p>
-                                                                <p>Veículo: {inscricao.rota.veiculo[0].vei_modelo}, {inscricao.rota.veiculo[0].vei_placa}</p>
+                                                                <p>Monitor: {inscricao?.rota?.monitor[0].mon_nome}</p>
+                                                                <p>Veículo: {inscricao?.rota?.veiculo[0].vei_modelo}, {inscricao?.rota?.veiculo[0].vei_placa}</p>
                                                             </Popover.Body>
                                                         </Popover>
                                                     }
                                                 ><div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                        {inscricao.rota.nome}
+                                                        {inscricao?.rota?.nome}
                                                         <div style={{ width: '15%', marginLeft: '2%', textAlign: 'center' }}>
                                                             <IoInformationCircleSharp />
                                                         </div>
@@ -415,7 +415,7 @@ export default function RelatorioRotasDiferentes(props) {
                                                         <Popover id="popover-positioned-bottom">
                                                             <Popover.Header as="h3"></Popover.Header>
                                                             <Popover.Body>
-                                                                {inscricao.rota.pontos.map((pontoEmbarque) => (
+                                                                {inscricao?.rota?.pontos.map((pontoEmbarque) => (
                                                                     <p>{pontoEmbarque.bairro}. {pontoEmbarque.rua}, {pontoEmbarque.numero}</p>
                                                                 ))}
                                                             </Popover.Body>
@@ -463,7 +463,7 @@ export default function RelatorioRotasDiferentes(props) {
                             <tbody>
                                 {sortedSubscriptions.map((inscricao) => {
                                     return (
-                                        <tr key={inscricao.codigo}>
+                                        <tr key={inscricao?.codigo}>
                                             <td className="linhas-tabela"><OverlayTrigger
                                                 trigger="hover"
                                                 key="bottom"
@@ -472,21 +472,21 @@ export default function RelatorioRotasDiferentes(props) {
                                                     <Popover id="popover-positioned-bottom">
                                                         <Popover.Header as="h3"></Popover.Header>
                                                         <Popover.Body>
-                                                            <p>RG: {inscricao.aluno.rg}</p>
-                                                            <p>Data de Nascimento: {format(new Date(inscricao.aluno.dataNasc), 'dd/MM/yyyy')}</p>
-                                                            <p>Celular: {inscricao.aluno.celular}</p>
-                                                            <p>Observações: {inscricao.aluno.observacoes}</p>
+                                                            <p>RG: {inscricao?.aluno?.rg}</p>
+                                                            <p>Data de Nascimento: {format(new Date(inscricao?.aluno?.dataNasc), 'dd/MM/yyyy')}</p>
+                                                            <p>Celular: {inscricao?.aluno?.celular}</p>
+                                                            <p>Observações: {inscricao?.aluno?.observacoes}</p>
                                                         </Popover.Body>
                                                     </Popover>
                                                 }
                                             ><div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    {inscricao.aluno.nome}
+                                                    {inscricao?.aluno?.nome}
                                                     <div style={{ width: '15%', marginLeft: '2%', textAlign: 'center' }}>
                                                         <IoInformationCircleSharp />
                                                     </div>
                                                 </div></OverlayTrigger></td>
-                                            <td className="linhas-tabela">{inscricao.bairro}. {inscricao.rua}, {inscricao.numero}</td>
-                                            <td className="linhas-tabela">{inscricao.pontoEmbarque.bairro}. {inscricao.pontoEmbarque.rua}, {inscricao.pontoEmbarque.numero}</td>
+                                            <td className="linhas-tabela">{inscricao?.bairro}. {inscricao?.rua}, {inscricao?.numero}</td>
+                                            <td className="linhas-tabela">{inscricao?.pontoEmbarque?.bairro}. {inscricao?.pontoEmbarque?.rua}, {inscricao?.pontoEmbarque?.numero}</td>
                                             <td className='linhas-tabela'><OverlayTrigger
                                                 trigger="hover"
                                                 key="bottom"
@@ -497,21 +497,21 @@ export default function RelatorioRotasDiferentes(props) {
                                                             <p>
                                                                 Tipo: {inscricao && (
                                                                     <>
-                                                                        {inscricao.escola.tipo === 'I' && 'Educação Infantil '}
-                                                                        {inscricao.escola.tipo === 'F' && 'Ensino Fundamental '}
-                                                                        {inscricao.escola.tipo === 'A' && 'Educação Infantil e Ensino Fundamental '}
-                                                                        {inscricao.escola.tipo === 'M' && 'Ensino Médio '}
+                                                                        {inscricao?.escola?.tipo === 'I' && 'Educação Infantil '}
+                                                                        {inscricao?.escola?.tipo === 'F' && 'Ensino Fundamental '}
+                                                                        {inscricao?.escola?.tipo === 'A' && 'Educação Infantil e Ensino Fundamental '}
+                                                                        {inscricao?.escola?.tipo === 'M' && 'Ensino Médio '}
                                                                     </>
                                                                 )}
                                                             </p>
-                                                            <p>Email: {inscricao.escola.email}</p>
-                                                            <p>Telefone: {inscricao.escola.telefone}</p>
+                                                            <p>Email: {inscricao?.escola?.email}</p>
+                                                            <p>Telefone: {inscricao?.escola?.telefone}</p>
                                                         </Popover.Body>
                                                     </Popover>
                                                 }
                                             >
                                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    {inscricao.escola.nome}
+                                                    {inscricao?.escola?.nome}
                                                     <div style={{ width: '15%', marginLeft: '2%', textAlign: 'center' }}>
                                                         <IoInformationCircleSharp />
                                                     </div>
@@ -519,50 +519,50 @@ export default function RelatorioRotasDiferentes(props) {
                                             </OverlayTrigger>
                                             </td>
                                             <td className="linhas-tabela">
-                                                {inscricao.anoLetivo === '1I'
+                                                {inscricao?.anoLetivo === '1I'
                                                     ? 'Pré 1' :
-                                                    inscricao.anoLetivo === '2I'
+                                                    inscricao?.anoLetivo === '2I'
                                                         ? 'Pré 2' :
-                                                        inscricao.anoLetivo.includes('1')
+                                                        inscricao?.anoLetivo?.includes('1')
                                                             ? '1º Ano' :
-                                                            inscricao.anoLetivo.includes('2')
+                                                            inscricao?.anoLetivo?.includes('2')
                                                                 ? '2º Ano'
-                                                                : inscricao.anoLetivo.includes('3')
+                                                                : inscricao?.anoLetivo?.includes('3')
                                                                     ? '3º Ano'
-                                                                    : inscricao.anoLetivo.includes('4')
+                                                                    : inscricao?.anoLetivo?.includes('4')
                                                                         ? '4º Ano'
-                                                                        : inscricao.anoLetivo.includes('5')
+                                                                        : inscricao?.anoLetivo?.includes('5')
                                                                             ? '5º Ano'
-                                                                            : inscricao.anoLetivo.includes('6')
+                                                                            : inscricao?.anoLetivo?.includes('6')
                                                                                 ? '6º Ano'
-                                                                                : inscricao.anoLetivo.includes('7')
+                                                                                : inscricao?.anoLetivo?.includes('7')
                                                                                     ? '7º Ano'
-                                                                                    : inscricao.anoLetivo.includes('8')
+                                                                                    : inscricao?.anoLetivo?.includes('8')
                                                                                         ? '8º Ano'
-                                                                                        : inscricao.anoLetivo.includes('9')
+                                                                                        : inscricao?.anoLetivo?.includes('9')
                                                                                             ? '9º Ano'
                                                                                             : ''}
-                                                {' ' + inscricao.turma}. {inscricao.etapa === 'I'
+                                                {' ' + inscricao?.turma}. {inscricao?.etapa === 'I'
                                                     ? 'Educação Infantil'
-                                                    : inscricao.etapa === 'F'
+                                                    : inscricao?.etapa === 'F'
                                                         ? 'Ensino Fundamental'
-                                                        : inscricao.etapa === 'M'
+                                                        : inscricao?.etapa === 'M'
                                                             ? 'Ensino Médio'
                                                             : ''}
-                                                {inscricao.etapa === 'F' ?
-                                                    (inscricao.anoLetivo.includes('1') ||
-                                                        inscricao.anoLetivo.includes('2') ||
-                                                        inscricao.anoLetivo.includes('3') ||
-                                                        inscricao.anoLetivo.includes('4') ||
-                                                        inscricao.anoLetivo.includes('5') ||
-                                                        inscricao.anoLetivo.includes('6'))
+                                                {inscricao?.etapa === 'F' ?
+                                                    (inscricao?.anoLetivo?.includes('1') ||
+                                                        inscricao?.anoLetivo?.includes('2') ||
+                                                        inscricao?.anoLetivo?.includes('3') ||
+                                                        inscricao?.anoLetivo?.includes('4') ||
+                                                        inscricao?.anoLetivo?.includes('5') ||
+                                                        inscricao?.anoLetivo?.includes('6'))
                                                         ? ' I'
                                                         : ' II'
-                                                    : ''}, {inscricao.periodo === 'M'
+                                                    : ''}, {inscricao?.periodo === 'M'
                                                         ? 'Matutino'
-                                                        : inscricao.periodo === 'V'
+                                                        : inscricao?.periodo === 'V'
                                                             ? 'Vespertino'
-                                                            : inscricao.periodo === 'I'
+                                                            : inscricao?.periodo === 'I'
                                                                 ? 'Integral'
                                                                 : ''}
                                             </td>
@@ -575,16 +575,16 @@ export default function RelatorioRotasDiferentes(props) {
                                                         <Popover.Header as="h3"></Popover.Header>
                                                         <Popover.Body>
                                                             <p>Motoristas:</p>
-                                                            {inscricao.rota.motoristas.map((motorista) => (
+                                                            {inscricao?.rota?.motoristas.map((motorista) => (
                                                                 <p>{motorista.nome}</p>
                                                             ))}
-                                                            <p>Monitor: {inscricao.rota.monitor[0].mon_nome}</p>
-                                                            <p>Veículo: {inscricao.rota.veiculo[0].vei_modelo}, {inscricao.rota.veiculo[0].vei_placa}</p>
+                                                            <p>Monitor: {inscricao?.rota?.monitor[0].mon_nome}</p>
+                                                            <p>Veículo: {inscricao?.rota?.veiculo[0].vei_modelo}, {inscricao?.rota?.veiculo[0].vei_placa}</p>
                                                         </Popover.Body>
                                                     </Popover>
                                                 }
                                             ><div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    {inscricao.rota.nome}
+                                                    {inscricao?.rota?.nome}
                                                     <div style={{ width: '15%', marginLeft: '2%', textAlign: 'center' }}>
                                                         <IoInformationCircleSharp />
                                                     </div>
@@ -597,7 +597,7 @@ export default function RelatorioRotasDiferentes(props) {
                                                     <Popover id="popover-positioned-bottom">
                                                         <Popover.Header as="h3"></Popover.Header>
                                                         <Popover.Body>
-                                                            {inscricao.rota.pontos.map((pontoEmbarque) => (
+                                                            {inscricao?.rota?.pontos.map((pontoEmbarque) => (
                                                                 <p>{pontoEmbarque.bairro}. {pontoEmbarque.rua}, {pontoEmbarque.numero}</p>
                                                             ))}
                                                         </Popover.Body>
