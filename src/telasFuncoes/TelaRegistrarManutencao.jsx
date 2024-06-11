@@ -16,6 +16,7 @@ export default function TelaRegistrarManutencao(props) {
         tipo: 'preventiva',
         data: '',
         observacoes: '',
+        valor:'',
         veiculoCodigo: ''
     });
     const [modoEdicao, setModoEdicao] = useState(false);
