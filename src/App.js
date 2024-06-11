@@ -21,7 +21,6 @@ import TelaCodigo from './telasCadastro/telaCodigo.jsx'
 import RotaProtegida from './RotaProtegida.js'
 import MensagemPermissaoNegada from './mensagemPermissaonegada.jsx';
 import RelatorioRotasDiferentes from './telasSaida/RelatorioRotasDiferentes.jsx';
-import RelatorioRotasDesatualizadas from './telasSaida/RelatorioRotasDesatualizadas.jsx';
 import RelatorioAlunos from './telasSaida/RelatorioAlunos.jsx';
 import RelatorioAlunosNaoInscritos from './telasSaida/RelatorioNaoInscritos.jsx';
 import './recursos/App.css';
@@ -53,7 +52,6 @@ function App() {
         <Route path='/relatorios/alunos' element={autenticado? <RelatorioAlunos /> : <RotaProtegida><RelatorioAlunos /></RotaProtegida>} />
         <Route path='/monitor' element={autenticado? < TelaCadastroMonitor/> : <RotaProtegida><TelaCadastroMonitor /></RotaProtegida>} />
         <Route path='/relatorios/rotas-diferentes' element={autenticado? <RelatorioRotasDiferentes />  : <RotaProtegida><RelatorioRotasDiferentes /></RotaProtegida>} />
-        <Route path='/relatorios/rotas-desatualizadas' element={autenticado? <RelatorioRotasDesatualizadas />  : <RotaProtegida><RelatorioRotasDesatualizadas /></RotaProtegida>} />
         <Route path='relatorios/alunos-nao-inscritos' element={autenticado? <RelatorioAlunosNaoInscritos />  : <RotaProtegida><RelatorioAlunosNaoInscritos /></RotaProtegida>} />
         <Route path='/teste' element={autenticado ? <TelaAlertaManutencao/> : <RotaProtegida><TelaAlertaManutencao /></RotaProtegida>} />
         <Route path='relatorios' element={autenticado? <Relatorios />  : <RotaProtegida><Relatorios /></RotaProtegida>} />

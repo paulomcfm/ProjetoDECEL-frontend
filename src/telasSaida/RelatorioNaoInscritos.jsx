@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Container, Modal, Form, Popover, OverlayTrigger } from 'react-bootstrap';
+import { Button, Container, Modal, Form, Popover, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarAlunos, atualizarAluno } from '../redux/alunoReducer';
 import { buscarInscricoes } from '../redux/inscricaoReducer';
@@ -13,8 +13,10 @@ import { TfiWrite } from "react-icons/tfi";
 import { IoPersonRemove } from "react-icons/io5";
 import '../templates/style.css';
 import 'react-toastify/dist/ReactToastify.css';
-import { AlignmentType, Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType, HeadingLevel } from "docx";
 import { IoInformationCircleSharp } from "react-icons/io5";
+import { AlignmentType, Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, Header, ImageRun, WidthType } from "docx";
+import { saveAs } from 'file-saver';
+import cabecalho from '../recursos/cabecalho.jpeg';
 
 export default function RelatorioAlunosNaoInscritos(props) {
     const [termoBusca, setTermoBusca] = useState('');
@@ -112,86 +114,116 @@ export default function RelatorioAlunosNaoInscritos(props) {
         setMostrarModal(false);
     }
 
+    const base64ToUint8Array = (base64) => {
+        const binaryString = atob(base64);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        return bytes;
+    };
+
+    const fetchImageAsBase64 = async (url) => {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    };
+
     const exportTableToWord = async () => {
         const table = document.querySelector('.tabela');
         const rows = table.querySelectorAll('tr');
-
-        const docTable = new Table({
-            rows: Array.from(rows).map((row, rowIndex) => new TableRow({
-                children: Array.from(row.cells).slice(0, -1).map(cell => new TableCell({ // Seleciona todas as células, exceto a última (coluna de ações)
-                    children: [new Paragraph({
-                        children: [
-                            new TextRun({
-                                text: cell.textContent,
-                                bold: rowIndex === 0,
-                            }),
-                        ],
-                        alignment: AlignmentType.CENTER,
-                        spacing: {
-                            before: 200,
-                            after: 200,
-                        },
-                    })],
-                    width: {
-                        size: 100 / (row.cells.length - 1),
-                        type: WidthType.PERCENTAGE,
-                    },
-                    margins: {
-                        top: 100,
-                        bottom: 100,
-                        left: 100,
-                        right: 100,
-                    },
-                })),
-            })),
-            width: {
-                size: 100,
-                type: WidthType.PERCENTAGE,
-            },
-            alignment: AlignmentType.CENTER,
-            margins: {
-                left: 300,
-                right: 300,
-            },
+    
+        const headerBase64 = await fetchImageAsBase64(cabecalho);
+        const headerUint8Array = base64ToUint8Array(headerBase64);
+        const pageWidth = 9 * 72;
+    
+        const headerImage = new Image();
+        headerImage.src = `data:image/jpeg;base64,${headerBase64}`;
+        await headerImage.decode();
+        const headerImageHeight = (headerImage.height / headerImage.width) * pageWidth;
+    
+        const createTableCell = (text, isHeader) => new TableCell({
+            children: [new Paragraph({
+                children: [new TextRun({ text, bold: isHeader, font: { name: 'Arial' }, size: isHeader ? 24 : 22 })],
+                alignment: AlignmentType.CENTER,
+            })],
+            verticalAlign: isHeader ? "center" : "top",
         });
-
+    
+        // Identify the index of the "Ações" column
+        let actionColumnIndex = -1;
+        const headerCells = Array.from(rows[0].cells);
+        headerCells.forEach((cell, index) => {
+            if (cell.textContent.trim() === "Ações") {
+                actionColumnIndex = index;
+            }
+        });
+    
+        const filteredRows = Array.from(rows).map(row => {
+            const cells = Array.from(row.cells);
+            if (actionColumnIndex !== -1) {
+                cells.splice(actionColumnIndex, 1); // Remove the "Ações" column
+            }
+            return cells;
+        });
+    
+        const docTable = new Table({
+            width: { size: 100, type: WidthType.PERCENTAGE },
+            rows: filteredRows.map((cells, rowIndex) => new TableRow({
+                children: cells.map(cell => createTableCell(cell.textContent, rowIndex === 0)),
+            })),
+        });
+    
         const doc = new Document({
             sections: [{
-                properties: {},
+                properties: {
+                    page: { margin: { top: 720, right: 720, bottom: 720, left: 720 } },
+                },
+                headers: {
+                    default: new Header({
+                        margin: { top: 360, right: 360, bottom: 360, left: 360 },
+                        children: [
+                            new Paragraph({
+                                children: [
+                                    new ImageRun({
+                                        data: headerUint8Array,
+                                        transformation: { width: pageWidth, height: headerImageHeight },
+                                        alignment: AlignmentType.CENTER,
+                                    }),
+                                ],
+                                alignment: AlignmentType.CENTER,
+                            }),
+                        ],
+                    }),
+                },
                 children: [
                     new Paragraph({
-                        text: "Relatório de Alunos Desatualizados",
-                        heading: HeadingLevel.TITLE,
-                        alignment: AlignmentType.CENTER,
+                        children: [
+                            new TextRun({ text: "Relatório: ", bold: true, font: { name: 'Arial', size: 12 } }),
+                            new TextRun({ text: "Alunos não inscritos ou desatualizados", font: { name: 'Arial', size: 12 } }),
+                        ],
+                        alignment: AlignmentType.LEFT,
                     }),
-                    new Paragraph({
-                        text: `Ordenado por: Aluno`,
-                        alignment: AlignmentType.CENTER,
-                    }),
-                    new Paragraph({
-                        text: "",
-                        spacing: {
-                            after: 300,
-                        },
-                    }),
+                    new Paragraph({ text: "", spacing: { after: 400 } }),
                     docTable,
-                ].filter(Boolean),
+                ],
             }],
         });
-
+    
         const blob = await Packer.toBlob(doc);
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = nomeArquivo + '.docx';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        saveAs(blob, nomeArquivo + '.docx');
     };
+      
 
     return (
         <Pagina>
+            <h3 style={{ display: 'flex', justifyContent: 'center', marginTop: '1%' }}>Relatório de Alunos não Inscritos ou Desatualizados</h3>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '-6%', padding: '2%' }}>
                 <Button onClick={() => setModalArquivo(true)}>
                     <MdFileDownload style={{ width: '100%', height: '100%' }} />
@@ -232,31 +264,6 @@ export default function RelatorioAlunosNaoInscritos(props) {
                                 <td className='linhas-tabela'>{aluno.inscricao?.ano || 'Aluno não possui inscrição.'}</td>
                                 <td className="linhas-tabela">
                                     <OverlayTrigger
-                                    trigger="hover"
-                                    key="bottom"
-                                    placement="bottom"
-                                    overlay={
-                                        <Popover id="popover-positioned-bottom">
-                                            <Popover.Header as="h3"></Popover.Header>
-                                            <Popover.Body>
-                                                <p>RG: {aluno.aluno.rg}</p>
-                                                <p>Data de Nascimento: {format(new Date(aluno.aluno.dataNasc), 'dd/MM/yyyy')}</p>
-                                                <p>Celular: {aluno.aluno.celular}</p>
-                                                <p>Observações: {aluno.aluno.observacoes}</p>
-                                            </Popover.Body>
-                                        </Popover>
-                                    }
-                                    >
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        {aluno.aluno.nome}
-                                        <div style={{ width: '15%', marginLeft: '2%', textAlign: 'center' }}>
-                                            <IoInformationCircleSharp />
-                                        </div>
-                                    </div></OverlayTrigger>
-                                </td>
-                                <td className='linhas-tabela'>{aluno.inscricao?.escola?.nome || 'Aluno não possui inscrição.'}</td>
-                                <td className="linhas-tabela">
-                                    <OverlayTrigger
                                         trigger="hover"
                                         key="bottom"
                                         placement="bottom"
@@ -264,33 +271,81 @@ export default function RelatorioAlunosNaoInscritos(props) {
                                             <Popover id="popover-positioned-bottom">
                                                 <Popover.Header as="h3"></Popover.Header>
                                                 <Popover.Body>
-                                                    <p>Motoristas:</p>
-                                                    {aluno.inscricao?.rota?.motoristas && aluno.inscricao.rota.motoristas.length > 0 && aluno.inscricao.rota.motoristas.map((motorista) => (
-                                                        <p>{motorista.nome}</p>
-                                                    ))}
-                                                    {aluno.inscricao?.rota?.monitor && (
-                                                        <p>Monitor: {aluno.inscricao.rota.monitor.nome}</p>
-                                                    )}
-                                                    {aluno.inscricao?.rota?.veiculo && (
-                                                        <p>Veículo: {aluno.inscricao.rota.veiculo.modelo}, {aluno.inscricao.rota.veiculo.placa}</p>
-                                                    )}
-
+                                                    <p>RG: {aluno.aluno.rg}</p>
+                                                    <p>Data de Nascimento: {format(new Date(aluno.aluno.dataNasc), 'dd/MM/yyyy')}</p>
+                                                    <p>Celular: {aluno.aluno.celular}</p>
+                                                    <p>Observações: {aluno.aluno.observacoes}</p>
                                                 </Popover.Body>
                                             </Popover>
                                         }
                                     >
-                                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                                            {aluno.inscricao?.rota?.nome || 'Aluno não possui inscrição.'}
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                                            {aluno.aluno.nome}
                                             <div style={{ width: '15%', marginLeft: '2%', textAlign: 'center' }}>
                                                 <IoInformationCircleSharp />
                                             </div>
-                                        </div>
-                                    </OverlayTrigger>
+                                        </div></OverlayTrigger>
                                 </td>
+                                <td className='linhas-tabela'>{aluno.inscricao?.escola?.nome || 'Aluno não possui inscrição.'}</td>
+                                {aluno.inscricao ? (
+                                    aluno.inscricao.rota ? (
+                                        <td className="linhas-tabela">
+                                            <OverlayTrigger
+                                                trigger="hover"
+                                                key="bottom"
+                                                placement="bottom"
+                                                overlay={
+                                                    <Popover id="popover-positioned-bottom">
+                                                        <Popover.Header as="h3"></Popover.Header>
+                                                        <Popover.Body>
+                                                            <p>Motoristas:</p>
+                                                            {aluno.inscricao.rota.motoristas && aluno.inscricao.rota.motoristas.length > 0 ? (
+                                                                aluno.inscricao.rota.motoristas.map((motorista) => (
+                                                                    <p key={motorista.id}>{motorista.nome}</p>
+                                                                ))
+                                                            ) : (
+                                                                <p>Sem motoristas</p>
+                                                            )}
+                                                            {aluno.inscricao.rota.monitor && (
+                                                                <p>Monitor: {aluno.inscricao.rota.monitor.nome}</p>
+                                                            )}
+                                                            {aluno.inscricao.rota.veiculo && (
+                                                                <p>Veículo: {aluno.inscricao.rota.veiculo.modelo}, {aluno.inscricao.rota.veiculo.placa}</p>
+                                                            )}
+                                                        </Popover.Body>
+                                                    </Popover>
+                                                }
+                                            >
+                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                                                    {aluno.inscricao.rota.nome}
+                                                    <div style={{ width: '15%', marginLeft: '2%', textAlign: 'center' }}>
+                                                        <IoInformationCircleSharp />
+                                                    </div>
+                                                </div>
+                                            </OverlayTrigger>
+                                        </td>
+                                    ) : (
+                                        <td className="linhas-tabela">Aluno não está alocado.</td>
+                                    )
+                                ) : (
+                                    <td className="linhas-tabela">Aluno não possui inscrição.</td>
+                                )}
+
+
 
                                 <td className='linhas-tabela' style={{ display: 'flex', alignItems: 'center', gap: '2%', justifyContent: 'center' }}>
-                                    <Button style={{ display: 'flex', alignItems: 'center' }} onClick={() => handleInscreverAluno(aluno.aluno)}> <TfiWrite /></Button>
-                                    <Button style={{ display: 'flex', alignItems: 'center' }} variant='danger' onClick={() => setMostrarModal(aluno.aluno)}><IoPersonRemove /></Button>
+                                    <OverlayTrigger placement="bottom" overlay={
+                                        <Tooltip id="tooltip">
+                                            Inscrever Aluno
+                                        </Tooltip>}>
+                                        <Button style={{ display: 'flex', alignItems: 'center' }} onClick={() => handleInscreverAluno(aluno.aluno)}> <TfiWrite /></Button>
+                                    </OverlayTrigger>
+                                    <OverlayTrigger placement="bottom" overlay={
+                                        <Tooltip id="tooltip">
+                                            Desabilitar Aluno
+                                        </Tooltip>}>
+                                        <Button style={{ display: 'flex', alignItems: 'center' }} variant='danger' onClick={() => setMostrarModal(aluno.aluno)}><IoPersonRemove /></Button>
+                                    </OverlayTrigger>
                                 </td>
                             </tr>
                         ))}
