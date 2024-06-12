@@ -85,7 +85,7 @@ export default function TelaAlocarAluno(props) {
                             progress: undefined,
                             theme: "light",
                             onClick: () => {
-                                window.location.href = 'http://localhost:3000/relatorios/rotas-desatualizadas';
+                                window.location.href = 'http://localhost:3000/relatorios/alunos-nao-inscritos';
                             }
                         });
                     }, index * 3000);

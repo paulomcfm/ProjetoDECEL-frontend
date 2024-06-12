@@ -129,6 +129,8 @@ export default function TabelaAlunos(props) {
                         <th>Data de Nascimento</th>
                         <th>Celular</th>
                         <th>Observações</th>
+                        <th>Situação</th>
+                        <th>Motivo Inativo</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -140,6 +142,8 @@ export default function TabelaAlunos(props) {
                             <td>{format(new Date(aluno.dataNasc), 'dd/MM/yyyy')}</td>
                             <td>{aluno.celular}</td>
                             <td>{aluno.observacoes}</td>
+                            <td>{aluno.status === 'A' ? "Ativo" : "Inativo"}</td>
+                            <td>{aluno.status === 'I' ? aluno.motivoInativo : "Aluno ativo"}</td>
                             <td>
                                 <Button variant="danger" onClick={() => {
                                     excluirAluno(aluno);
