@@ -130,7 +130,13 @@ const CadastroManutencao = (props) => {
                             onChange={manipularMudancas}
                             required
                             isInvalid={placaInexistente}
-                        />
+                        >
+                            {veiculos.map(veiculo => (
+                                <option key={veiculo.codigo} value={veiculo.placa}>
+                                    {veiculo.placa}
+                                </option>
+                            ))}
+                        </Form.Control>
                         {placaInexistente && <Form.Text className="text-danger">Este veículo não existe.</Form.Text>}
                     </Form.Group>
 
