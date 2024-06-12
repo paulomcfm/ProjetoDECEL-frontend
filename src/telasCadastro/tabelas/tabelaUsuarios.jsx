@@ -22,8 +22,9 @@ export default function TabelaUsuarios(props) {
         if (usuario.nivel === 'administrador' && administradores.length <= 1) {
             alert('Não é possível excluir o último administrador.');
         }
-        if (window.confirm('Deseja realmente excluir esse usuário?')) {
+        else if (window.confirm('Deseja realmente excluir esse usuário?')) {
             dispatch(removerUsuario(usuario));
+            window.location.reload();
         }
     }
 
@@ -36,12 +37,6 @@ export default function TabelaUsuarios(props) {
     useEffect(() => {
         dispatch(buscarUsuarios());
     }, [dispatch]);
-
- //   useEffect(() => {
- //       if (mensagem === 'Usuário adicionado com sucesso' || mensagem === 'Usuário atualizado com sucesso') {
-  //          props.exibirFormulario(false);
- //       }
- //  }, [mensagem, props]);
 
     const usuariosFiltrados = usuarios.filter(usuario =>
         usuario.nome.toLowerCase().includes(termoBusca.toLowerCase())

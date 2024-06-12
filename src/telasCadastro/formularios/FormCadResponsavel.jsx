@@ -115,6 +115,8 @@ export default function FormCadResponsavel(props) {
             else
             {
                     dispatch(atualizarResponsavel(responsavel)).then((retorno) => {
+                        console.log(retorno.payload);
+                        console.log(retorno.payload.status);
                         if(retorno.payload.status){
                             props.setMensagem('Responsável alterado com sucesso');
                             props.setTipoMensagem('success');
@@ -212,7 +214,7 @@ export default function FormCadResponsavel(props) {
                     <InputMask
                         style={{width:'300px'}}
                         className="form-control"
-                        mask="999.999.999-99" // Máscara para o CPF
+                        mask="999.999.999-99"
                         maskChar="_"
                         placeholder="XXX.XXX.XXX-XX"
                         id="cpf"
