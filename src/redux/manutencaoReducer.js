@@ -29,6 +29,40 @@ export const buscarManutencoes = createAsyncThunk('manutencao/buscar', async () 
     }
 });
 
+export const buscarManutencoesRelatorio = createAsyncThunk('manutencao/buscarManutencao', async (data) => {
+    try {
+        const url = 'http://localhost:8080/manutencoes/relatorios'
+        const resposta = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          });
+        const dados = await resposta.json();
+        console.log(dados.listaManutencoes)
+        if (dados.status) {
+            return {
+                status: true,
+                listaManutencoes: dados.listaManutencoes,
+                mensagem: ''
+            }
+        } else {
+            return {
+                status: false,
+                listaManutencoes: [],
+                mensagem: 'Ocorreu um erro ao recuperar as manutenções da base de dados.'
+            }
+        }
+    } catch (erro) {
+        return {
+            status: false,
+            listaManutencoes: [],
+            mensagem: 'Ocorreu um erro ao recuperar as manutenções da base de dados:' + erro.message
+        }
+    }
+});
+
 export const adicionarManutencao = createAsyncThunk('manutencoes/adicionar', async (manutencao, { rejectWithValue }) => {
     try {
         const resposta = await fetch(urlBase, {
@@ -142,6 +176,21 @@ const manutencaoSlice = createSlice({
                 state.mensagem = action.payload.mensagem;
             }
         }).addCase(buscarManutencoes.rejected, (state, action) => {
+            state.estado = ESTADO.ERRO;
+            state.mensagem = action.error.message;
+        }).addCase(buscarManutencoesRelatorio.pending, (state) => {
+            state.estado = ESTADO.PENDENTE;
+            state.mensagem = "Buscando manutenções...";
+        }).addCase(buscarManutencoesRelatorio.fulfilled, (state, action) => {
+            if (action.payload.status) {
+                state.estado = ESTADO.OCIOSO;
+                state.mensagem = action.payload.mensagem;
+                state.manutencoes = action.payload.listaManutencoes;
+            } else {
+                state.estado = ESTADO.ERRO;
+                state.mensagem = action.payload.mensagem;
+            }
+        }).addCase(buscarManutencoesRelatorio.rejected, (state, action) => {
             state.estado = ESTADO.ERRO;
             state.mensagem = action.error.message;
         }).addCase(adicionarManutencao.pending, (state) => {
