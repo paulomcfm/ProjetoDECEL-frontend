@@ -84,20 +84,20 @@ export default function TabelaPontosEmbarque(props) {
                     onChange={e => setTermoBusca(e.target.value)}
                 />
             </div>
-            <Table striped bordered hover>
-                <thead>
+            <table className='tabela'>
+                <thead className='head-tabela'>
                     <tr>
-                        <th>Endereço</th>
-                        <th>CEP</th>
-                        <th style={{ width: '9%' }}>Ações</th>
+                        <th className='linhas-titulo-tabela'>Endereço</th>
+                        <th className='linhas-titulo-tabela'>CEP</th>
+                        <th className='linhas-titulo-tabela' style={{ width: '9%' }}>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     {pontoEmbarqueFiltrados.map(pontoEmbarque => (
                         <tr key={pontoEmbarque.codigo}>
-                            <td>{pontoEmbarque.rua}, {pontoEmbarque.numero}, {pontoEmbarque.bairro}</td>
-                            <td>{pontoEmbarque.cep.replace(/^(\d{5})(\d{3})$/, '$1-$2')}</td>
-                            <td>
+                            <td className='linhas-tabela' >{pontoEmbarque.rua}, {pontoEmbarque.numero}, {pontoEmbarque.bairro}</td>
+                            <td className='linhas-tabela'>{pontoEmbarque.cep.replace(/^(\d{5})(\d{3})$/, '$1-$2')}</td>
+                            <td className='linhas-tabela'>
                                 <Button variant="danger" onClick={() => {
                                     excluirPontoEmbarque(pontoEmbarque);
                                 }}>
@@ -136,7 +136,7 @@ export default function TabelaPontosEmbarque(props) {
                     onConfirmar={confirmarExclusao}
                     onCancelar={() => setMostrarModalExcluir(false)}
                 />
-            </Table>
+            </table>
         </Container>
     );
 }

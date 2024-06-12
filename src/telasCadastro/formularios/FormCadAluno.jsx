@@ -53,7 +53,7 @@ export default function FormCadAlunos(props) {
     const formatarCelular = (celular) => {
         if (!celular) return celular;
 
-        let celularFormatado = celular.replace(/\D/g, '');
+        let celularFormatado = celular?.replace(/\D/g, '');
 
         celularFormatado = celularFormatado.substring(0, 11);
         if (celularFormatado.length === 8) {
@@ -70,13 +70,13 @@ export default function FormCadAlunos(props) {
     }
 
     function limparString(texto) {
-        return texto.replace(/[^A-Za-z0-9-]/g, '');
+        return texto?.replace(/[^A-Za-z0-9-]/g, '');
     }
 
     function manipularSubmissao(e) {
         const form = e.currentTarget;
         var celularValidado = false;
-        if (aluno.celular == '')
+        if (aluno.celular === '' || aluno.celular === null)
             celularValidado = true;
         else {
             celularValidado = validarCelular(aluno.celular);
@@ -398,7 +398,7 @@ export default function FormCadAlunos(props) {
                         <Form.Control.Feedback type="invalid">
                             O celular deve estar no formato (99) 99999-9999.
                         </Form.Control.Feedback>
-                        {aluno.celular.length == 15 && !validarCelular(aluno.celular) && (
+                        {aluno.celular && aluno.celular.length === 15 && !validarCelular(aluno.celular) && (
                             <Form.Text className="text-danger">
                                 Celular inválido.
                             </Form.Text>
@@ -437,7 +437,7 @@ export default function FormCadAlunos(props) {
                                         <Form.Select
                                             aria-label="Selecione o motivo da inatividade"
                                             onChange={(e) => {
-                                                if (e.target.value === 'Outro') {
+                                                if (e.target.value === 'Outro...') {
                                                     setAluno({ ...aluno, motivoInativo: '' });
                                                     setAnotherMotive(true);
                                                 } else {
@@ -451,11 +451,11 @@ export default function FormCadAlunos(props) {
                                             isInvalid={formValidado && !aluno.motivoInativo}
                                             required
                                         >
-                                            <option>Selecione o motivo</option>
+                                            <option disabled selected>Selecione o motivo</option>
                                             <option value="Ensino Médio Completo">Ensino Médio Completo</option>
                                             <option value="Mudou-se de Álvares Machado">Mudou-se de Álvares Machado</option>
                                             <option value="Deixou de utilizar rede pública">Deixou de utilizar rede pública</option>
-                                            <option value="Outro">Outro...</option>
+                                            <option value="Outro...">Outro...</option>
                                         </Form.Select>
                                         <Form.Control.Feedback type="invalid">
                                             Selecione o motivo.

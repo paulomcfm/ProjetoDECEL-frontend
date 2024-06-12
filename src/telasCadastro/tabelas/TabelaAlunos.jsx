@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Container, Table, Modal } from 'react-bootstrap';
+import { Button, Container, Modal } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { buscarAlunos, removerAluno } from '../../redux/alunoReducer';
 import { buscarParentescosAluno } from '../../redux/parentescoReducer';
@@ -121,26 +121,30 @@ export default function TabelaAlunos(props) {
                     onChange={e => setTermoBusca(e.target.value)}
                 />
             </div>
-            <Table striped bordered hover>
-                <thead>
+            <table className='tabela'>
+            <thead className='head-tabela'>
                     <tr>
-                        <th>Nome</th>
-                        <th>RG</th>
-                        <th>Data de Nascimento</th>
-                        <th>Celular</th>
-                        <th>Observações</th>
-                        <th>Ações</th>
+                        <th className='linhas-titulo-tabela'>Nome</th>
+                        <th className='linhas-titulo-tabela'>RG</th>
+                        <th className='linhas-titulo-tabela'>Data de Nascimento</th>
+                        <th className='linhas-titulo-tabela'>Celular</th>
+                        <th className='linhas-titulo-tabela'>Observações</th>
+                        <th className='linhas-titulo-tabela'>Situação</th>
+                        <th className='linhas-titulo-tabela'>Motivo Inativo</th>
+                        <th className='linhas-titulo-tabela'>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     {alunosFiltrados.map(aluno => (
                         <tr key={aluno.codigo}>
-                            <td>{aluno.nome}</td>
-                            <td>{aluno.rg}</td>
-                            <td>{format(new Date(aluno.dataNasc), 'dd/MM/yyyy')}</td>
-                            <td>{aluno.celular}</td>
-                            <td>{aluno.observacoes}</td>
-                            <td>
+                            <td className='linhas-tabela'>{aluno.nome}</td>
+                            <td className='linhas-tabela'>{aluno.rg}</td>
+                            <td className='linhas-tabela'>{format(new Date(aluno.dataNasc), 'dd/MM/yyyy')}</td>
+                            <td className='linhas-tabela'>{aluno.celular}</td>
+                            <td className='linhas-tabela'>{aluno.observacoes}</td>
+                            <td className='linhas-tabela'>{aluno.status === 'A' ? "Ativo" : "Inativo"}</td>
+                            <td className='linhas-tabela'>{aluno.status === 'I' ? aluno.motivoInativo : "Aluno ativo"}</td>
+                            <td className='linhas-tabela'>
                                 <Button variant="danger" onClick={() => {
                                     excluirAluno(aluno);
                                 }}>
@@ -173,7 +177,7 @@ export default function TabelaAlunos(props) {
                         </tr>
                     ))}
                 </tbody>
-            </Table>
+            </table>
             <Modal show={mostrarModal} onHide={() => setMostrarModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirmar Exclusão</Modal.Title>
