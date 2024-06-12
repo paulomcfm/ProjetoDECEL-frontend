@@ -121,7 +121,7 @@ const CadastroManutencao = (props) => {
             <Form noValidate validated={formValidado} onSubmit={manipularSubmissao} id='formManutencao'>
                 <Row>
                     <Form.Group as={Col} className="mb-3">
-                        <Form.Label>Placa(*):</Form.Label>
+                        <Form.Label>Selecionar Placa(*):</Form.Label>
                         <Form.Control
                             as="select"
                             id="placa"
