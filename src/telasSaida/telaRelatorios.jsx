@@ -29,6 +29,12 @@ export default function Relatorios(props) {
             title: "Rotas",
             description: "Ponto de embarque fora dos pontos de sua rota",
             icon: <TbRouteX  style={{ width: '10%', height: '10%' }} />
+        },
+        {
+            path: "/relatorios/manutencoes",
+            title: "Manutencões",
+            description: "Manutenções realizadas",
+            icon: <TbRouteX  style={{ width: '10%', height: '10%' }} />
         }
     ];
 
