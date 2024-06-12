@@ -5,7 +5,8 @@ import { NavLink } from 'react-router-dom';
 import { TbReportAnalytics } from "react-icons/tb";
 import { PiStudentFill } from "react-icons/pi";
 import { MdUpdate } from "react-icons/md";
-import { TbRouteX  } from "react-icons/tb";
+import { TbRouteX } from "react-icons/tb";
+import { BsTools } from "react-icons/bs";
 import '../templates/style.css';
 
 export default function Relatorios(props) {
@@ -28,13 +29,13 @@ export default function Relatorios(props) {
             path: "/relatorios/rotas-diferentes",
             title: "Rotas",
             description: "Ponto de embarque fora dos pontos de sua rota",
-            icon: <TbRouteX  style={{ width: '10%', height: '10%' }} />
+            icon: <TbRouteX style={{ width: '10%', height: '10%' }} />
         },
         {
             path: "/relatorios/manutencoes",
             title: "Manutencões",
             description: "Manutenções realizadas",
-            icon: <TbRouteX  style={{ width: '10%', height: '10%' }} />
+            icon: <BsTools style={{ width: '10%', height: '10%' }} />
         }
     ];
 
@@ -62,9 +63,18 @@ export default function Relatorios(props) {
                             onChange={e => setTermoBusca(e.target.value)}
                         />
                     </div>
-                    <Container style={{ marginTop: '40px', display: 'flex', flexDirection: 'column', marginLeft: '4%', marginRight: '4%', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
+                    <Container style={{
+                        marginTop: '40px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+                        backgroundColor: 'white', 
+                        opacity: 1, 
+                        borderRadius: '10px',
+                        padding: '2%',
+                    }}>
                         <div style={{ margin: '1%', fontSize: '25px', display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
-                            <TbReportAnalytics style={{marginBottom: '1%'}}/>
+                            <TbReportAnalytics style={{ marginBottom: '1%' }} />
                             <p><strong>Relatórios</strong></p>
                         </div>
                         <div className="mb-3" style={{ marginLeft: '1%', marginRight: '1%', gap: '1%', height: '15%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
