@@ -48,6 +48,10 @@ export default function TelaAlertaManutencao(props) {
         );
     }
 
+    function formatarData(data) {
+        return new Date(data).toLocaleDateString('pt-BR');
+    }
+
     function listarManutencoes(manutencoes) {
         let valorTotal = 0;
     
@@ -68,7 +72,7 @@ export default function TelaAlertaManutencao(props) {
                             return (
                                 <tr key={manut.codigo}>
                                     <td className="linhas-tabela">{manut.tipo === 'P' ? "Preventiva" : "Corretiva"}</td>
-                                    <td className="linhas-tabela">{manut.data}</td>
+                                    <td className="linhas-tabela">{formatarData(manut.data)}</td>
                                     <td className="linhas-tabela">{manut.observacoes}</td>
                                     <td className="linhas-tabela">R${manut.valor.toFixed(2)}</td>
                                 </tr>
@@ -86,7 +90,6 @@ export default function TelaAlertaManutencao(props) {
             </CSSTransition>
         );
     }
-    
 
     function manipularMudancas(event) {
         setFiltro(event.target.value);
@@ -120,7 +123,7 @@ export default function TelaAlertaManutencao(props) {
             conteudo += `Veículo: ${veiculo.placa}\n`;
             veiculo.manutencoes.forEach(manut => {
                 conteudo += `  Tipo: ${manut.tipo === 'P' ? "Preventiva" : "Corretiva"}\n`;
-                conteudo += `  Data: ${manut.data}\n`;
+                conteudo += `  Data: ${formatarData(manut.data)}\n`;
                 conteudo += `  Observações: ${manut.observacoes}\n`;
                 conteudo += `  Valor: R$${manut.valor.toFixed(2)}\n`;
                 conteudo += '\n';
@@ -134,42 +137,40 @@ export default function TelaAlertaManutencao(props) {
 
     return (
         <Pagina>
-    <Container className="mt-5">
-        <Row className="justify-content-center">
-            <Col xs={12} md={8} lg={6}>
-                <div className="d-flex align-items-center justify-content-between mb-3">
-                    <div style={{ flex: '1' }}>
-                        <Form.Control
-                            type="text"
-                            className="mb-3"
-                            style={{borderRadius:'5px'}}
-                            placeholder="Pesquisar Veículo..."
-                            value={filtro}
-                            onChange={manipularMudancas}
-                        />
-                    </div>
-                    <Button
-                        style={{marginLeft:'10px',marginTop:'-15px'}}
-                        onClick={exportarParaWord}
-                    >
-                        Exportar para Word
-                    </Button>
-                </div>
-
-                <Card className="p-3 shadow-sm" style={{ borderRadius: '15px' }}>
-                    {veiculosFiltrados.length > 0 ? (
-                        veiculosFiltrados.map((veiculo, index) => listarVeiculos(veiculo, index))
-                    ) : (
-                        <div className="text-center text-muted">
-                            Não foi possível localizar o veículo mencionado
+            <Container className="mt-5">
+                <Row className="justify-content-center">
+                    <Col xs={12} md={8} lg={6}>
+                        <div className="d-flex align-items-center justify-content-between mb-3">
+                            <div style={{ flex: '1' }}>
+                                <Form.Control
+                                    type="text"
+                                    className="mb-3"
+                                    style={{ borderRadius: '5px' }}
+                                    placeholder="Pesquisar Veículo..."
+                                    value={filtro}
+                                    onChange={manipularMudancas}
+                                />
+                            </div>
+                            <Button
+                                style={{ marginLeft: '10px', marginTop: '-15px' }}
+                                onClick={exportarParaWord}
+                            >
+                                Exportar para Word
+                            </Button>
                         </div>
-                    )}
-                </Card>
-            </Col>
-        </Row>
-    </Container>
-</Pagina>
 
-
+                        <Card className="p-3 shadow-sm" style={{ borderRadius: '15px' }}>
+                            {veiculosFiltrados.length > 0 ? (
+                                veiculosFiltrados.map((veiculo, index) => listarVeiculos(veiculo, index))
+                            ) : (
+                                <div className="text-center text-muted">
+                                    Não foi possível localizar o veículo mencionado
+                                </div>
+                            )}
+                        </Card>
+                    </Col>
+                </Row>
+            </Container>
+        </Pagina>
     );
 }

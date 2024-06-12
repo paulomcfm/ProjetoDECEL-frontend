@@ -14,6 +14,7 @@ export default function TabelaManutencao(props) {
         tipo: 'preventiva',
         data: '',
         observacoes: '',
+        valor:'',
         veiculoCodigo: ''
     };
 
@@ -112,6 +113,7 @@ export default function TabelaManutencao(props) {
                         <th>Tipo</th>
                         <th>Data</th>
                         <th>Observações</th>
+                        <th>Valor</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -122,6 +124,7 @@ export default function TabelaManutencao(props) {
                             <td>{manutencao.tipo}</td>
                             <td>{formatarData(manutencao.data)}</td>
                             <td>{manutencao.observacoes}</td>
+                            <td>{manutencao.valor}</td>
                             <td>
                             <Button variant="danger" onClick={() => {
                                     excluirManutencao(manutencao);

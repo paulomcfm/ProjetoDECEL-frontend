@@ -17,7 +17,7 @@ export default function Cabecalho(props) {
         const usuarioLogado = localStorage.getItem('usuario');
         if (usuarioLogado) {
             const usuario = JSON.parse(usuarioLogado);
-            setNomeUsuario(usuario.nome);
+            setNomeUsuario(usuario?.nome);
         }
     }, []);
 

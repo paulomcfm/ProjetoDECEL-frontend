@@ -9,6 +9,7 @@ const CadastroManutencao = (props) => {
         tipo: 'preventiva',
         data: '',
         observacoes: '',
+        valor: '',
         veiculoCodigo: ''
     };
 
@@ -164,6 +165,19 @@ const CadastroManutencao = (props) => {
                             id="data"
                             name="data"
                             value={manutencao.data}
+                            onChange={manipularMudancas}
+                            required
+                        />
+                    </Form.Group>
+
+                    <Form.Group as={Col} className="mb-3">
+                        <Form.Label>Valor(*):</Form.Label>
+                        <Form.Control
+                            type="number"
+                            step="0.01"
+                            id="valor"
+                            name="valor"
+                            value={manutencao.valor}
                             onChange={manipularMudancas}
                             required
                         />
