@@ -89,7 +89,6 @@ export default function TabelaResponsaveis(props) {
             <Table striped bordered hover>
                 <thead>
                     <tr>
-                        <th>Código</th>
                         <th>Nome</th>
                         <th>RG</th>
                         <th>CPF</th>
@@ -102,7 +101,6 @@ export default function TabelaResponsaveis(props) {
                 <tbody>
                     {responsaveisFiltrados.map(responsavel => (
                         <tr key={responsavel.codigo}>
-                            <td>{responsavel.codigo}</td>
                             <td>{responsavel.nome}</td>
                             <td>{responsavel.rg}</td>
                             <td>{responsavel.cpf}</td>

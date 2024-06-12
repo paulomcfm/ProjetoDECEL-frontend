@@ -76,6 +76,7 @@ export default function TabelaManutencao(props) {
             </Button>
             <div className="mb-5 d-flex justify-content-center align-items-center">
                 <h4 style={{ marginRight: '10px' }}>Buscar pela data</h4>
+                <h5>Inicio: </h5>
                 <input
                     type="date"
                     className="form-control"
@@ -91,6 +92,7 @@ export default function TabelaManutencao(props) {
                     value={dataInicio}
                     onChange={e => setDataInicio(e.target.value)}
                 />
+                <h5>Fim: </h5>
                 <input
                     type="date"
                     className="form-control"
