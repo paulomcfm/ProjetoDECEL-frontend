@@ -17,7 +17,6 @@ const CadastroManutencao = (props) => {
     const { setMostrarMensagem, setMensagem, setTipoMensagem } = props;
     const [manutencao, setManutencao] = useState(estadoInicialManutencao);
     const [formValidado, setFormValidado] = useState(false);
-    const [erroPlaca, setErroPlaca] = useState(false);
     const [placa, setPlaca] = useState('');
     const [observacoesDesabilitado, setObservacoesDesabilitado] = useState(estadoInicialManutencao.tipo === 'preventiva');
     const [placaInexistente, setPlacaInexistente] = useState(false);
@@ -48,12 +47,9 @@ const CadastroManutencao = (props) => {
             const veiculo = veiculos.find(v => v.placa === placa);
             if (veiculo) {
                 setManutencao({ ...manutencao, veiculoCodigo: veiculo.codigo });
-                const jaEmManutencao = manutencoes.some(m => m.veiculoCodigo === veiculo.codigo && m.codigo !== manutencao.codigo);
-                setErroPlaca(jaEmManutencao);
                 setPlacaInexistente(false);
             } else {
                 setManutencao({ ...manutencao, veiculoCodigo: '' });
-                setErroPlaca(false);
                 setPlacaInexistente(true);
             }
         }
@@ -76,7 +72,7 @@ const CadastroManutencao = (props) => {
         e.preventDefault();
         e.stopPropagation();
         const form = e.currentTarget;
-        if (form.checkValidity() && !erroPlaca && !placaInexistente) {
+        if (form.checkValidity() && !placaInexistente) {
             if (props.modoEdicao) {
                 dispatch(atualizarManutencao(formatarManutencaoParaEnvio(manutencao))).then((retorno) => {
                     setMostrarMensagem(true);
@@ -126,18 +122,23 @@ const CadastroManutencao = (props) => {
             <Form noValidate validated={formValidado} onSubmit={manipularSubmissao} id='formManutencao'>
                 <Row>
                     <Form.Group as={Col} className="mb-3">
-                        <Form.Label>Placa(*):</Form.Label>
+                        <Form.Label>Selecionar Placa(*):</Form.Label>
                         <Form.Control
-                            type="text"
-                            placeholder="Placa"
+                            as="select"
                             id="placa"
                             name="placa"
                             value={placa}
                             onChange={manipularMudancas}
                             required
-                            isInvalid={erroPlaca || placaInexistente}
-                        />
-                        {erroPlaca && <Form.Text className="text-danger">Este veículo já está em manutenção.</Form.Text>}
+                            isInvalid={placaInexistente}
+                        >
+                            <option value="">Selecione uma placa</option>
+                            {veiculos.map(veiculo => (
+                                <option key={veiculo.codigo} value={veiculo.placa}>
+                                    {veiculo.placa}
+                                </option>
+                            ))}
+                        </Form.Control>
                         {placaInexistente && <Form.Text className="text-danger">Este veículo não existe.</Form.Text>}
                     </Form.Group>
 
@@ -202,7 +203,7 @@ const CadastroManutencao = (props) => {
 
                 <Row>
                     <Col md={6} className="d-flex justify-content-end">
-                        <Button type="submit" variant="primary" disabled={erroPlaca || placaInexistente}>
+                        <Button type="submit" variant="primary" disabled={placaInexistente}>
                             {props.modoEdicao ? "Alterar" : "Cadastrar"}
                         </Button>
                     </Col>
