@@ -123,15 +123,20 @@ const CadastroManutencao = (props) => {
                     <Form.Group as={Col} className="mb-3">
                         <Form.Label>Placa(*):</Form.Label>
                         <Form.Control
-                            type="text"
-                            placeholder="Placa"
+                            as="select"
                             id="placa"
                             name="placa"
                             value={placa}
                             onChange={manipularMudancas}
                             required
                             isInvalid={placaInexistente}
-                        />
+                        >
+                            {veiculos.map(veiculo => (
+                                <option key={veiculo.codigo} value={veiculo.placa}>
+                                    {veiculo.placa}
+                                </option>
+                            ))}
+                        </Form.Control>
                         {placaInexistente && <Form.Text className="text-danger">Este veículo não existe.</Form.Text>}
                     </Form.Group>
 
