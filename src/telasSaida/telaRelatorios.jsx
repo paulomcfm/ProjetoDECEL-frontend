@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom';
 import { TbReportAnalytics } from "react-icons/tb";
 import { PiStudentFill } from "react-icons/pi";
 import { MdUpdate } from "react-icons/md";
-import { TbRouteX } from "react-icons/tb";
+import { TbRouteX, TbRoute } from "react-icons/tb";
 import { BsTools } from "react-icons/bs";
 import '../templates/style.css';
 
@@ -36,7 +36,13 @@ export default function Relatorios(props) {
             title: "Manutencões",
             description: "Manutenções realizadas",
             icon: <BsTools style={{ width: '10%', height: '10%' }} />
-        }
+        },
+        {
+            path: "/relatorios/rotas",
+            title: "Rotas",
+            description: "Informações das rotas.",
+            icon: <TbRoute style={{ width: '10%', height: '10%' }} />
+        },
     ];
 
     const filteredRelatorios = relatorios.filter(relatorio =>

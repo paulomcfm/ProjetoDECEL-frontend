@@ -189,16 +189,16 @@ export default function TabelaInscricoes(props) {
     const exportTableToWord = async () => {
         const table = document.querySelector('.tabela');
         const rows = table.querySelectorAll('tr');
-    
+
         const headerBase64 = await fetchImageAsBase64(cabecalho);
         const headerUint8Array = base64ToUint8Array(headerBase64);
         const pageWidth = 9 * 72;
-    
+
         const headerImage = new Image();
         headerImage.src = `data:image/jpeg;base64,${headerBase64}`;
         await headerImage.decode();
         const headerImageHeight = (headerImage.height / headerImage.width) * pageWidth;
-    
+
         const createTableCell = (text, isHeader) => new TableCell({
             children: [new Paragraph({
                 children: [
@@ -215,7 +215,7 @@ export default function TabelaInscricoes(props) {
             })],
             verticalAlign: isHeader ? "center" : "top",
         });
-    
+
         const docTable = new Table({
             width: {
                 size: 100,
@@ -225,20 +225,20 @@ export default function TabelaInscricoes(props) {
                 children: Array.from(row.cells).map(cell => createTableCell(cell.textContent, rowIndex === 0)),
             })),
         });
-    
+
         const nomeEscolas = escolasSelecionadas.map(escola => escola.nome).join(', ');
         const nomeRotas = rotasSelecionadas.map(rota => rota.nome).join(', ');
         const periodos = periodosSelecionados.map(obterNomePeriodoCompleto).join(', ');
-    
+
         const doc = new Document({
             sections: [{
                 properties: {
                     page: {
                         margin: {
-                            top: 720,    
-                            right: 720,  
-                            bottom: 720, 
-                            left: 720,   
+                            top: 720,
+                            right: 720,
+                            bottom: 720,
+                            left: 720,
                         },
                     },
                 },
@@ -246,9 +246,9 @@ export default function TabelaInscricoes(props) {
                     default: new Header({
                         margin: {
                             top: 360,
-                            right: 360,  
-                            bottom: 360, 
-                            left: 360,   
+                            right: 360,
+                            bottom: 360,
+                            left: 360,
                         },
                         children: [
                             new Paragraph({
@@ -381,7 +381,7 @@ export default function TabelaInscricoes(props) {
                 ].filter(Boolean),
             }],
         });
-    
+
         const blob = await Packer.toBlob(doc);
         saveAs(blob, nomeArquivo + '.docx');
     };
@@ -389,7 +389,7 @@ export default function TabelaInscricoes(props) {
     return (
         <Pagina>
             <h3 style={{ display: 'flex', justifyContent: 'center', marginTop: '1%' }}>Relatório de Alunos</h3>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '-6%', padding: '2%' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '-5%', padding: '2%' }}>
                 <Button onClick={() => setModalArquivo(true)}>
                     <MdFileDownload style={{ width: '100%', height: '100%' }} />
                 </Button>
@@ -430,130 +430,131 @@ export default function TabelaInscricoes(props) {
                 </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
-
             </div>
-            <table bordered hover className='tabela' style={{ magin: '5%' }}>
-                <thead className='head-tabela'>
-                    <tr>
-                        <th className='linhas-titulo-tabela'>Aluno</th>
-                        <th className='linhas-titulo-tabela'>RG</th>
-                        <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} >
-                            <div className='div-linhas-titulo-tabela'> Escola <TbFilterDown onClick={() => { setModalEscola(true) }} />
-                            </div>
-                        </th>
-                        <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} >
-                            <div className='div-linhas-titulo-tabela'> Período <TbFilterDown onClick={() => { setModalPeriodo(true) }} /></div>
-                        </th>
-                        <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} >
-                            <div className='div-linhas-titulo-tabela'> Rota <TbFilterDown onClick={() => { setModalRota(true) }} /></div>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {alunosFiltrados
-                        .filter(aluno => aluno.nome.toLowerCase().includes(termoBusca.toLowerCase()) || aluno.rg.toLowerCase().includes(termoBusca.toLowerCase()))
-                        .filter(aluno => {
-                            if (filtroAlunosInscritos && filtroAlunosAlocados) {
-                                return inscricoes.some(inscricao => inscricao.aluno.codigo === aluno.codigo) &&
-                                    inscricoes.some(inscricao => inscricao.aluno.codigo === aluno.codigo && inscricao.rota);
-                            } else if (filtroAlunosInscritos) {
-                                return inscricoes.some(inscricao => inscricao.aluno.codigo === aluno.codigo && inscricao.ano === anoAtual);
-                            } else if (filtroAlunosAlocados) {
-                                return inscricoes.some(inscricao => inscricao.aluno.codigo === aluno.codigo && inscricao.ano === anoAtual && inscricao.rota);
-                            }
-                            return true;
-                        })
-                        .map(aluno => {
-                            const inscricaoAluno = inscricoes.find(inscricao => inscricao.aluno.codigo === aluno.codigo && inscricao.ano === anoAtual);
-                            const rota = inscricaoAluno ? rotas.find(rota => inscricaoAluno.rota && inscricaoAluno.rota.codigo === rota.codigo) : null;
-                            const veiculo = rota ? rota.veiculo[0] : '';
-                            const escola = inscricaoAluno ? escolas.find(escola => escola.codigo === inscricaoAluno.escola.codigo) : null;
-                            const periodo = inscricaoAluno ? inscricaoAluno.periodo : '';
-                            return (
-                                <tr key={aluno.codigo}>
-                                    <td className='linhas-tabela'>
-                                        <OverlayTrigger
-                                            trigger="hover"
-                                            key="bottom"
-                                            placement="bottom"
-                                            overlay={
-                                                <Popover id="popover-positioned-bottom">
-                                                    <Popover.Header as="h3">{aluno.nome}</Popover.Header>
-                                                    <Popover.Body>
-                                                        <p>Data de Nascimento: {format(new Date(aluno.dataNasc), 'dd/MM/yyyy')}</p>
-                                                        <p>Celular: {aluno.celular}</p>
-                                                        <p>Observações: {aluno.observacoes}</p>
-                                                        {aluno.status === 'I' &&
-                                                            <p style={{ color: 'red' }}><b>Status: Inativo</b></p>}
-                                                    </Popover.Body>
-                                                </Popover>
-                                            }
-                                        >
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2%' }}>{aluno.nome} <IoInformationCircleSharp /> {aluno.status === 'I' && <PiWarningBold style={{ marginLeft: '2%', verticalAlign: 'middle', color: 'red' }} />} </div>
-                                        </OverlayTrigger>
-                                    </td>
-                                    <td className='linhas-tabela'>{aluno.rg}</td>
-                                    <td className='linhas-tabela'>
-                                        {escola ?
+            <Container>
+                <table bordered hover className='tabela' style={{ magin: '5%' }}>
+                    <thead className='head-tabela'>
+                        <tr>
+                            <th className='linhas-titulo-tabela'>Aluno</th>
+                            <th className='linhas-titulo-tabela'>RG</th>
+                            <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} >
+                                <div className='div-linhas-titulo-tabela'> Escola <TbFilterDown onClick={() => { setModalEscola(true) }} />
+                                </div>
+                            </th>
+                            <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} >
+                                <div className='div-linhas-titulo-tabela'> Período <TbFilterDown onClick={() => { setModalPeriodo(true) }} /></div>
+                            </th>
+                            <th className='linhas-titulo-tabela' style={{ cursor: 'pointer' }} >
+                                <div className='div-linhas-titulo-tabela'> Rota <TbFilterDown onClick={() => { setModalRota(true) }} /></div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {alunosFiltrados
+                            .filter(aluno => aluno.nome.toLowerCase().includes(termoBusca.toLowerCase()) || aluno.rg.toLowerCase().includes(termoBusca.toLowerCase()))
+                            .filter(aluno => {
+                                if (filtroAlunosInscritos && filtroAlunosAlocados) {
+                                    return inscricoes.some(inscricao => inscricao.aluno.codigo === aluno.codigo) &&
+                                        inscricoes.some(inscricao => inscricao.aluno.codigo === aluno.codigo && inscricao.rota);
+                                } else if (filtroAlunosInscritos) {
+                                    return inscricoes.some(inscricao => inscricao.aluno.codigo === aluno.codigo && inscricao.ano === anoAtual);
+                                } else if (filtroAlunosAlocados) {
+                                    return inscricoes.some(inscricao => inscricao.aluno.codigo === aluno.codigo && inscricao.ano === anoAtual && inscricao.rota);
+                                }
+                                return true;
+                            })
+                            .map(aluno => {
+                                const inscricaoAluno = inscricoes.find(inscricao => inscricao.aluno.codigo === aluno.codigo && inscricao.ano === anoAtual);
+                                const rota = inscricaoAluno ? rotas.find(rota => inscricaoAluno.rota && inscricaoAluno.rota.codigo === rota.codigo) : null;
+                                const veiculo = rota ? rota.veiculo[0] : '';
+                                const escola = inscricaoAluno ? escolas.find(escola => escola.codigo === inscricaoAluno.escola.codigo) : null;
+                                const periodo = inscricaoAluno ? inscricaoAluno.periodo : '';
+                                return (
+                                    <tr key={aluno.codigo}>
+                                        <td className='linhas-tabela'>
                                             <OverlayTrigger
                                                 trigger="hover"
                                                 key="bottom"
                                                 placement="bottom"
                                                 overlay={
                                                     <Popover id="popover-positioned-bottom">
-                                                        <Popover.Header as="h3">{escola.nome}</Popover.Header>
+                                                        <Popover.Header as="h3">{aluno.nome}</Popover.Header>
                                                         <Popover.Body>
-                                                            <p>
-                                                                Tipo: {inscricaoAluno && (
-                                                                    <>
-                                                                        {inscricaoAluno.escola.tipo === 'I' && 'Educação Infantil '}
-                                                                        {inscricaoAluno.escola.tipo === 'F' && 'Ensino Fundamental '}
-                                                                        {inscricaoAluno.escola.tipo === 'A' && 'Educação Infantil e Ensino Fundamental '}
-                                                                        {inscricaoAluno.escola.tipo === 'M' && 'Ensino Médio '}
-                                                                    </>
-                                                                )}
-                                                            </p>
-                                                            <p>Email: {escola.email}</p>
-                                                            <p>Telefone: {escola.telefone}</p>
+                                                            <p>Data de Nascimento: {format(new Date(aluno.dataNasc), 'dd/MM/yyyy')}</p>
+                                                            <p>Celular: {aluno.celular}</p>
+                                                            <p>Observações: {aluno.observacoes}</p>
+                                                            {aluno.status === 'I' &&
+                                                                <p style={{ color: 'red' }}><b>Status: Inativo</b></p>}
                                                         </Popover.Body>
                                                     </Popover>
                                                 }
                                             >
-                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2%' }}>{escola.nome}<IoInformationCircleSharp /></div>
+                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2%' }}>{aluno.nome} <IoInformationCircleSharp /> {aluno.status === 'I' && <PiWarningBold style={{ marginLeft: '2%', verticalAlign: 'middle', color: 'red' }} />} </div>
                                             </OverlayTrigger>
-                                            : 'Aluno não inscrito...'}
-                                    </td>
-                                    <td className='linhas-tabela' style={{width:'15%'}}>
-                                        {periodo === 'M' ? 'Matutino' : periodo === 'V' ? 'Vespertino' : periodo === 'I' ? 'Integral' : 'Aluno não inscrito...'}
-                                    </td>
-                                    <td className='linhas-tabela'>
-                                        {rota ?
-                                            <OverlayTrigger
-                                                trigger="hover"
-                                                key="bottom"
-                                                placement="bottom"
-                                                overlay={
-                                                    <Popover id="popover-positioned-bottom">
-                                                        <Popover.Header as="h3">{rota.nome}</Popover.Header>
-                                                        <Popover.Body>
-                                                            <p>Período: {rota.periodo === 'M' ? 'Matinal' : rota.periodo === 'T' ? 'Tarde' : rota.periodo === 'N' ? 'Noite' : 'Rota sem período'}</p>
-                                                            <p>Distância: {rota.km} km</p>
-                                                            <p>Tempo: {rota.tempoInicio} até {rota.volta}</p>
-                                                            <p>Veículo: {veiculo.vei_modelo}</p>
-                                                            <p>Placa: {veiculo.vei_placa}</p>
-                                                        </Popover.Body>
-                                                    </Popover>
-                                                }
-                                            >
-                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2%' }}>{rota.nome}<IoInformationCircleSharp /></div>
-                                            </OverlayTrigger> : 'Aluno não alocado...'}
-                                    </td>
-                                </tr>
-                            );
-                        })
-                    }
-                </tbody>
-            </table>
+                                        </td>
+                                        <td className='linhas-tabela'>{aluno.rg}</td>
+                                        <td className='linhas-tabela'>
+                                            {escola ?
+                                                <OverlayTrigger
+                                                    trigger="hover"
+                                                    key="bottom"
+                                                    placement="bottom"
+                                                    overlay={
+                                                        <Popover id="popover-positioned-bottom">
+                                                            <Popover.Header as="h3">{escola.nome}</Popover.Header>
+                                                            <Popover.Body>
+                                                                <p>
+                                                                    Tipo: {inscricaoAluno && (
+                                                                        <>
+                                                                            {inscricaoAluno.escola.tipo === 'I' && 'Educação Infantil '}
+                                                                            {inscricaoAluno.escola.tipo === 'F' && 'Ensino Fundamental '}
+                                                                            {inscricaoAluno.escola.tipo === 'A' && 'Educação Infantil e Ensino Fundamental '}
+                                                                            {inscricaoAluno.escola.tipo === 'M' && 'Ensino Médio '}
+                                                                        </>
+                                                                    )}
+                                                                </p>
+                                                                <p>Email: {escola.email}</p>
+                                                                <p>Telefone: {escola.telefone}</p>
+                                                            </Popover.Body>
+                                                        </Popover>
+                                                    }
+                                                >
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2%' }}>{escola.nome}<IoInformationCircleSharp /></div>
+                                                </OverlayTrigger>
+                                                : 'Aluno não inscrito...'}
+                                        </td>
+                                        <td className='linhas-tabela' style={{ width: '15%' }}>
+                                            {periodo === 'M' ? 'Matutino' : periodo === 'V' ? 'Vespertino' : periodo === 'I' ? 'Integral' : 'Aluno não inscrito...'}
+                                        </td>
+                                        <td className='linhas-tabela'>
+                                            {rota ?
+                                                <OverlayTrigger
+                                                    trigger="hover"
+                                                    key="bottom"
+                                                    placement="bottom"
+                                                    overlay={
+                                                        <Popover id="popover-positioned-bottom">
+                                                            <Popover.Header as="h3">{rota.nome}</Popover.Header>
+                                                            <Popover.Body>
+                                                                <p>Período: {rota.periodo === 'M' ? 'Matinal' : rota.periodo === 'T' ? 'Tarde' : rota.periodo === 'N' ? 'Noite' : 'Rota sem período'}</p>
+                                                                <p>Distância: {rota.km} km</p>
+                                                                <p>Tempo: {rota.tempoInicio} até {rota.volta}</p>
+                                                                <p>Veículo: {veiculo.vei_modelo}</p>
+                                                                <p>Placa: {veiculo.vei_placa}</p>
+                                                            </Popover.Body>
+                                                        </Popover>
+                                                    }
+                                                >
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2%' }}>{rota.nome}<IoInformationCircleSharp /></div>
+                                                </OverlayTrigger> : 'Aluno não alocado...'}
+                                        </td>
+                                    </tr>
+                                );
+                            })
+                        }
+                    </tbody>
+                </table>
+            </Container>
             <Modal show={mostrarModal} onHide={() => setMostrarModal(false)}>
                 <Modal.Header closeButton>
                     Filtre os alunos:
