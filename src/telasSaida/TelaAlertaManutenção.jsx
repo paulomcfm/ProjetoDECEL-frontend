@@ -1,45 +1,34 @@
-import React, { useState } from 'react';
-import { Button, Row, Col, Form, Container, Card } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Button, Row, Col, Form, Container, Card, Table, OverlayTrigger, Popover, Modal } from 'react-bootstrap';
+import { DateRangePicker } from 'react-dates';
+import 'moment/locale/pt-br';
+import 'react-dates/lib/css/_datepicker.css';
 import { CSSTransition } from 'react-transition-group';
 import Pagina from '../templates/Pagina.jsx';
-import fileDownload from 'js-file-download';
+import 'react-dates/initialize';
 import './telacss.css';
 
+import { useDispatch, useSelector } from 'react-redux';
+import { buscarManutencoesRelatorio } from '../redux/manutencaoReducer.js';
+
 export default function TelaAlertaManutencao(props) {
-    const [filtro, setFiltro] = useState('');
-    const [listaManutencao, setListaManutencao] = useState([
-        {
-            "placa": "ABC123",
-            "manutencoes": [
-                { "codigo": 1, "tipo": "P", "data": "2024-04-22", "observacoes": "Troca de óleo e filtros", "valor": 200 },
-                { "codigo": 5, "tipo": "P", "data": "2024-06-20", "observacoes": "Verificação dos freios", "valor": 150 },
-                { "codigo": 9, "tipo": "P", "data": "2024-08-05", "observacoes": "Troca de óleo e filtros", "valor": 200 }
-            ]
-        },
-        {
-            "placa": "DEF456",
-            "manutencoes": [
-                { "codigo": 3, "tipo": "P", "data": "2024-05-15", "observacoes": "Revisão do motor", "valor": 500 },
-                { "codigo": 7, "tipo": "P", "data": "2024-07-10", "observacoes": "Troca de óleo e filtros", "valor": 200 }
-            ]
-        },
-        {
-            "placa": "GHI789",
-            "manutencoes": [
-                { "codigo": 4, "tipo": "C", "data": "2024-06-10", "observacoes": "Troca de filtros", "valor": 100 },
-                { "codigo": 8, "tipo": "C", "data": "2024-07-20", "observacoes": "Reparo na parte elétrica", "valor": 300 }
-            ]
-        },
-        {
-            "placa": "XYZ789",
-            "manutencoes": [
-                { "codigo": 2, "tipo": "C", "data": "2024-05-05", "observacoes": "Substituição de pneus", "valor": 400 },
-                { "codigo": 6, "tipo": "C", "data": "2024-07-01", "observacoes": "Reparo na suspensão", "valor": 350 },
-                { "codigo": 10, "tipo": "C", "data": "2024-08-15", "observacoes": "Substituição de pneus", "valor": 400 }
-            ]
+    const [filtroPlaca, setFiltroPlaca] = useState('');
+    const [dateRange, setDateRange] = useState({ startDate: null, endDate: null });
+    const [focusedInput, setFocusedInput] = useState(null);
+    const [listaManutencao, setListaManutencao] = useState([]);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        async function fetchData() {
+            const resposta = await dispatch(buscarManutencoesRelatorio({ inicio: null, fim: null }));
+            console.log(resposta.payload.status);
+            console.log(resposta.payload);
+            setListaManutencao(resposta.payload.listaManutencoes);
+            console.log(listaManutencao);
         }
-    ]);
-    
+        fetchData();
+    }, [dispatch]);
+
     const [veiculosSelecionados, setVeiculosSelecionados] = useState([]);
 
     function handleButtonClick(index) {
@@ -48,13 +37,9 @@ export default function TelaAlertaManutencao(props) {
         );
     }
 
-    function formatarData(data) {
-        return new Date(data).toLocaleDateString('pt-BR');
-    }
-
     function listarManutencoes(manutencoes) {
         let valorTotal = 0;
-    
+
         return (
             <CSSTransition in={true} timeout={500} classNames="manutencoes" unmountOnExit>
                 <table className="tabela" style={{ width: '100%' }}>
@@ -68,13 +53,14 @@ export default function TelaAlertaManutencao(props) {
                     </thead>
                     <tbody>
                         {manutencoes.map(manut => {
-                            valorTotal += manut.valor; // Acumula o valor de cada manutenção
+                            const valor = Number(manut.valor) || 0;
+                            valorTotal += valor;
                             return (
                                 <tr key={manut.codigo}>
-                                    <td className="linhas-tabela">{manut.tipo === 'P' ? "Preventiva" : "Corretiva"}</td>
-                                    <td className="linhas-tabela">{formatarData(manut.data)}</td>
+                                    <td className="linhas-tabela">{manut.tipo === 'preventiva' ? "Preventiva" : "Corretiva"}</td>
+                                    <td className="linhas-tabela">{manut.data}</td>
                                     <td className="linhas-tabela">{manut.observacoes}</td>
-                                    <td className="linhas-tabela">R${manut.valor.toFixed(2)}</td>
+                                    <td className="linhas-tabela">R${valor.toFixed(2)}</td>
                                 </tr>
                             );
                         })}
@@ -84,84 +70,103 @@ export default function TelaAlertaManutencao(props) {
                             <td className="linhas-tabela" style={{ border: 'none' }}><strong>Total</strong></td>
                             <td className="linhas-tabela" style={{ border: 'none' }}><strong>R${valorTotal.toFixed(2)}</strong></td>
                         </tr>
-
                     </tbody>
                 </table>
             </CSSTransition>
         );
     }
 
-    function manipularMudancas(event) {
-        setFiltro(event.target.value);
-    }
-
-    function listarVeiculos(veiculo, index) {
-        if (filtro === "" || veiculo.placa.toLowerCase().includes(filtro.toLowerCase())) {
+    function listarVeiculos({ veiculo, manutencao }, index) {
+        console.log(veiculo.renavam, veiculo.modelo, veiculo.tipo, veiculo.capacidade);
+        if (
+            (filtroPlaca === "" || veiculo.placa.toLowerCase().includes(filtroPlaca.toLowerCase()))
+        ) {
             return (
                 <div key={veiculo.placa} style={{ width: '100%', marginTop: '10px' }}>
-                    <Button
-                        style={{ width: '100%' }}
-                        variant={veiculosSelecionados.includes(index) ? "secondary" : "primary"}
-                        onClick={() => handleButtonClick(index)}
+                    <OverlayTrigger
+                        trigger="hover"
+                        key="bottom"
+                        placement="bottom"
+                        overlay={
+                            <Popover id="popover-positioned-bottom">
+                                <Popover.Header as="h3">{veiculo.placa}</Popover.Header>
+                                <Popover.Body>
+                                    <p>Renavam: {veiculo.renavam}</p>
+                                    <p>Modelo: {veiculo.modelo}</p>
+                                    <p>Tipo: {veiculo.tipo}</p>
+                                    <p>Capacidade: {veiculo.capacidade}</p>
+                                </Popover.Body>
+                            </Popover>
+                        }
                     >
-                        {veiculo.placa}
-                    </Button>
-                    {veiculosSelecionados.includes(index) && listarManutencoes(veiculo.manutencoes)}
+                        <Button
+                            style={{ width: '100%' }}
+                            variant={veiculosSelecionados.includes(index) ? "secondary" : "primary"}
+                            onClick={() => handleButtonClick(index)}
+                        >
+                            {veiculo.placa}
+                        </Button>
+                    </OverlayTrigger>
+                    {veiculosSelecionados.includes(index) && listarManutencoes(manutencao)}
                 </div>
             );
         }
     }
 
-    const veiculosFiltrados = listaManutencao.filter(veiculo =>
-        filtro === "" || veiculo.placa.toLowerCase().includes(filtro.toLowerCase())
-    );
-
-    function exportarParaWord() {
-        let conteudo = 'Lista de Manutenções:\n\n';
-        
-        listaManutencao.forEach(veiculo => {
-            conteudo += `Veículo: ${veiculo.placa}\n`;
-            veiculo.manutencoes.forEach(manut => {
-                conteudo += `  Tipo: ${manut.tipo === 'P' ? "Preventiva" : "Corretiva"}\n`;
-                conteudo += `  Data: ${formatarData(manut.data)}\n`;
-                conteudo += `  Observações: ${manut.observacoes}\n`;
-                conteudo += `  Valor: R$${manut.valor.toFixed(2)}\n`;
-                conteudo += '\n';
-            });
-            conteudo += '\n';
-        });
-
-        const blob = new Blob([conteudo], { type: 'application/msword' });
-        fileDownload(blob, 'manutencoes.doc');
+    async function aplicarFiltro() {
+        const startDate = dateRange.startDate ? dateRange.startDate.format('YYYY-MM-DD') : null;
+        const endDate = dateRange.endDate ? dateRange.endDate.format('YYYY-MM-DD') : null;
+        const resposta = await dispatch(buscarManutencoesRelatorio({ inicio: startDate, fim: endDate }));
+        console.log(resposta.payload.status);
+        console.log(resposta.payload);
+        setListaManutencao(resposta.payload.listaManutencoes);
+        console.log(listaManutencao);
     }
 
     return (
         <Pagina>
             <Container className="mt-5">
                 <Row className="justify-content-center">
+                    <div style={{ width: '200px' }}>
+                        <Form.Control
+                            type="text"
+                            style={{ borderRadius: '5px' }}
+                            placeholder="Pesquisar Placa"
+                            value={filtroPlaca}
+                            onChange={(event) => setFiltroPlaca(event.target.value)}
+                        />
+                    </div>
+                </Row>
+                <Row className="justify-content-center" style={{ marginTop: '10px' }}>
                     <Col xs={12} md={8} lg={6}>
-                        <div className="d-flex align-items-center justify-content-between mb-3">
-                            <div style={{ flex: '1' }}>
-                                <Form.Control
-                                    type="text"
-                                    className="mb-3"
-                                    style={{ borderRadius: '5px' }}
-                                    placeholder="Pesquisar Veículo..."
-                                    value={filtro}
-                                    onChange={manipularMudancas}
-                                />
-                            </div>
+                        <div className="justify-content-center" style={{ marginLeft: '110px', marginBottom: '10px' }}>
+                            <DateRangePicker
+                                startDate={dateRange.startDate}
+                                startDateId="startDate"
+                                endDate={dateRange.endDate}
+                                endDateId="endDate"
+                                onDatesChange={({ startDate, endDate }) => setDateRange({ startDate, endDate })}
+                                focusedInput={focusedInput}
+                                onFocusChange={setFocusedInput}
+                                isOutsideRange={() => false}
+                                displayFormat="DD/MM/YYYY"
+                                numberOfMonths={1}
+                                showClearDates={true}
+                                startDatePlaceholderText="Início"
+                                endDatePlaceholderText="Fim"
+                                locale="pt-br"
+                            />
                             <Button
-                                style={{ marginLeft: '10px', marginTop: '-15px' }}
-                                onClick={exportarParaWord}
+                                style={{ marginLeft: '10px' }}
+                                onClick={aplicarFiltro}
                             >
-                                Exportar para Word
+                                Filtrar
                             </Button>
                         </div>
 
                         <Card className="p-3 shadow-sm" style={{ borderRadius: '15px' }}>
-                            {veiculosFiltrados.length > 0 ? (
-                                veiculosFiltrados.map((veiculo, index) => listarVeiculos(veiculo, index))
+                            {listaManutencao.length > 0 ? (
+                                listaManutencao.map((veiculo, index) => listarVeiculos(veiculo, index))
                             ) : (
                                 <div className="text-center text-muted">
                                     Não foi possível localizar o veículo mencionado

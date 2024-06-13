@@ -20,9 +20,9 @@ export default function TelaEsqueci() {
             setMensagem("Código enviado para seu E-mail!");
             setTimeout(() => {
                 if (resposta.payload) {
-                    navigate('/codigo', { state: { email } });  // Pass email as state
+                    navigate('/codigo', { state: { email } });
                 }
-            }, 1500);
+            }, 1000);
 
         } catch (error) {
             console.error('Erro ao solicitar código de redefinição:', error);

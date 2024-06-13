@@ -16,7 +16,7 @@ export default function TelaCadastroMonitor(){
 
     return (
         <Pagina>
-            { tela? <TabelaMonitor monitor={monitor} setMonitor={setMonitor} tela={tela} setTela={setTela} modo={modo} setModo={setModo} />:<FormMonitor monitor={monitor} setMonitor={setMonitor} tela={tela} setTela={setTela} modo={modo} setModo={setModo} /> }
+            { tela? <TabelaMonitor monitor={monitor} setMonitor={setMonitor} tela={tela} setTela={setTela} modo={modo} setModo={setModo} monitorVazio={monitorVazio} />:<FormMonitor monitor={monitor} setMonitor={setMonitor} tela={tela} setTela={setTela} modo={modo} setModo={setModo} monitorVazio={monitorVazio} /> }
         </Pagina>
     )
 }

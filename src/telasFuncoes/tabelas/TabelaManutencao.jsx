@@ -75,7 +75,8 @@ export default function TabelaManutencao(props) {
                 Cadastrar Manutenção
             </Button>
             <div className="mb-5 d-flex justify-content-center align-items-center">
-                <h4 style={{ marginRight: '10px' }}>Buscar pela data</h4>
+                <h4 style={{ marginRight: '10px' }}>Buscar pela data   </h4>
+                <h5 style={{ marginRight: '10px' }}>Início:</h5>
                 <input
                     type="date"
                     className="form-control"
@@ -91,6 +92,7 @@ export default function TabelaManutencao(props) {
                     value={dataInicio}
                     onChange={e => setDataInicio(e.target.value)}
                 />
+                <h5 style={{ marginRight: '10px' }}>Fim:</h5>
                 <input
                     type="date"
                     className="form-control"
