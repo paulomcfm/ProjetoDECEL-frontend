@@ -77,7 +77,7 @@ export default function TabelaMonitor(props) {
             </Modal>
             <Row style={{ marginBottom: '40px' }}>
                 <Col>
-                    <button type="button" className="btn btn-primary" onClick={() => { props.setTela(false) }}>Cadastrar Monitor</button>{' '}
+                    <button type="button" className="btn btn-primary" onClick={() => { props.setTela(false);props.setModo('gravar')}}>Cadastrar Monitor</button>{' '}
                 </Col>
             </Row>
             <br />

@@ -17,6 +17,7 @@ export default function FormMonitor(props) {
           function manipularMudancas(e){
             const input = e.target
             setMonitor({...monitor,[input.name]:input.value})
+            console.log(monitor)
           }
 
           
@@ -25,10 +26,12 @@ export default function FormMonitor(props) {
           const [exibirMensagem,setExibir] = useState(false)
 
           async function manipularEnvio(e){
-              const form = e.target
-              if(validarCelular(monitor.celular)){
+
+            console.log("entrouuuuuuuuuuu")
+            if(validarCelular(monitor.celular)){
                 
                 if(props.modo === 'gravar'){
+                  console.log("passou")
                   dispatch(adicionarMonitor(monitor))
                   setMensagemForm('Adicionado com sucesso');
                   setExibir(true)

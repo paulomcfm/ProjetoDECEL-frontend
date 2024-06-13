@@ -7,6 +7,7 @@ export const buscarVeiculos = createAsyncThunk('veiculo/buscar', async () => {
         const resposta = await fetch(urlBase, { method: 'GET' });
         const dados = await resposta.json();
         if (dados.status) {
+            console.log(dados.listaVeiculos)
             return {
                 status: true,
                 listaVeiculos: dados.listaVeiculos,

@@ -12,6 +12,8 @@ import { useEffect } from 'react';
 
 import '../templates/style.css';
 import '../styles/rota.css'
+import { buscarMonitores } from '../redux/monitorReducer';
+import { buscarVeiculos } from '../redux/veiculoReducer';
 
 export default function FormularioRotas(props) {
 
@@ -25,6 +27,9 @@ export default function FormularioRotas(props) {
   const {estado,mensagem,rotas} = useSelector(state => state.rota)
   const { estadoP, mensagemP, pontosEmbarque } = useSelector(state => state.pontoEmbarque);
   const { estadoM, mensagemM, motoristas } = useSelector(state => state.motorista);
+  const { estadoMo, mensagemMo, monitores } = useSelector(state => state.monitor);
+  const { estadoV, mensagemV, veiculos } = useSelector(state => state.veiculo);
+
   const dispatch =  useDispatch()
   
   
@@ -75,6 +80,8 @@ export default function FormularioRotas(props) {
 
   useEffect(() => {
     dispatch(buscarMotoristas());
+    dispatch(buscarMonitores())
+    dispatch(buscarVeiculos())
   }, [dispatch]);
   
     useEffect(() => {
@@ -437,8 +444,8 @@ export default function FormularioRotas(props) {
                     <h4 className="mb-3">Placa do Veículo(*):</h4>
                     <select id="veiculo" className="form-select mb-3" name='veiculo' value={form.veiculo} onChange={manipularMudancas}>
                         {
-                          placas.map(veiculo =>{
-                            return(<option key={veiculo.vei_codigo} value={veiculo.vei_codigo}>{veiculo.vei_placa} ({veiculo.vei_modelo})</option>)
+                          veiculos.map(veiculo =>{
+                            return(<option key={veiculo.codigo} value={veiculo.codigo}>{veiculo.placa} ({veiculo.modelo})</option>)
                           })
                         }
                     </select>
@@ -463,14 +470,14 @@ export default function FormularioRotas(props) {
                   <Col md>
                     <h4 className="mb-3">Monitor(*):</h4>
                     <div className="mb-3">
-                        <select id="monitor" className="form-select" name='monitor' value={form.monitor} onChange={manipularMudancas}>
-                            <option value="1">Valdemar</option>
-                            <option value="2">Antonio</option>
-                            <option value="3">Joao</option>
-                            <option value="4">Maria</option>
-                        </select>
+                      <select id="monitor" className="form-select" name='monitor' value={form.monitor} onChange={manipularMudancas}>
+                        {monitores.map(monitor => (
+                          <option key={monitor.codigo} value={monitor.codigo}>{monitor.nome}</option>
+                        ))}
+                      </select>
                     </div>
                   </Col>
+
 
                 </Row>
 
