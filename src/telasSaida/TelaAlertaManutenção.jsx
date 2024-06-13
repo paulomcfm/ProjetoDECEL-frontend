@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Row, Col, Form, Container, Card } from 'react-bootstrap';
+import { Button, Row, Col, Form, Container, Card, Table, OverlayTrigger, Popover, Modal } from 'react-bootstrap';
 import { DateRangePicker } from 'react-dates';
 import 'moment/locale/pt-br';
 import 'react-dates/lib/css/_datepicker.css';
@@ -20,11 +20,11 @@ export default function TelaAlertaManutencao(props) {
 
     useEffect(() => {
         async function fetchData() {
-            const resposta = await dispatch(buscarManutencoesRelatorio({ inicio: null, fim: null }))
-            console.log(resposta.payload.status)
-            console.log(resposta.payload)
-            setListaManutencao(resposta.payload.listaManutencoes)
-            console.log(listaManutencao)
+            const resposta = await dispatch(buscarManutencoesRelatorio({ inicio: null, fim: null }));
+            console.log(resposta.payload.status);
+            console.log(resposta.payload);
+            setListaManutencao(resposta.payload.listaManutencoes);
+            console.log(listaManutencao);
         }
         fetchData();
     }, [dispatch]);
@@ -53,7 +53,7 @@ export default function TelaAlertaManutencao(props) {
                     </thead>
                     <tbody>
                         {manutencoes.map(manut => {
-                            const valor = Number(manut.valor) || 0;  // Converte para número
+                            const valor = Number(manut.valor) || 0;
                             valorTotal += valor;
                             return (
                                 <tr key={manut.codigo}>
@@ -77,18 +77,36 @@ export default function TelaAlertaManutencao(props) {
     }
 
     function listarVeiculos({ veiculo, manutencao }, index) {
+        console.log(veiculo.renavam, veiculo.modelo, veiculo.tipo, veiculo.capacidade);
         if (
             (filtroPlaca === "" || veiculo.placa.toLowerCase().includes(filtroPlaca.toLowerCase()))
         ) {
             return (
                 <div key={veiculo.placa} style={{ width: '100%', marginTop: '10px' }}>
-                    <Button
-                        style={{ width: '100%' }}
-                        variant={veiculosSelecionados.includes(index) ? "secondary" : "primary"}
-                        onClick={() => handleButtonClick(index)}
+                    <OverlayTrigger
+                        trigger="hover"
+                        key="bottom"
+                        placement="bottom"
+                        overlay={
+                            <Popover id="popover-positioned-bottom">
+                                <Popover.Header as="h3">{veiculo.placa}</Popover.Header>
+                                <Popover.Body>
+                                    <p>Renavam: {veiculo.renavam}</p>
+                                    <p>Modelo: {veiculo.modelo}</p>
+                                    <p>Tipo: {veiculo.tipo}</p>
+                                    <p>Capacidade: {veiculo.capacidade}</p>
+                                </Popover.Body>
+                            </Popover>
+                        }
                     >
-                        {veiculo.placa}
-                    </Button>
+                        <Button
+                            style={{ width: '100%' }}
+                            variant={veiculosSelecionados.includes(index) ? "secondary" : "primary"}
+                            onClick={() => handleButtonClick(index)}
+                        >
+                            {veiculo.placa}
+                        </Button>
+                    </OverlayTrigger>
                     {veiculosSelecionados.includes(index) && listarManutencoes(manutencao)}
                 </div>
             );
@@ -98,11 +116,11 @@ export default function TelaAlertaManutencao(props) {
     async function aplicarFiltro() {
         const startDate = dateRange.startDate ? dateRange.startDate.format('YYYY-MM-DD') : null;
         const endDate = dateRange.endDate ? dateRange.endDate.format('YYYY-MM-DD') : null;
-        const resposta = await dispatch(buscarManutencoesRelatorio({ inicio: startDate, fim: endDate }))
-        console.log(resposta.payload.status)
-        console.log(resposta.payload)
-        setListaManutencao(resposta.payload.listaManutencoes)
-        console.log(listaManutencao)
+        const resposta = await dispatch(buscarManutencoesRelatorio({ inicio: startDate, fim: endDate }));
+        console.log(resposta.payload.status);
+        console.log(resposta.payload);
+        setListaManutencao(resposta.payload.listaManutencoes);
+        console.log(listaManutencao);
     }
 
     return (
@@ -147,7 +165,7 @@ export default function TelaAlertaManutencao(props) {
                         </div>
 
                         <Card className="p-3 shadow-sm" style={{ borderRadius: '15px' }}>
-                            {listaManutencao.length > 0? (
+                            {listaManutencao.length > 0 ? (
                                 listaManutencao.map((veiculo, index) => listarVeiculos(veiculo, index))
                             ) : (
                                 <div className="text-center text-muted">
