@@ -12,7 +12,7 @@ import { saveAs } from 'file-saver';
 import { AlignmentType, Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, Header, ImageRun, WidthType } from "docx";
 import cabecalho from '../recursos/cabecalho.jpeg';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import './RelatorioRotas.css'; // Arquivo CSS para animações
+import './RelatorioRotas.css'; 
 
 export default function RelatorioRotas(props) {
     const dispatch = useDispatch();

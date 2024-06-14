@@ -15,8 +15,8 @@ export default function Menu(props) {
                     display: 'flex',
                     flexDirection: 'column',
                     boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-                    backgroundColor: 'white', // Adiciona a cor de fundo branca
-                    opacity: 1, // Assegura que a opacidade esteja em 100%
+                    backgroundColor: 'white', 
+                    opacity: 1, 
                     borderRadius: '10px',
                     padding: '2%',
                 }}>
@@ -54,7 +54,7 @@ export default function Menu(props) {
                             <div className="imagem-botao w-100 hover-scale rounded shadow">
                                 <NavLink to="/registrar-manutencao" className="nav-link" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                                     <FaTools style={{ width: '50%', height: '50%', marginTop: '40px' }} />
-                                    <p style={{ fontSize: '30px', marginTop: '40px', marginBottom: '20px' }}>Registrar Manutenção</p>
+                                    <p style={{ marginLeft: '65px', fontSize: '30px', marginTop: '40px', marginBottom: '20px' }}>Registrar Manutenção</p>
                                 </NavLink>
                             </div>
                         </Col>
