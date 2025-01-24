@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ESTADO from '../recursos/estado';
-const urlBase = 'http://localhost:8080/alocar-alunos';
+const urlBase = 'https://projetodecel-backend-production-85a1.up.railway.app/alocar-alunos';
 
 export const atualizarInscricoes = createAsyncThunk('alocar-alunos/atualizar-inscricoes', async (inscricoes) => {
     const resposta = await fetch(urlBase + '/atualizar-inscricoes', {

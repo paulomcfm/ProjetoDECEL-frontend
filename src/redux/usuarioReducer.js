@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ESTADO from '../recursos/estado.js';
-
-const urlBase = 'http://localhost:8080/usuario';
+const urlBase = 'https://projetodecel-backend-production-85a1.up.railway.app/usuario';
 
 // Função para salvar o estado de autenticação no localStorage
 const saveAuthToLocalStorage = (state) => {

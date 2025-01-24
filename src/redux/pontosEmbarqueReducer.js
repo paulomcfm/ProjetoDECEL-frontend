@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ESTADO from '../recursos/estado';
-const urlBase = 'http://localhost:8080/pontos-embarque';
-// const urlBase = 'http://localhost:8080/pontos-embarque';
+const urlBase = 'https://projetodecel-backend-production-85a1.up.railway.app/pontos-embarque';
 
 export const buscarPontosEmbarque = createAsyncThunk('pontos-embarque/buscar', async () => {
     try {

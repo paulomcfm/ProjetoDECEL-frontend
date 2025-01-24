@@ -1,8 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ESTADO from '../recursos/estado';
-
-const urlBase = 'http://localhost:8080/definir-rota';
-
+const urlBase = 'https://projetodecel-backend-production-85a1.up.railway.app/definir-rota';
 
 export const buscarRotas = createAsyncThunk('rotas/buscar', async (filtro) => {
     try {
