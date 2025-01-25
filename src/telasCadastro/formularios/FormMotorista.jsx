@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
+import { Row, Col } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import validarCelular from '../../validacoes/validarCelular';
 import InputMask from 'react-input-mask';

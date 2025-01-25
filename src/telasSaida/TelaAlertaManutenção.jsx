@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Row, Col, Form, Container, Card, Table, OverlayTrigger, Popover, Modal } from 'react-bootstrap';
-import { DateRangePicker } from 'react-dates';
 import 'moment/locale/pt-br';
-import 'react-dates/lib/css/_datepicker.css';
 import { CSSTransition } from 'react-transition-group';
 import Pagina from '../templates/Pagina.jsx';
-import 'react-dates/initialize';
 import './telacss.css';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { buscarManutencoesRelatorio } from '../redux/manutencaoReducer.js';
 
 export default function TelaAlertaManutencao(props) {
     const [filtroPlaca, setFiltroPlaca] = useState('');
-    const [dateRange, setDateRange] = useState({ startDate: null, endDate: null });
-    const [focusedInput, setFocusedInput] = useState(null);
+    const [dateRange, setDateRange] = useState([null, null]);
+    const [startDate, endDate] = dateRange;
     const [listaManutencao, setListaManutencao] = useState([]);
     const dispatch = useDispatch();
 
@@ -140,21 +139,15 @@ export default function TelaAlertaManutencao(props) {
                 <Row className="justify-content-center" style={{ marginTop: '10px' }}>
                     <Col xs={12} md={8} lg={6}>
                         <div className="justify-content-center" style={{ marginLeft: '110px', marginBottom: '10px' }}>
-                            <DateRangePicker
-                                startDate={dateRange.startDate}
-                                startDateId="startDate"
-                                endDate={dateRange.endDate}
-                                endDateId="endDate"
-                                onDatesChange={({ startDate, endDate }) => setDateRange({ startDate, endDate })}
-                                focusedInput={focusedInput}
-                                onFocusChange={setFocusedInput}
-                                isOutsideRange={() => false}
-                                displayFormat="DD/MM/YYYY"
-                                numberOfMonths={1}
-                                showClearDates={true}
-                                startDatePlaceholderText="Início"
-                                endDatePlaceholderText="Fim"
-                                locale="pt-br"
+                            <DatePicker
+                                selected={startDate}
+                                onChange={(dates) => setDateRange(dates)}
+                                startDate={startDate}
+                                endDate={endDate}
+                                selectsRange
+                                isClearable
+                                placeholderText="Selecione um intervalo de datas"
+                                dateFormat="dd/MM/yyyy"
                             />
                             <Button
                                 style={{ marginLeft: '10px' }}

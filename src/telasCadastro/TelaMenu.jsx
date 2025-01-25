@@ -8,8 +8,8 @@ import { FaRoute, FaBus, FaTools } from "react-icons/fa";
 
 export default function Menu(props) {
     return (
-        <div className="background-image">
-            <Pagina>
+        <div className="background-image" basename = '/ProjetoDECEL-frontend'>
+            <Pagina >
                 <Container style={{
                     marginTop: '40px',
                     display: 'flex',
