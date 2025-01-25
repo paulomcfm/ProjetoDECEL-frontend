@@ -35,7 +35,7 @@ function App() {
 
   return (
     <div className="App">
-      <Routes>
+      <Routes basename = '/ProjetoDECEL-frontend'>
         <Route path='/' element={<TelaLogin />} />
         <Route path='/esqueci-senha' element={<TelaEsqueci />} />
         <Route path='/codigo' element={<TelaCodigo />} />
