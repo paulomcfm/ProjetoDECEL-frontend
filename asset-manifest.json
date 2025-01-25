@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/static/css/main.1838429a.css",
-    "main.js": "/static/js/main.9b91b49a.js",
-    "static/media/logodecel.png": "/static/media/logodecel.f932cd60af7593ca6359.png",
-    "static/media/cabecalho.jpeg": "/static/media/cabecalho.4e47404a752f6b10bd9b.jpeg",
-    "static/media/avatarPadrao.png": "/static/media/avatarPadrao.a04ee5ee63828fb16d2c.png",
-    "static/media/fundo.png": "/static/media/fundo.23e85c4e5672ec11ef9e.png",
-    "index.html": "/index.html",
-    "main.1838429a.css.map": "/static/css/main.1838429a.css.map",
-    "main.9b91b49a.js.map": "/static/js/main.9b91b49a.js.map"
+    "main.css": "/ProjetoDECEL-frontend/menu/static/css/main.bb34aa86.css",
+    "main.js": "/ProjetoDECEL-frontend/menu/static/js/main.7716e192.js",
+    "static/media/logodecel.png": "/ProjetoDECEL-frontend/menu/static/media/logodecel.f932cd60af7593ca6359.png",
+    "static/media/cabecalho.jpeg": "/ProjetoDECEL-frontend/menu/static/media/cabecalho.4e47404a752f6b10bd9b.jpeg",
+    "static/media/avatarPadrao.png": "/ProjetoDECEL-frontend/menu/static/media/avatarPadrao.a04ee5ee63828fb16d2c.png",
+    "static/media/fundo.png": "/ProjetoDECEL-frontend/menu/static/media/fundo.23e85c4e5672ec11ef9e.png",
+    "index.html": "/ProjetoDECEL-frontend/menu/index.html",
+    "main.bb34aa86.css.map": "/ProjetoDECEL-frontend/menu/static/css/main.bb34aa86.css.map",
+    "main.7716e192.js.map": "/ProjetoDECEL-frontend/menu/static/js/main.7716e192.js.map"
   },
   "entrypoints": [
-    "static/css/main.1838429a.css",
-    "static/js/main.9b91b49a.js"
+    "static/css/main.bb34aa86.css",
+    "static/js/main.7716e192.js"
   ]
 }
