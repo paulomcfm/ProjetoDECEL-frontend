@@ -1,7 +1,7 @@
 {
   "name": "decel-frontend",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "dependencies": {
     "@react-google-maps/api": "^2.19.3",
     "@reduxjs/toolkit": "^2.2.2",
