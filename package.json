@@ -1,4 +1,5 @@
 {
+  "homepage": "https://paulomcfm.github.io/ProjetoDECEL-frontend/menu",
   "name": "decel-frontend",
   "version": "0.1.0",
   "private": false,
@@ -13,7 +14,6 @@
     "date-fns": "^3.6.0",
     "docx": "^8.5.0",
     "file-saver": "^2.0.5",
-    "gh-pages": "^6.3.0",
     "js-file-download": "^0.4.12",
     "moment": "^2.30.1",
     "nodemailer": "^6.9.13",
@@ -35,12 +35,11 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "deploy": "gh-pages -d build",
-    "predeploy": "npm run build",
-    "homepage": "https://paulomcfm.github.io/ProjetoDECEL-frontend/menu"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -61,6 +60,7 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "gh-pages": "^6.3.0"
   }
 }
